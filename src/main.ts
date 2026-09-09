@@ -1,16 +1,20 @@
 // The ledger window: three big dials, a legend, the full conversation list,
 // and the calibration/settings dialog.
-import { applySavedTheme, bindThemeButton } from "./shared/theme";
+import { applySavedTheme, bindThemeButton, effectiveTheme } from "./shared/theme";
 import {
-  calibrate, getAutostart, getHome, getSettings, getSnapshot, onOpenSettings, onSnapshot,
-  refreshNow, setAutostart, updateSettings,
+  broadcastScheme, calibrate, getAutostart, getHome, getSettings, getSnapshot, onOpenSettings,
+  onSchemeChanged, onSnapshot, refreshNow, setAutostart, updateSettings,
 } from "./shared/bridge";
 import { convColor, modelColor, paint, paceNote } from "./shared/color";
 import { entryName, esc, hhmm, setHome, short, tidy, tok, until, usd, when } from "./shared/format";
 import { grow, numText, ringArcs } from "./shared/ring";
+import {
+  applyScheme, CUSTOM_ID, currentSchemeId, customScheme, GROUPS, paletteOf, SCHEMES, saveCustom, setScheme,
+} from "./shared/schemes";
 import type { CalibrationInput, Entry, GroupKey, Settings, Snapshot, WeeklyReset, WindowOut } from "./shared/types";
 
 applySavedTheme();
+applyScheme();
 
 const BR = 58;
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -187,6 +191,7 @@ $("refresh").addEventListener("click", async () => {
 });
 $("calibrate").addEventListener("click", openSettingsDialog);
 bindThemeButton($("themebtn"));
+$("themebtn").addEventListener("click", () => { if (dlg.open) renderSchemes(); });
 
 // ---------- settings dialog ----------
 
@@ -221,6 +226,7 @@ async function openSettingsDialog(): Promise<void> {
   ($("f_weekly") as HTMLInputElement).placeholder = hint(s.calibration.weekly);
   ($("f_fable") as HTMLInputElement).placeholder = hint(s.calibration.fable);
   $("f_err").textContent = "";
+  renderSchemes();
   dlg.showModal();
 }
 
@@ -255,6 +261,99 @@ $("settingsForm").addEventListener("submit", async (e) => {
   }
 });
 
+
+// ---------- appearance ----------
+
+// Which palette the custom editor is editing — not necessarily the one showing,
+// since a scheme carries both and the theme button decides which is on screen.
+let cmode: "light" | "dark" = "light";
+
+const SWATCH = ["--ground", "--accent", "--m-fable51", "--m-sonnet5", "--m-opus5", "--ink"];
+
+function schemeCard(id: string, name: string, note: string, cur: string, mode: "light" | "dark"): string {
+  const p = paletteOf(id, mode);
+  const sw = SWATCH.map((v) => `<i style="background:${p[v]}"></i>`).join("");
+  return `<button type="button" class="scard" role="radio" data-scheme="${id}" aria-checked="${id === cur}">
+    <span class="sw">${sw}</span><b>${esc(name)}</b><span>${esc(note)}</span></button>`;
+}
+
+function renderSchemes(): void {
+  const cur = currentSchemeId();
+  const mode = effectiveTheme();
+  const custom = customScheme();
+  const n = Object.keys(custom.light).length + Object.keys(custom.dark).length;
+  $("f_schemes").innerHTML =
+    SCHEMES.map((s) => schemeCard(s.id, s.name, s.note, cur, mode)).join("") +
+    schemeCard(CUSTOM_ID, "Custom", n ? `${n} color${n === 1 ? "" : "s"} of your own` : "pick every color yourself", cur, mode);
+  $("f_schemes").querySelectorAll<HTMLButtonElement>(".scard").forEach((b) =>
+    b.addEventListener("click", () => chooseScheme(b.dataset.scheme!)));
+  $("f_custom").hidden = cur !== CUSTOM_ID;
+  if (cur === CUSTOM_ID) renderCustom();
+}
+
+function chooseScheme(id: string): void {
+  const from = currentSchemeId();
+  if (id === CUSTOM_ID) {
+    // Switching in with nothing of your own yet: start from what you were
+    // looking at, so the pickers open on the palette you just had.
+    const c = customScheme();
+    if (!Object.keys(c.light).length && !Object.keys(c.dark).length) {
+      saveCustom({ light: paletteOf(from, "light"), dark: paletteOf(from, "dark") });
+    }
+    cmode = effectiveTheme();
+  }
+  setScheme(id);
+  void broadcastScheme();
+  renderSchemes();
+}
+
+function renderCustom(): void {
+  const showing = effectiveTheme();
+  $("f_cnote").textContent = cmode === showing
+    ? `Editing the ${cmode} palette — the one on screen now.`
+    : `Editing the ${cmode} palette. The app is showing ${showing}, so these changes won't appear until you switch themes.`;
+  $("f_cmode").querySelectorAll<HTMLButtonElement>("button").forEach((b) =>
+    b.setAttribute("aria-pressed", String(b.dataset.mode === cmode)));
+  const p = paletteOf(CUSTOM_ID, cmode);
+  $("f_colors").innerHTML = GROUPS.map((g) => `<div class="cgroup"><h4>${esc(g.name)}</h4><div class="cswatches">${
+    g.tokens.map((t) => `<label class="citem">
+      <input type="color" value="${p[t.v]}" data-var="${t.v}" aria-label="${esc(g.name)} — ${esc(t.label)}">
+      <span class="cl"><b>${esc(t.label)}</b><code>${p[t.v]}</code></span></label>`).join("")
+  }</div></div>`).join("");
+  $("f_colors").querySelectorAll<HTMLInputElement>("input[type=color]").forEach((i) =>
+    i.addEventListener("input", () => {
+      const c = customScheme();
+      c[cmode][i.dataset.var!] = i.value;
+      saveCustom(c);
+      applyScheme();
+      void broadcastScheme();
+      const code = i.parentElement!.querySelector("code");
+      if (code) code.textContent = i.value;
+    }));
+}
+
+$("f_cmode").querySelectorAll<HTMLButtonElement>("button").forEach((b) =>
+  b.addEventListener("click", () => { cmode = b.dataset.mode as "light" | "dark"; renderCustom(); }));
+
+$("f_cseed").addEventListener("change", () => {
+  const sel = $("f_cseed") as HTMLSelectElement;
+  if (!sel.value) return;
+  saveCustom({ light: paletteOf(sel.value, "light"), dark: paletteOf(sel.value, "dark") });
+  sel.value = "";
+  applyScheme();
+  void broadcastScheme();
+  renderSchemes();
+});
+
+$("f_creset").addEventListener("click", () => {
+  saveCustom({ light: {}, dark: {} });
+  applyScheme();
+  void broadcastScheme();
+  renderSchemes();
+});
+
+($("f_cseed") as HTMLSelectElement).append(...SCHEMES.map((s) => new Option(s.name, s.id)));
+
 // ---------- boot ----------
 
 (async () => {
@@ -266,4 +365,5 @@ $("settingsForm").addEventListener("submit", async (e) => {
   }
   await onSnapshot(apply);
   await onOpenSettings(openSettingsDialog);
+  await onSchemeChanged(() => { applyScheme(); if (dlg.open) renderSchemes(); });
 })();

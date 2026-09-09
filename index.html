@@ -88,6 +88,23 @@
         <div class="frow"><label for="f_boost">Boost note</label><input type="text" id="f_boost" placeholder="Weekly limit 50% higher through Sep 13"></div>
       </fieldset>
       <fieldset>
+        <legend>Appearance</legend>
+        <div class="frow"><span class="hint">Schemes apply immediately, to this window and the widget. Each one carries a light and a dark palette; the theme button still picks which is showing.</span></div>
+        <div class="schemes" id="f_schemes" role="radiogroup" aria-label="Color scheme"></div>
+        <div id="f_custom" hidden>
+          <div class="crow">
+            <div class="segbtns" id="f_cmode" role="group" aria-label="Palette being edited">
+              <button type="button" data-mode="light" aria-pressed="true">Light palette</button>
+              <button type="button" data-mode="dark" aria-pressed="false">Dark palette</button>
+            </div>
+            <select id="f_cseed" aria-label="Copy colors from a scheme"><option value="">Copy from…</option></select>
+            <button class="btn" type="button" id="f_creset">Reset custom</button>
+          </div>
+          <div class="hint" id="f_cnote"></div>
+          <div class="cgrid" id="f_colors"></div>
+        </div>
+      </fieldset>
+      <fieldset>
         <legend>App</legend>
         <div class="frow"><label for="f_dir">Claude config dir</label><input type="text" id="f_dir" placeholder="auto (~/.claude or $CLAUDE_CONFIG_DIR)"></div>
         <div class="frow"><span class="hint">Changing this discards the index and rescans.</span></div>

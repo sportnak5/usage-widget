@@ -108,4 +108,27 @@ legend{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10px;letter-
 .frow input[type=checkbox]{width:16px;height:16px;accent-color:var(--accent)}
 .dfoot{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 20px 16px;border-top:1px solid var(--line);margin-top:10px}
 .err{color:var(--crit);font-size:12.5px;flex:1}
+/* appearance: scheme cards and the custom palette editor */
+.schemes{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:8px}
+.scard{display:flex;flex-direction:column;gap:6px;text-align:left;padding:8px 9px;border:1px solid var(--line);
+  border-radius:var(--r);background:var(--surface);cursor:pointer;font:inherit;color:var(--ink);transition:border-color .12s,box-shadow .12s}
+.scard:hover{border-color:var(--faint)}
+.scard[aria-checked="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.scard b{font-size:12.5px;font-weight:600;line-height:1.2}
+.scard span{font-size:10.5px;color:var(--faint);line-height:1.25}
+.scard .sw{display:flex;gap:0;border-radius:4px;overflow:hidden;height:14px;border:1px solid var(--line-soft)}
+.scard .sw i{flex:1}
+.crow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:4px}
+.crow select{font:inherit;font-size:12.5px;color:var(--ink);background:var(--ground);border:1px solid var(--line);border-radius:6px;padding:5px 8px}
+#f_cnote{font-size:11.5px;color:var(--faint)}
+.cgrid{display:flex;flex-direction:column;gap:10px}
+.cgroup{display:flex;flex-direction:column;gap:6px}
+.cgroup h4{margin:0;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--faint);font-weight:500}
+.cswatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:6px}
+.citem{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--ink-2);min-width:0}
+.citem input[type=color]{width:26px;height:22px;flex:none;padding:0;border:1px solid var(--line);border-radius:5px;background:var(--surface);cursor:pointer}
+.citem .cl{display:flex;flex-direction:column;min-width:0}
+.citem .cl b{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.citem .cl code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10px;color:var(--faint)}
 @media (max-width:700px){.bigdials{grid-template-columns:1fr}.lhead,.row{grid-template-columns:14px minmax(0,1fr) 92px;gap:9px}.lhead .h-raw,.row .raw,.lhead .h-mix,.row .mix{display:none}.detail{padding-left:16px}.frow{grid-template-columns:1fr}.frow .hint{grid-column:1}}

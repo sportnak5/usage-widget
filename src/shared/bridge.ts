@@ -10,15 +10,18 @@ const inTauri = typeof window !== "undefined" && "__TAURI_INTERNALS__" in window
 
 type Invoke = <T>(cmd: string, args?: Record<string, unknown>) => Promise<T>;
 type Listen = <T>(event: string, cb: (e: { payload: T }) => void) => Promise<() => void>;
+type Emit = (event: string, payload?: unknown) => Promise<void>;
 
 let invoke: Invoke;
 let listen: Listen;
+let emit: Emit;
 
 if (inTauri) {
   const core = await import("@tauri-apps/api/core");
   const ev = await import("@tauri-apps/api/event");
   invoke = core.invoke as Invoke;
   listen = ev.listen as Listen;
+  emit = ev.emit as Emit;
 } else {
   let cached: Snapshot | null = null;
   const devSnapshot = async (): Promise<Snapshot | null> => {
@@ -44,6 +47,7 @@ if (inTauri) {
     }
   }) as Invoke;
   listen = (async () => () => {}) as Listen;
+  emit = (async () => {}) as Emit;
 }
 
 export const isNative = inTauri;
@@ -64,6 +68,11 @@ export const setAutostart = (on: boolean) => invoke<void>("set_autostart", { on 
 
 export const onSnapshot = (cb: (s: Snapshot) => void) => listen<Snapshot>("snapshot", (e) => cb(e.payload));
 export const onOpenSettings = (cb: () => void) => listen<void>("open-settings", () => cb());
+
+// Appearance lives in localStorage, which the two webviews share but do not get
+// storage events across, so a change is announced explicitly.
+export const broadcastScheme = () => emit("scheme-changed");
+export const onSchemeChanged = (cb: () => void) => listen<void>("scheme-changed", () => cb());
 
 /** Window drag has to come from the window API; a no-op in the browser. */
 export async function startDragging(): Promise<void> {

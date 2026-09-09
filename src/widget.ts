@@ -2,13 +2,15 @@
 // dial labels (re-scope the rows), the chevron (expand in place), ring hover
 // (model tooltip), drag on the chrome, and double-click to open the ledger.
 import { applySavedTheme } from "./shared/theme";
-import { getHome, getSnapshot, onSnapshot, openMain, openSettings, setWidgetExpanded, startDragging } from "./shared/bridge";
+import { getHome, getSnapshot, onSchemeChanged, onSnapshot, openMain, openSettings, setWidgetExpanded, startDragging } from "./shared/bridge";
 import { modelColor, paint, paceNote } from "./shared/color";
 import { basename, esc, hhmm, setHome, short, tidy, tok, until } from "./shared/format";
 import { grow, numText, ringArcs } from "./shared/ring";
+import { applyScheme } from "./shared/schemes";
 import type { Snapshot, WindowOut } from "./shared/types";
 
 applySavedTheme();
+applyScheme();
 
 const R = 24.5;
 const SHORT = ["Session", "Weekly", "Fable"];
@@ -123,4 +125,5 @@ document.addEventListener("contextmenu", (e) => e.preventDefault());
   if (s) apply(s);
   else $("dials").innerHTML = `<span class="wempty">Reading transcripts…</span>`;
   await onSnapshot(apply);
+  await onSchemeChanged(applyScheme);
 })();
