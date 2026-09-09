@@ -25,29 +25,79 @@ export function ringArcs(r: number, segs: Segment[], fill: number, restLabel: st
 
 const still = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-/** Animate every arc and number under `root` from zero to its data value. */
+interface Prev { arcs: Record<string, [string, string]>; nums: Record<string, number> }
+
+// Where each re-render leaves its rings, so the next one can start there
+// instead of snapping back to zero. Keyed by container element.
+const lastState = new WeakMap<ParentNode, Prev>();
+
+/** Stable key for an arc: which ring it belongs to, its colour, and its rank among same-coloured arcs. */
+function keyOf(root: ParentNode, el: Element, seen: Map<string, number>): string {
+  const svgs = Array.from(root.querySelectorAll("svg"));
+  const ring = svgs.indexOf(el.closest("svg") as SVGSVGElement);
+  const base = `${ring}:${el.getAttribute("stroke") ?? ""}`;
+  const n = seen.get(base) ?? 0;
+  seen.set(base, n + 1);
+  return `${base}:${n}`;
+}
+
+function numKey(root: ParentNode, el: Element): string {
+  const svgs = Array.from(root.querySelectorAll("svg"));
+  return String(svgs.indexOf(el.closest("svg") as SVGSVGElement));
+}
+
+/**
+ * Animate every arc and number under `root` to its data value — from where the
+ * previous render of this container left them, so a refresh nudges the ring
+ * forward instead of redrawing it from zero. First render starts at zero.
+ */
 export function grow(root: ParentNode, dur = 900): void {
   const quiet = still();
+  const prev = lastState.get(root);
+  const next: Prev = { arcs: {}, nums: {} };
+  const seen = new Map<string, number>();
+
   root.querySelectorAll<SVGCircleElement>(".arc[data-len]").forEach((a) => {
-    const set = () => a.setAttribute("stroke-dasharray", `${a.dataset.len} 999`);
+    const key = keyOf(root, a, seen);
+    const len = a.dataset.len ?? "0";
+    const off = a.getAttribute("stroke-dashoffset") ?? "0";
+    next.arcs[key] = [len, off];
+    const from = prev?.arcs[key];
+    if (from && !quiet) {
+      // Start where the last render ended, then transition to the new value.
+      a.setAttribute("stroke-dasharray", `${from[0]} 999`);
+      a.setAttribute("stroke-dashoffset", from[1]);
+    }
+    const set = () => {
+      a.setAttribute("stroke-dasharray", `${len} 999`);
+      a.setAttribute("stroke-dashoffset", off);
+    };
     // A timer, not rAF: rAF is paused in a hidden window, and a widget that
     // was hidden when data arrived would show empty rings until it repainted.
     quiet ? set() : setTimeout(set, 30);
   });
+
   root.querySelectorAll<SVGTextElement>(".num[data-v]").forEach((t) => {
     const digits = t.querySelector<SVGTSpanElement>(".v");
     if (!digits) return;
-    if (t.dataset.v === "") { digits.textContent = "—"; return; }
+    const key = numKey(root, t);
+    if (t.dataset.v === "") { digits.textContent = "\u2014"; return; }
     const v = Number(t.dataset.v);
+    next.nums[key] = v;
     if (quiet) { digits.textContent = String(Math.round(v)); return; }
+    const from = prev?.nums[key] ?? 0;
+    if (Math.round(from) === Math.round(v)) { digits.textContent = String(Math.round(v)); return; }
+    digits.textContent = String(Math.round(from));
     const t0 = performance.now();
     const step = (now: number) => {
       const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3);
-      digits.textContent = String(Math.round(v * e));
+      digits.textContent = String(Math.round(from + (v - from) * e));
       if (k < 1) requestAnimationFrame(step);
     };
     requestAnimationFrame(step);
   });
+
+  lastState.set(root, next);
 }
 
 /** `<text>` with a big number and a small unit, or an em dash when unknown. */
