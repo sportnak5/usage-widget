@@ -2,6 +2,7 @@
 //! commands the pages call. All logic lives in `engine`; this file only
 //! wires it to the OS.
 
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
 use std::time::Duration;
 
@@ -9,7 +10,7 @@ use chrono::Utc;
 use serde::Deserialize;
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
-use tauri::{AppHandle, Emitter, LogicalSize, Manager, PhysicalPosition, State, WindowEvent};
+use tauri::{AppHandle, Emitter, LogicalPosition, LogicalSize, Manager, State, WindowEvent};
 use tauri_plugin_autostart::{MacosLauncher, ManagerExt};
 
 use crate::engine::{CalibrationInput, Engine};
@@ -19,11 +20,17 @@ use crate::settings::{Settings, WidgetGeometry};
 pub struct AppState {
     engine: Mutex<Engine>,
     snapshot: Mutex<Option<Snapshot>>,
+    /// Creating the widget window emits a Moved event of its own, before the
+    /// remembered position has been applied. Until the position *we* chose is
+    /// on the window, a move is the window server talking, not the user.
+    widget_placed: AtomicBool,
 }
 
 const WIDGET_MIN_W: f64 = 380.0;
 const WIDGET_MAX_W: f64 = 640.0;
 const WIDGET_H: f64 = 84.0;
+const WIDGET_MIN_SCALE: f64 = 0.6;
+const WIDGET_MAX_SCALE: f64 = 3.0;
 
 fn lock<'a, T>(m: &'a Mutex<T>) -> std::sync::MutexGuard<'a, T> {
     m.lock().unwrap_or_else(|p| p.into_inner())
@@ -68,11 +75,91 @@ fn show_main(app: &AppHandle) {
 fn show_widget(app: &AppHandle) {
     let Some(w) = app.get_webview_window("widget") else { return };
     let state = app.state::<AppState>();
-    let geom = lock(&state.engine).settings.widget.clone();
-    if let Some(g) = geom {
-        let _ = w.set_position(tauri::Position::Physical(PhysicalPosition { x: g.x, y: g.y }));
+    let (geom, on_top) = {
+        let eng = lock(&state.engine);
+        (eng.settings.widget.clone(), eng.settings.widget_on_top)
+    };
+    let pos = geom
+        .filter(|g| on_a_monitor(&w, g.x, g.y))
+        .map(|g| LogicalPosition { x: g.x as f64, y: g.y as f64 })
+        // Saved on a display that is gone, or asleep: park it where it can be
+        // seen rather than showing it off the edge of every screen.
+        .or_else(|| default_widget_position(&w));
+    if let Some(p) = pos {
+        let (ox, oy) = crate::platform::desktop_offset(w.scale_factor().unwrap_or(1.0));
+        let _ = w.set_position(tauri::Position::Logical(LogicalPosition { x: p.x - ox, y: p.y - oy }));
+    }
+    state.widget_placed.store(true, Ordering::Relaxed);
+    apply_widget_layer(&w, on_top);
+    let _ = w.show();
+}
+
+/// The display holding the menu bar: on macOS the global coordinate space is
+/// anchored to it, so it is the one at the origin. `primary_monitor` does not
+/// agree when a second display sits above and to the left of it.
+fn main_monitor(w: &tauri::WebviewWindow) -> Option<tauri::Monitor> {
+    let monitors = w.available_monitors().ok()?;
+    monitors
+        .iter()
+        .find(|m| m.position().x == 0 && m.position().y == 0)
+        .cloned()
+        .or_else(|| w.primary_monitor().ok().flatten())
+        .or_else(|| w.current_monitor().ok().flatten())
+}
+
+/// Is the widget's top-left corner inside a display that exists right now?
+/// Everything here is in logical points: that is the space the saved geometry
+/// is in, and the one the OS lays displays out in.
+fn on_a_monitor(w: &tauri::WebviewWindow, x: i32, y: i32) -> bool {
+    let Ok(monitors) = w.available_monitors() else { return true };
+    monitors.iter().any(|m| {
+        let p: LogicalPosition<f64> = m.position().to_logical(m.scale_factor());
+        let s: tauri::LogicalSize<f64> = m.size().to_logical(m.scale_factor());
+        let (x, y) = (x as f64, y as f64);
+        // A whole corner of the card, not just the pixel, has to be on screen.
+        x >= p.x && y >= p.y && x + 60.0 <= p.x + s.width && y + 40.0 <= p.y + s.height
+    })
+}
+
+/// Top-right of the main display, inset far enough to clear the menu bar.
+fn default_widget_position(w: &tauri::WebviewWindow) -> Option<LogicalPosition<f64>> {
+    let m = main_monitor(w)?;
+    let p: LogicalPosition<f64> = m.position().to_logical(m.scale_factor());
+    let s: tauri::LogicalSize<f64> = m.size().to_logical(m.scale_factor());
+    let size: tauri::LogicalSize<f64> = w
+        .outer_size()
+        .map(|z| z.to_logical(w.scale_factor().unwrap_or(1.0)))
+        .unwrap_or(tauri::LogicalSize { width: 466.0, height: 87.0 });
+    Some(LogicalPosition { x: p.x + (s.width - size.width - 40.0).max(0.0), y: p.y + 60.0 })
+}
+
+/// Put the widget back on the main display and show it — the escape hatch when
+/// it is parked on a display that is no longer there.
+fn reset_widget_position(app: &AppHandle) {
+    let Some(w) = app.get_webview_window("widget") else { return };
+    if let Some(p) = default_widget_position(&w) {
+        let _ = w.set_position(tauri::Position::Logical(p));
+        let state = app.state::<AppState>();
+        let mut eng = lock(&state.engine);
+        let cur = eng.settings.widget.clone();
+        eng.settings.widget = Some(WidgetGeometry {
+            x: p.x as i32,
+            y: p.y as i32,
+            expanded: cur.as_ref().map(|g| g.expanded).unwrap_or(false),
+            scale: cur.as_ref().map(|g| g.scale).unwrap_or(1.0),
+        });
+        eng.settings.show_widget = true;
+        eng.save();
     }
     let _ = w.show();
+}
+
+/// Where the widget sits in the window stack: floating above everything, or
+/// parked below normal windows so it reads as part of the desktop.
+fn apply_widget_layer(w: &tauri::WebviewWindow, on_top: bool) {
+    let _ = w.set_always_on_top(on_top);
+    let _ = w.set_always_on_bottom(!on_top);
+    crate::platform::pin_to_desktop(w, !on_top);
 }
 
 fn toggle_widget(app: &AppHandle) {
@@ -132,6 +219,7 @@ pub struct SettingsPatch {
     pub claude_dir: Option<String>,
     pub refresh_secs: Option<u64>,
     pub show_widget: Option<bool>,
+    pub widget_on_top: Option<bool>,
     pub plan: Option<String>,
     pub boost: Option<String>,
     pub theme: Option<String>,
@@ -159,6 +247,9 @@ fn update_settings(app: AppHandle, patch: SettingsPatch) -> Result<Snapshot, Str
         if let Some(v) = patch.show_widget {
             eng.settings.show_widget = v;
         }
+        if let Some(v) = patch.widget_on_top {
+            eng.settings.widget_on_top = v;
+        }
         if let Some(p) = patch.plan {
             eng.settings.plan = p;
         }
@@ -172,7 +263,11 @@ fn update_settings(app: AppHandle, patch: SettingsPatch) -> Result<Snapshot, Str
     }
     if let Some(w) = app.get_webview_window("widget") {
         let state = app.state::<AppState>();
-        let want = lock(&state.engine).settings.show_widget;
+        let (want, on_top) = {
+            let eng = lock(&state.engine);
+            (eng.settings.show_widget, eng.settings.widget_on_top)
+        };
+        apply_widget_layer(&w, on_top);
         if want {
             show_widget(&app);
         } else {
@@ -206,20 +301,34 @@ fn hide_widget(app: AppHandle) {
 
 /// The widget page measured itself; resize the OS window to match.
 #[tauri::command]
-fn set_widget_expanded(app: AppHandle, expanded: bool, width: f64, height: f64) -> Result<(), String> {
+fn set_widget_expanded(
+    app: AppHandle,
+    expanded: bool,
+    width: f64,
+    height: f64,
+    scale: f64,
+) -> Result<(), String> {
     let w = app.get_webview_window("widget").ok_or("no widget window")?;
-    let h = height.clamp(WIDGET_H, 600.0);
-    let wd = width.clamp(WIDGET_MIN_W, WIDGET_MAX_W);
+    // The card is zoomed, so the bounds it may occupy scale with it.
+    let k = scale.clamp(WIDGET_MIN_SCALE, WIDGET_MAX_SCALE);
+    let h = height.clamp(WIDGET_H * k, 600.0 * k);
+    let wd = width.clamp(WIDGET_MIN_W * k, WIDGET_MAX_W * k);
     w.set_size(tauri::Size::Logical(LogicalSize { width: wd, height: h }))
         .map_err(|e| e.to_string())?;
     let state = app.state::<AppState>();
     let mut eng = lock(&state.engine);
-    let pos = w.outer_position().ok();
+    let sf = w.scale_factor().unwrap_or(1.0);
+    let (ox, oy) = crate::platform::desktop_offset(sf);
+    let pos = w.outer_position().ok().map(|p| {
+        let l: LogicalPosition<f64> = p.to_logical(sf);
+        ((l.x + ox) as i32, (l.y + oy) as i32)
+    });
     let cur = eng.settings.widget.clone();
     eng.settings.widget = Some(WidgetGeometry {
-        x: pos.map(|p| p.x).or(cur.as_ref().map(|c| c.x)).unwrap_or(0),
-        y: pos.map(|p| p.y).or(cur.as_ref().map(|c| c.y)).unwrap_or(0),
+        x: pos.map(|p| p.0).or(cur.as_ref().map(|c| c.x)).unwrap_or(0),
+        y: pos.map(|p| p.1).or(cur.as_ref().map(|c| c.y)).unwrap_or(0),
         expanded,
+        scale: k,
     });
     let _ = eng.settings.save(&eng.settings_path);
     Ok(())
@@ -243,9 +352,23 @@ pub fn run() {
     let show_widget_at_start = engine.settings.show_widget;
     let calibrated = engine.settings.calibration.session.is_some();
 
-    tauri::Builder::default()
+    #[allow(unused_mut)]
+    let mut builder = tauri::Builder::default();
+    // macOS reopens the running app; every other platform starts a second copy,
+    // tray icon and all, unless the first one is told to come forward instead.
+    #[cfg(not(target_os = "macos"))]
+    {
+        builder = builder.plugin(tauri_plugin_single_instance::init(|app, _argv, _cwd| {
+            show_main(app);
+        }));
+    }
+    builder
         .plugin(tauri_plugin_autostart::init(MacosLauncher::LaunchAgent, Some(vec!["--autostart"])))
-        .manage(AppState { engine: Mutex::new(engine), snapshot: Mutex::new(None) })
+        .manage(AppState {
+            engine: Mutex::new(engine),
+            snapshot: Mutex::new(None),
+            widget_placed: AtomicBool::new(false),
+        })
         .invoke_handler(tauri::generate_handler![
             get_snapshot,
             refresh_now,
@@ -265,6 +388,11 @@ pub fn run() {
 
             if show_widget_at_start {
                 show_widget(app.handle());
+            }
+            // Opening the app from Spotlight or the Dock should put something
+            // on screen. At login it should not: the tray owns the process.
+            if !std::env::args().any(|a| a == "--autostart") {
+                show_main(app.handle());
             }
             // First run: nothing is calibrated, so the widget can't show
             // percentages yet. Open the ledger with the calibration pane.
@@ -305,26 +433,51 @@ pub fn run() {
             WindowEvent::Moved(pos) if window.label() == "widget" => {
                 let app = window.app_handle();
                 let state = app.state::<AppState>();
+                if !state.widget_placed.load(Ordering::Relaxed) {
+                    return;
+                }
                 let mut eng = lock(&state.engine);
-                let expanded = eng.settings.widget.as_ref().map(|g| g.expanded).unwrap_or(false);
-                eng.settings.widget = Some(WidgetGeometry { x: pos.x, y: pos.y, expanded });
+                let cur = eng.settings.widget.clone();
+                let expanded = cur.as_ref().map(|g| g.expanded).unwrap_or(false);
+                let scale = cur.as_ref().map(|g| g.scale).unwrap_or(1.0);
+                // Moved carries physical pixels; set_position takes points, so
+                // storing raw pixels would double the position on every launch.
+                let sf = window.scale_factor().unwrap_or(1.0);
+                let p: LogicalPosition<f64> = pos.to_logical(sf);
+                let (ox, oy) = crate::platform::desktop_offset(sf);
+                eng.settings.widget = Some(WidgetGeometry {
+                    x: (p.x + ox) as i32,
+                    y: (p.y + oy) as i32,
+                    expanded,
+                    scale,
+                });
                 let _ = eng.settings.save(&eng.settings_path);
             }
             _ => {}
         })
-        .run(tauri::generate_context!())
-        .expect("error while running Token Ledger");
+        .build(tauri::generate_context!())
+        .expect("error while running Token Ledger")
+        .run(|_app, _event| {
+            // Dock or Spotlight click while the app is already running: macOS
+            // sends Reopen, and with every window hidden nothing would happen.
+            // The variant only exists on macOS, so the arm has to as well.
+            #[cfg(target_os = "macos")]
+            if let tauri::RunEvent::Reopen { .. } = _event {
+                show_main(_app);
+            }
+        });
 }
 
 fn build_tray(app: &AppHandle) -> tauri::Result<()> {
     let open = MenuItem::with_id(app, "open", "Open Token Ledger", true, None::<&str>)?;
     let widget = MenuItem::with_id(app, "widget", "Show / Hide Widget", true, None::<&str>)?;
+    let recenter = MenuItem::with_id(app, "recenter", "Reset Widget Position", true, None::<&str>)?;
     let refresh = MenuItem::with_id(app, "refresh", "Refresh Now", true, None::<&str>)?;
     let calibrate = MenuItem::with_id(app, "calibrate", "Calibrate…", true, None::<&str>)?;
     let quit = MenuItem::with_id(app, "quit", "Quit Token Ledger", true, None::<&str>)?;
     let menu = Menu::with_items(
         app,
-        &[&open, &widget, &refresh, &calibrate, &PredefinedMenuItem::separator(app)?, &quit],
+        &[&open, &widget, &recenter, &refresh, &calibrate, &PredefinedMenuItem::separator(app)?, &quit],
     )?;
 
     let mut tray = TrayIconBuilder::with_id("tray")
@@ -334,6 +487,7 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
         .on_menu_event(|app, e| match e.id.as_ref() {
             "open" => show_main(app),
             "widget" => toggle_widget(app),
+            "recenter" => reset_widget_position(app),
             "refresh" => {
                 let _ = do_refresh(app);
             }

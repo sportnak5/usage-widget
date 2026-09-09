@@ -14,6 +14,14 @@ pub struct WidgetGeometry {
     pub x: i32,
     pub y: i32,
     pub expanded: bool,
+    /// How far the card is zoomed. The widget has no reflowing layout, so a
+    /// resize scales the whole card instead of rearranging it.
+    #[serde(default = "unit_scale")]
+    pub scale: f64,
+}
+
+fn unit_scale() -> f64 {
+    1.0
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -28,6 +36,9 @@ pub struct Settings {
     pub prices: PriceTable,
     pub widget: Option<WidgetGeometry>,
     pub show_widget: bool,
+    /// Float the widget above every other window. Off by default: it sits at
+    /// desktop level, so ordinary windows cover it like a homescreen widget.
+    pub widget_on_top: bool,
     pub theme: Option<String>,
 }
 
@@ -42,6 +53,7 @@ impl Default for Settings {
             prices: PriceTable::default(),
             widget: None,
             show_widget: true,
+            widget_on_top: false,
             theme: None,
         }
     }

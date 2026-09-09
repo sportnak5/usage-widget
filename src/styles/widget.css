@@ -1,8 +1,12 @@
 /* The desktop widget: a transparent OS window whose only visible content is
    this card. Everything is sized so the collapsed card is ~400×82. */
 html,body{background:transparent;overflow:hidden;user-select:none;-webkit-user-select:none;cursor:default}
-.widget{background:var(--surface);border:1px solid var(--line);border-radius:11px;
+.widget{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:11px;
   box-shadow:var(--shadow);padding:9px 13px 10px;width:max-content;min-width:380px;max-width:640px}
+.grip{position:absolute;right:1px;bottom:1px;display:flex;padding:2px;color:var(--faint);
+  opacity:0;transition:opacity .12s;cursor:nwse-resize}
+.widget:hover .grip{opacity:.7}
+.grip:hover{opacity:1!important}
 .wrow{display:flex;align-items:center;gap:11px;white-space:nowrap}
 .dials{display:flex;align-items:stretch;gap:11px}
 .dial{display:flex;flex-direction:row;align-items:center;gap:8px;

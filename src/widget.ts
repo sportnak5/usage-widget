@@ -2,7 +2,10 @@
 // dial labels (re-scope the rows), the chevron (expand in place), ring hover
 // (model tooltip), drag on the chrome, and double-click to open the ledger.
 import { applySavedTheme } from "./shared/theme";
-import { getHome, getSnapshot, onSchemeChanged, onSnapshot, openMain, openSettings, setWidgetExpanded, startDragging } from "./shared/bridge";
+import {
+  getHome, getSettings, getSnapshot, onSchemeChanged, onSnapshot, openMain, openSettings,
+  setWidgetExpanded, startDragging, startResizing,
+} from "./shared/bridge";
 import { modelColor, paint, paceNote } from "./shared/color";
 import { basename, esc, hhmm, setHome, short, tidy, tok, until } from "./shared/format";
 import { grow, numText, ringArcs } from "./shared/ring";
@@ -19,6 +22,11 @@ const SCOPE = ["5h window", "this week", "Fable, this week"];
 let snap: Snapshot | null = null;
 let sel = 0;
 let expanded = false;
+// The card has no reflowing layout — nothing here would read well at a
+// different aspect — so resizing zooms it whole rather than rearranging it.
+let scale = 1;
+const MIN_SCALE = 0.6;
+const MAX_SCALE = 3;
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
@@ -83,13 +91,38 @@ function setWindow(i: number): void {
   renderRows();
 }
 
+function applyScale(): void {
+  // `zoom`, not `transform`: it scales layout, so measuring the card afterwards
+  // still gives the size the window has to be.
+  document.documentElement.style.zoom = String(scale);
+}
+
 async function fitWindow(): Promise<void> {
   // The OS window doesn't grow with the page; measure and ask Rust to resize.
   // Width too: system fonts differ per platform, so the card decides its size.
   await new Promise((r) => setTimeout(r, 20));
   const box = $("widget").getBoundingClientRect();
-  await setWidgetExpanded(expanded, Math.ceil(box.width) + 2, Math.ceil(box.height) + 2);
+  await setWidgetExpanded(expanded, Math.ceil(box.width) + 2, Math.ceil(box.height) + 2, scale);
 }
+
+// A drag on the grip resizes the OS window; the card then takes the zoom that
+// makes it fill the new width, and the window snaps back to the card's box so
+// no transparent margin is left over.
+$("grip").addEventListener("mousedown", (e) => { e.stopPropagation(); void startResizing(); });
+
+let settle: number | undefined;
+window.addEventListener("resize", () => {
+  window.clearTimeout(settle);
+  settle = window.setTimeout(() => {
+    const box = $("widget").getBoundingClientRect();
+    if (box.width < 1) return;
+    const next = Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale * (window.innerWidth / box.width)));
+    if (Math.abs(next - scale) < 0.01) return;
+    scale = next;
+    applyScale();
+    void fitWindow();
+  }, 140);
+});
 
 function apply(s: Snapshot): void {
   snap = s;
@@ -112,7 +145,7 @@ $("chev").addEventListener("click", async (e) => {
 $("widget").addEventListener("mousedown", (e) => {
   if (e.button !== 0) return;
   const t = e.target as HTMLElement;
-  if (t.closest("button, .arc, .wr")) return;
+  if (t.closest("button, .arc, .wr, .grip")) return;
   if (e.detail >= 2) { void openMain(); return; }
   void startDragging();
 });
@@ -121,6 +154,10 @@ document.addEventListener("contextmenu", (e) => e.preventDefault());
 
 (async () => {
   try { setHome(await getHome()); } catch { /* fine */ }
+  try {
+    const g = (await getSettings()).widget;
+    if (g) { scale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, g.scale || 1)); applyScale(); }
+  } catch { /* first run, or no backend */ }
   const s = await getSnapshot();
   if (s) apply(s);
   else $("dials").innerHTML = `<span class="wempty">Reading transcripts…</span>`;

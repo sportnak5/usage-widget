@@ -237,6 +237,7 @@ async function openSettingsDialog(): Promise<void> {
   ($("f_dir") as HTMLInputElement).value = s.claude_dir ?? "";
   ($("f_refresh") as HTMLInputElement).value = String(s.refresh_secs);
   ($("f_widget") as HTMLInputElement).checked = s.show_widget;
+  ($("f_ontop") as HTMLInputElement).checked = s.widget_on_top;
   try { ($("f_auto") as HTMLInputElement).checked = await getAutostart(); } catch { /* plugin unavailable in dev */ }
   const hint = (a: Settings["calibration"]["session"]) => a ? `anchored ${a.pct}% at ${when(a.captured_at)}` : "not set";
   const src = s.calibration.auto_fetched_at && (!s.calibration.manual_at || s.calibration.manual_at < s.calibration.auto_fetched_at)
@@ -275,6 +276,7 @@ $("settingsForm").addEventListener("submit", async (e) => {
       claude_dir: val("f_dir"),
       refresh_secs: Number(val("f_refresh")) || 60,
       show_widget: ($("f_widget") as HTMLInputElement).checked,
+      widget_on_top: ($("f_ontop") as HTMLInputElement).checked,
     });
     try { await setAutostart(($("f_auto") as HTMLInputElement).checked); } catch { /* ignore in dev */ }
     apply(await calibrate(input));

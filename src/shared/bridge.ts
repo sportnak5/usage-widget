@@ -35,7 +35,7 @@ if (inTauri) {
   const devSettings: Settings = {
     claude_dir: null, plan: "Max (20x)", boost: null, refresh_secs: 60,
     calibration: { session_reset_at: null, auto_fetched_at: null, manual_at: null, weekly_reset: null, session: null, weekly: null, fable: null },
-    widget: null, show_widget: true, theme: null,
+    widget: null, show_widget: true, widget_on_top: false, theme: null,
   };
   invoke = (async (cmd: string) => {
     switch (cmd) {
@@ -56,12 +56,12 @@ export const refreshNow = () => invoke<Snapshot>("refresh_now");
 export const getSettings = () => invoke<Settings>("get_settings");
 export const getHome = () => invoke<string>("get_home");
 export const calibrate = (input: CalibrationInput) => invoke<Snapshot>("calibrate", { input });
-export const updateSettings = (patch: Partial<Pick<Settings, "claude_dir" | "refresh_secs" | "show_widget" | "plan" | "boost">>) =>
+export const updateSettings = (patch: Partial<Pick<Settings, "claude_dir" | "refresh_secs" | "show_widget" | "widget_on_top" | "plan" | "boost">>) =>
   invoke<Snapshot>("update_settings", { patch });
 export const openMain = () => invoke<void>("open_main");
 export const openSettings = () => invoke<void>("open_settings");
-export const setWidgetExpanded = (expanded: boolean, width: number, height: number) =>
-  invoke<void>("set_widget_expanded", { expanded, width, height });
+export const setWidgetExpanded = (expanded: boolean, width: number, height: number, scale: number) =>
+  invoke<void>("set_widget_expanded", { expanded, width, height, scale });
 export const hideWidget = () => invoke<void>("hide_widget");
 export const getAutostart = () => invoke<boolean>("get_autostart");
 export const setAutostart = (on: boolean) => invoke<void>("set_autostart", { on });
@@ -79,4 +79,11 @@ export async function startDragging(): Promise<void> {
   if (!inTauri) return;
   const { getCurrentWindow } = await import("@tauri-apps/api/window");
   await getCurrentWindow().startDragging();
+}
+
+/** Hand the drag to the OS resize loop, from the widget's corner grip. */
+export async function startResizing(): Promise<void> {
+  if (!inTauri) return;
+  const { getCurrentWindow } = await import("@tauri-apps/api/window");
+  await getCurrentWindow().startResizeDragging("SouthEast");
 }

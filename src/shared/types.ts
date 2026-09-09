@@ -129,8 +129,9 @@ export interface Settings {
   boost: string | null;
   refresh_secs: number;
   calibration: Calibration;
-  widget: { x: number; y: number; expanded: boolean } | null;
+  widget: { x: number; y: number; expanded: boolean; scale: number } | null;
   show_widget: boolean;
+  widget_on_top: boolean;
   theme: string | null;
 }
 
