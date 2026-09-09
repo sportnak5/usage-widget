@@ -2,13 +2,14 @@
 // and the calibration/settings dialog.
 import { applySavedTheme, bindThemeButton, effectiveTheme } from "./shared/theme";
 import {
-  broadcastScheme, calibrate, getAutostart, getHome, getSettings, getSnapshot, onOpenSettings,
-  onSchemeChanged, onSnapshot, refreshNow, setAutostart, updateSettings,
+  broadcastScheme, calibrate, checkLiveReadings, getAutostart, getHome, getSettings, getSnapshot,
+  onOpenSettings, onSchemeChanged, onSnapshot, refreshNow, setAutostart, setLiveReadings,
+  updateSettings,
 } from "./shared/bridge";
 import { convColor, modelColor, paint, paceNote } from "./shared/color";
 import { entryName, esc, hhmm, setHome, short, tidy, tok, until, usd, when } from "./shared/format";
 import { grow, numText, ringArcs } from "./shared/ring";
-import { bindSetup, setupCard, setupPanel } from "./shared/setup";
+import { bindSetup, diagOf, setupCard, setupPanel } from "./shared/setup";
 import {
   applyScheme, CUSTOM_ID, currentSchemeId, customScheme, GROUPS, paletteOf, SCHEMES, saveCustom, setScheme,
 } from "./shared/schemes";
@@ -52,6 +53,29 @@ async function recheck(btn: HTMLButtonElement): Promise<void> {
 }
 
 
+/// First-run path: turn live readings on straight from the setup card, so the
+/// most accurate route doesn't require finding it in settings first. A refusal
+/// is reported in place — the card is where the user is looking.
+async function turnOnLive(btn: HTMLButtonElement): Promise<void> {
+  const label = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Turning on…";
+  try {
+    apply(await setLiveReadings(true));
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = label;
+    const box = btn.closest(".setup");
+    if (box) {
+      const p = document.createElement("p");
+      p.className = "serr";
+      p.textContent = String(e);
+      box.querySelector(".serr")?.remove();
+      box.appendChild(p);
+    }
+  }
+}
+
 function renderHeader(): void {
   if (!snap) return;
   $("tier").textContent = snap.plan;
@@ -61,8 +85,20 @@ function renderHeader(): void {
   const cacheAge = cache ? (Date.now() - new Date(cache.fetched_at).getTime()) / 3.6e6 : null;
   if (!snap.calibrated) {
     notices.push(setupCard(snap));
+  } else if (diagOf(snap).live && cache) {
+    notices.push(`<div class="notice"><span><b>Live readings.</b> Percentages come straight from Anthropic, last fetched ${when(cache.fetched_at)}; only usage since then is estimated from transcripts.</span></div>`);
   } else if (snap.calibration_source === "auto" && cache) {
-    notices.push(`<div class="notice"><span><b>Auto-calibrated</b> from Claude Code's own Usage reading, fetched ${when(cache.fetched_at)}${cacheAge! > 24 ? ` — ${cacheAge!.toFixed(0)} h old; run /usage in a Claude Code terminal session to refresh it` : ""}.</span></div>`);
+    const d = diagOf(snap);
+    const fell = d.connected && d.live_error
+      ? ` Live readings are on but ${d.live_auth_failed ? "Claude Code's login couldn't be used" : "the last fetch failed"} — ${esc(d.live_error)}`
+      : "";
+    // Someone calibrated from /usage never meets the setup card, so this is
+    // the only place they learn the exact route exists. Offer it, once, next
+    // to the number it would improve — not as a banner they must dismiss.
+    const offer = !d.connected
+      ? ` <button type="button" class="btn tiny" data-live>Turn on live readings</button> for exact percentages that never go stale.`
+      : "";
+    notices.push(`<div class="notice${fell ? " warn" : ""}"><span><b>Auto-calibrated</b> from Claude Code's own Usage reading, fetched ${when(cache.fetched_at)}${cacheAge! > 24 ? ` — ${cacheAge!.toFixed(0)} h old; run /usage in a Claude Code terminal session to refresh it` : ""}.${offer}${fell}</span></div>`);
   }
   if (snap.boost) {
     notices.push(`<div class="notice"><span><b>Boost active.</b> ${esc(snap.boost)}. These meters read against the boosted ceiling.</span></div>`);
@@ -72,7 +108,7 @@ function renderHeader(): void {
     notices.push(`<div class="notice warn"><span><b>Session boundary unknown.</b> No transcripts found yet, so the session dial is a rolling 5-hour window.</span></div>`);
   }
   $("notices").innerHTML = notices.join("");
-  bindSetup($("notices"), { recheck, settings: openSettingsDialog });
+  bindSetup($("notices"), { recheck, settings: openSettingsDialog, live: turnOnLive });
   const s = snap.scan;
   $("scan").textContent = `index: ${snap.index_records.toLocaleString()} unique turns · last scan ${s.files_in_window} of ${s.files_total} files in range, ${s.files_read} read, ${(s.bytes_read / 1e6).toFixed(1)} MB, +${s.records_added} new, ${s.duplicates_skipped} duplicates skipped, ${s.duration_ms} ms`;
 }
@@ -251,10 +287,75 @@ async function openSettingsDialog(): Promise<void> {
   ($("f_session") as HTMLInputElement).placeholder = hint(s.calibration.session);
   ($("f_weekly") as HTMLInputElement).placeholder = hint(s.calibration.weekly);
   ($("f_fable") as HTMLInputElement).placeholder = hint(s.calibration.fable);
+  ($("f_live") as HTMLInputElement).checked = s.live_readings;
+  renderConnection();
   $("f_err").textContent = "";
   renderSchemes();
   dlg.showModal();
 }
+
+/// State comes from the last snapshot's diagnosis, not from a fresh probe:
+/// opening settings shouldn't cost a network round trip, or raise the OS
+/// permission prompt before the user has asked for anything.
+function renderConnection(): void {
+  const d = snap ? diagOf(snap) : null;
+  const box = $("f_connstate");
+  if (!d?.connected) {
+    box.className = "";
+    box.textContent = "Off — using Claude Code's cached reading, or the percentages you typed in.";
+    return;
+  }
+  if (d.live_error) {
+    box.className = "bad";
+    box.textContent = `On, but the last fetch failed — ${d.live_error}`;
+  } else {
+    box.className = "good";
+    box.textContent = `On. Percentages come from Anthropic on every refresh${d.fetched_at ? `, last ${when(d.fetched_at)}` : ""}.`;
+  }
+}
+
+/// Turning it on is refused by the backend unless a fetch actually works, so
+/// a failure here leaves the checkbox where it was rather than lying about it.
+async function toggleLive(): Promise<void> {
+  const box = $("f_live") as HTMLInputElement;
+  const want = box.checked;
+  box.disabled = true;
+  $("f_err").textContent = "";
+  try {
+    apply(await setLiveReadings(want));
+  } catch (e) {
+    box.checked = !want;
+    $("f_err").textContent = String(e);
+  } finally {
+    box.disabled = false;
+    renderConnection();
+  }
+}
+
+/// Say whether it would work, without turning anything on.
+async function checkLive(): Promise<void> {
+  const btn = $("f_live_check") as HTMLButtonElement;
+  const label = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Checking…";
+  $("f_err").textContent = "";
+  const box = $("f_connstate");
+  try {
+    box.textContent = await checkLiveReadings();
+    box.className = "good";
+  } catch (e) {
+    box.textContent = String(e);
+    box.className = "bad";
+  } finally {
+    btn.disabled = false;
+    btn.textContent = label;
+  }
+}
+
+$("f_live").addEventListener("change", toggleLive);
+$("f_live_check").addEventListener("click", checkLive);
+// The settings dialog has its own copy buttons, outside any setup card.
+bindSetup($("f_conn"), { recheck });
 
 $("f_cancel").addEventListener("click", () => dlg.close());
 $("settingsForm").addEventListener("submit", async (e) => {

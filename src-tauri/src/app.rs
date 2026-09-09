@@ -213,6 +213,30 @@ fn calibrate(app: AppHandle, input: CalibrationInput) -> Result<Snapshot, String
     Ok(republish(&app))
 }
 
+/// Turn live readings on or off. Switching on is refused unless a fetch with
+/// Claude Code's credential actually works, so the toggle can never end up on
+/// while silently doing nothing.
+#[tauri::command]
+fn set_live_readings(app: AppHandle, enabled: bool) -> Result<Snapshot, String> {
+    {
+        let state = app.state::<AppState>();
+        let mut eng = lock(&state.engine);
+        eng.set_live_readings(enabled)?;
+        let _ = eng.refresh(Utc::now());
+        eng.save();
+    }
+    Ok(republish(&app))
+}
+
+/// Try the whole path without committing to it — what the "Check" button in
+/// settings and the first-run step both call.
+#[tauri::command]
+fn check_live_readings(app: AppHandle) -> Result<String, String> {
+    let state = app.state::<AppState>();
+    let eng = lock(&state.engine);
+    eng.probe_live_readings()
+}
+
 #[derive(Debug, Default, Deserialize)]
 #[serde(default)]
 pub struct SettingsPatch {
@@ -375,6 +399,8 @@ pub fn run() {
             get_settings,
             get_home,
             calibrate,
+            set_live_readings,
+            check_live_readings,
             update_settings,
             open_main,
             open_settings,

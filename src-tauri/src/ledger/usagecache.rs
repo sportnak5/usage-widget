@@ -88,7 +88,14 @@ pub fn parse(c: &Value) -> Option<UsageCache> {
     let ms = c.get("fetchedAtMs")?.as_i64()?;
     let fetched_at = Utc.timestamp_millis_opt(ms).single()?;
     let u = c.get("utilization")?;
+    Some(parse_utilization(u, fetched_at))
+}
 
+/// The `utilization` object on its own, which is also exactly what the
+/// `/api/oauth/usage` endpoint returns — the cache is that body plus a
+/// timestamp Claude Code stamps on locally. Kept separate so a live fetch and
+/// a cache read produce the same `UsageCache` through the same code.
+pub fn parse_utilization(u: &Value, fetched_at: DateTime<Utc>) -> UsageCache {
     let mut out = UsageCache { fetched_at, session: None, weekly: None, fable: None };
 
     // Current shape: a `limits` array with typed entries.
@@ -122,7 +129,7 @@ pub fn parse(c: &Value) -> Option<UsageCache> {
     if out.fable.is_none() {
         out.fable = u.get("seven_day_fable").and_then(|v| reading(v, "utilization"));
     }
-    Some(out)
+    out
 }
 
 #[cfg(test)]

@@ -173,12 +173,20 @@ pub fn build_snapshot(
         // one most of its turns ran in.
         let mut by_session: HashMap<String, (Acc, HashMap<String, u64>)> = HashMap::new();
 
+        let anchor = cal.anchor(w.kind);
+        // Cost accrued since the reading was taken, which is the only part of
+        // the dial we have to estimate when a live reading anchors us.
+        let mut since_anchor = 0.0;
+
         for r in index.records().filter(|r| w.contains(r.ts)) {
             let Some(e) = prices.lookup(&r.model) else { continue };
             if w.kind.fable_only() && !e.fable {
                 continue;
             }
             let cost = e.rates.cost(&r.usage);
+            if anchor.map_or(false, |a| r.ts >= a.captured_at) {
+                since_anchor += cost;
+            }
             total.push(r, cost);
             by_model.entry(r.model.clone()).or_default().push(r, cost);
             by_project.entry(r.cwd.clone()).or_default().push(r, cost);
@@ -187,9 +195,25 @@ pub fn build_snapshot(
             *se.1.entry(r.cwd.clone()).or_default() += 1;
         }
 
-        let anchor = cal.anchor(w.kind);
         let limit = anchor.map(|a| a.implied_limit).filter(|l| *l > 0.0);
-        let pct = limit.map(|l| total.cost / l * 100.0);
+        // Start from the reading itself and add only what we've spent since,
+        // so the dial can be wrong by at most one refresh's worth of usage.
+        // Deriving the whole percentage from local transcripts instead — as
+        // this used to — drifts without bound, because the real meter counts
+        // every surface on the account and we only see this machine's
+        // Claude Code sessions.
+        let pct = match anchor {
+            // An anchor from before this window started describes a window
+            // that has since reset: its percentage is spent, and all we can
+            // carry forward is the limit it implied.
+            Some(a) if a.captured_at >= w.start => match limit {
+                Some(l) => Some(a.pct + since_anchor / l * 100.0),
+                // Too low to have implied a limit and none inherited: show the
+                // reading, flat, rather than nothing at all.
+                None => Some(a.pct),
+            },
+            _ => limit.map(|l| total.cost / l * 100.0),
+        };
         let elapsed = w.elapsed_frac(now);
         let pace = pct.map(|p| p / (elapsed * 100.0));
         let rp = pct.zip(pace).map(|(p, pc)| ramp(p, pc));
@@ -249,7 +273,7 @@ pub fn build_snapshot(
             reset: w.end,
             boundary_known: w.boundary_known,
             idle: w.idle,
-            calibrated: limit.is_some(),
+            calibrated: pct.is_some(),
             pct: pct.map(round2),
             pace: pace.map(round2),
             ramp: rp.map(|x| (x * 1000.0).round() / 1000.0),

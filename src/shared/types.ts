@@ -86,6 +86,12 @@ export interface CacheDiag {
   detail: string | null;
   fetched_at: string | null;
   best_pct: number | null;
+  /** The reading came from the Usage endpoint rather than from the file. */
+  live: boolean;
+  /** A token is stored, whether or not the last fetch with it worked. */
+  connected: boolean;
+  live_error: string | null;
+  live_auth_failed: boolean;
 }
 
 export interface Snapshot {
@@ -133,6 +139,8 @@ export interface Settings {
   show_widget: boolean;
   widget_on_top: boolean;
   theme: string | null;
+  /** Read Claude Code's own login and fetch percentages from Anthropic. */
+  live_readings: boolean;
 }
 
 export interface CalibrationInput {

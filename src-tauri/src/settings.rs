@@ -40,6 +40,10 @@ pub struct Settings {
     /// desktop level, so ordinary windows cover it like a homescreen widget.
     pub widget_on_top: bool,
     pub theme: Option<String>,
+    /// Read Claude Code's own login and ask Anthropic for the percentages
+    /// directly. Off until the user turns it on: it reads a credential another
+    /// application owns, so it is never something the app just starts doing.
+    pub live_readings: bool,
 }
 
 impl Default for Settings {
@@ -55,6 +59,7 @@ impl Default for Settings {
             show_widget: true,
             widget_on_top: false,
             theme: None,
+            live_readings: false,
         }
     }
 }

@@ -8,6 +8,7 @@ use chrono::{DateTime, Duration, Utc};
 use serde::{Deserialize, Serialize};
 
 use crate::ledger::snapshot::{build_snapshot, window_total, Limits};
+use crate::ledger::usageapi::{self, FetchError};
 use crate::ledger::usagecache::{self, Reading, Status, UsageCache};
 use crate::ledger::windows::{resolve, Anchor, Window};
 use crate::ledger::{Index, ScanStats, Snapshot, WeeklyReset, WindowKind};
@@ -38,8 +39,17 @@ pub struct CacheDiag {
     pub reason: String,
     pub detail: Option<String>,
     pub fetched_at: Option<DateTime<Utc>>,
-    /// Largest percentage the cache carried — what "too low" was too low by.
+    /// Largest percentage the reading carried — what "too low" was too low by.
     pub best_pct: Option<f64>,
+    /// This reading came from the Usage endpoint, not from the file. Live
+    /// readings are as fresh as the refresh that fetched them.
+    pub live: bool,
+    /// A token is stored, whether or not the last fetch worked.
+    pub connected: bool,
+    /// Why the last live fetch failed, when one was attempted and did.
+    pub live_error: Option<String>,
+    /// The live token was rejected, so reconnecting is the fix.
+    pub live_auth_failed: bool,
 }
 
 impl CacheDiag {
@@ -88,6 +98,36 @@ impl Engine {
         Engine::open_at(data_dir())
     }
 
+    /// Switch live readings on only if they actually work. Turning the setting
+    /// on when the credential can't be read would displace a fallback that
+    /// does work, so the check happens before the flag moves.
+    ///
+    /// On macOS the first read raises the OS prompt asking whether Token
+    /// Ledger may open Claude Code's Keychain item, so this is also the moment
+    /// the user is asked — deliberately, while they are looking at settings.
+    pub fn set_live_readings(&mut self, on: bool) -> Result<(), String> {
+        if on {
+            usageapi::fetch().map_err(|e| e.message())?;
+        }
+        self.settings.live_readings = on;
+        Ok(())
+    }
+
+    /// Can live readings work here, without changing any setting? Drives the
+    /// "Check" button and the first-run step.
+    pub fn probe_live_readings(&self) -> Result<String, String> {
+        let src = usageapi::credential_source().map_err(|e| e.message())?;
+        let cache = usageapi::fetch().map_err(|e| e.message())?;
+        let best = [cache.session, cache.weekly, cache.fable]
+            .iter()
+            .filter_map(|r| r.map(|r| r.percent))
+            .fold(None, |a: Option<f64>, p| Some(a.map_or(p, |a| a.max(p))));
+        Ok(match best {
+            Some(p) => format!("Working — read {} and got {p:.0}% on the fullest window.", src.label()),
+            None => format!("Read {}, but Anthropic returned no percentages.", src.label()),
+        })
+    }
+
     pub fn save(&mut self) {
         if let Err(e) = self.settings.save(&self.settings_path) {
             self.last_error = Some(format!("saving settings: {e}"));
@@ -120,65 +160,119 @@ impl Engine {
         self.settings.claude_dir().map(|d| usagecache::default_path(&d))
     }
 
-    /// Re-anchor from Claude Code's cached Usage-tab reading when it is newer
-    /// than anything we've applied — and never over a later manual entry.
+    /// Re-anchor from the freshest Usage reading we can get: the endpoint
+    /// when a token is connected, Claude Code's cached copy otherwise.
     ///
     /// Always records why it could or couldn't, even on the paths that change
-    /// nothing: the entry screen leads with "run /usage", so it needs to know
-    /// whether that would actually help.
+    /// nothing: the entry screen leads with what to do next, so it needs to
+    /// know whether any of it would actually help.
     pub fn absorb_usage_cache(&mut self) {
-        let Some(path) = self.usage_cache_path() else {
-            self.usage_cache = None;
-            self.cache_diag =
-                CacheDiag { reason: "no_dir".into(), ..CacheDiag::default() };
-            return;
-        };
         let projects = self
             .settings
             .projects_dir()
             .map(|d| d.display().to_string())
             .unwrap_or_default();
+        let path = self.usage_cache_path();
+
+        // A live reading beats anything on disk, including a manual entry:
+        // it is the number the user would read off the Usage tab themselves.
+        let mut live_error = None;
+        let mut live_auth_failed = false;
+        // The refresh interval floors at 15s and a rescan can be triggered by
+        // hand on top of that; a percentage that moves in whole numbers does
+        // not need asking for that often.
+        let just_fetched = self.cache_diag.live
+            && self
+                .usage_cache
+                .as_ref()
+                .map_or(false, |c| Utc::now() - c.fetched_at < Duration::seconds(30));
+        if just_fetched {
+            return;
+        }
+        if self.settings.live_readings {
+            match usageapi::fetch() {
+                Ok(cache) => {
+                    self.apply_reading(cache, path.as_deref(), &projects, true, None, false, true);
+                    return;
+                }
+                Err(FetchError::Off) => {}
+                Err(e) => {
+                    live_auth_failed = e.is_auth();
+                    live_error = Some(e.message());
+                }
+            }
+        }
+
+        let Some(path) = path else {
+            self.usage_cache = None;
+            self.cache_diag = CacheDiag {
+                reason: "no_dir".into(),
+                projects_dir: projects,
+                connected: self.settings.live_readings,
+                live_error,
+                live_auth_failed,
+                ..CacheDiag::default()
+            };
+            return;
+        };
+        let fail = |eng: &mut Engine, reason: &str, detail: Option<String>| {
+            eng.usage_cache = None;
+            eng.cache_diag = CacheDiag {
+                projects_dir: projects.clone(),
+                connected: eng.settings.live_readings,
+                live_error: live_error.clone(),
+                live_auth_failed,
+                ..CacheDiag::at(&path, reason, detail)
+            };
+        };
         let cache = match usagecache::read_status(&path) {
             Status::Ok(c) => c,
-            Status::NoFile => {
-                self.usage_cache = None;
-                self.cache_diag = CacheDiag { projects_dir: projects, ..CacheDiag::at(&path, "no_file", None) };
-                return;
-            }
-            Status::NoKey => {
-                self.usage_cache = None;
-                self.cache_diag = CacheDiag { projects_dir: projects, ..CacheDiag::at(&path, "no_key", None) };
-                return;
-            }
-            Status::Unreadable(e) => {
-                self.usage_cache = None;
-                self.cache_diag =
-                    CacheDiag { projects_dir: projects, ..CacheDiag::at(&path, "unreadable", Some(e)) };
-                return;
-            }
+            Status::NoFile => return fail(self, "no_file", None),
+            Status::NoKey => return fail(self, "no_key", None),
+            Status::Unreadable(e) => return fail(self, "unreadable", Some(e)),
         };
 
+        // The file is written whenever someone runs `/usage`, so it can be
+        // older than what we already applied — and a manual entry made since
+        // is the user's most recent word on the subject.
+        let cal = &self.settings.calibration;
+        let already = cal.auto_fetched_at.map_or(false, |t| t >= cache.fetched_at);
+        let manual_newer = cal.manual_at.map_or(false, |m| m >= cache.fetched_at);
+        let apply = !(already || manual_newer);
+        self.apply_reading(cache, Some(&path), &projects, false, live_error, live_auth_failed, apply);
+    }
+
+    /// Diagnose a reading, and anchor from it unless told not to.
+    fn apply_reading(
+        &mut self,
+        cache: UsageCache,
+        path: Option<&std::path::Path>,
+        projects: &str,
+        live: bool,
+        live_error: Option<String>,
+        live_auth_failed: bool,
+        anchor: bool,
+    ) {
         let (reason, best_pct, anchors) = self.evaluate(&cache);
         self.usage_cache = Some(cache.clone());
         self.cache_diag = CacheDiag {
-            path: path.display().to_string(),
-            projects_dir: projects,
+            path: path.map(|p| p.display().to_string()).unwrap_or_default(),
+            projects_dir: projects.to_string(),
             reason,
             detail: None,
             fetched_at: Some(cache.fetched_at),
             best_pct,
+            live,
+            connected: self.settings.live_readings,
+            live_error,
+            live_auth_failed,
         };
-
-        let cal = &self.settings.calibration;
-        let already = cal.auto_fetched_at.map_or(false, |t| t >= cache.fetched_at);
-        let manual_newer = cal.manual_at.map_or(false, |m| m >= cache.fetched_at);
-        if already || manual_newer {
-            return;
+        if anchor {
+            self.apply_cache(&cache, anchors);
         }
-        self.apply_cache(&cache, anchors);
     }
 
-    /// What this cache would anchor, and why not, without touching settings.
+    /// What this reading would anchor, and why not, without touching settings.
     /// Split out from `apply_cache` so the diagnosis is the same whether or
     /// not we go on to apply it.
     fn evaluate(&self, cache: &UsageCache) -> (String, Option<f64>, Vec<(WindowKind, Anchor)>) {
@@ -193,16 +287,12 @@ impl Engine {
             .filter_map(|(_, r)| r.map(|r| r.percent))
             .fold(None, |a: Option<f64>, p| Some(a.map_or(p, |a| a.max(p))));
 
-        // Percentages are integers; below ~10% the rounding error swamps the
-        // implied limit, so keep whatever anchor we already have.
-        let mut usable = false;
+        let mut any_limit = false;
+        let mut any_reading = false;
         let mut anchors = Vec::new();
         for (kind, r) in readings {
             let Some(r) = r else { continue };
-            if r.percent < 10.0 {
-                continue;
-            }
-            usable = true;
+            any_reading = true;
             // The reading describes the window that was current at fetch
             // time; total our usage over exactly that window, up to then.
             let window = match r.resets_at {
@@ -215,27 +305,29 @@ impl Engine {
             };
             let clipped = Window { end: window.end.min(at), ..window };
             let total = window_total(&self.index, &self.settings.prices, &clipped);
-            if total <= 0.0 {
-                continue;
-            }
-            anchors.push((
-                kind,
-                Anchor {
-                    pct: r.percent,
-                    captured_at: at,
-                    implied_limit: total / (r.percent / 100.0),
-                },
-            ));
+
+            // Percentages are integers; below ~10% the rounding error swamps
+            // the implied limit. That is a reason not to re-derive the limit —
+            // never a reason to throw the reading away, which is what the dial
+            // is actually built on. Keep whatever limit we already had.
+            let derivable = r.percent >= 10.0 && total > 0.0;
+            let implied_limit = if derivable {
+                any_limit = true;
+                total / (r.percent / 100.0)
+            } else {
+                self.settings.calibration.anchor(kind).map(|a| a.implied_limit).unwrap_or(0.0)
+            };
+            anchors.push((kind, Anchor { pct: r.percent, captured_at: at, implied_limit }));
         }
-        let reason = if !anchors.is_empty() {
+        let reason = if any_limit {
             "ok"
-        } else if usable {
-            // Claude Code says we've used something; our transcripts disagree.
-            "no_usage"
-        } else if best_pct.is_some() {
-            "too_low"
-        } else {
+        } else if !any_reading {
             "no_readings"
+        } else if best_pct.map_or(false, |p| p >= 10.0) {
+            // The reading says we've used something; our transcripts disagree.
+            "no_usage"
+        } else {
+            "too_low"
         };
         (reason.into(), best_pct, anchors)
     }
@@ -364,7 +456,12 @@ mod tests {
 
     /// `cachedUsageUtilization` fetched at NOW, with one session percentage.
     fn cache_json(session_pct: u32) -> String {
-        let ms = utc(NOW).timestamp_millis();
+        cache_json_at(session_pct, utc(NOW).timestamp_millis())
+    }
+
+    /// The same, fetched at a time the caller picks — a second reading has to
+    /// be newer than the first or it is ignored as already applied.
+    fn cache_json_at(session_pct: u32, ms: i64) -> String {
         format!(
             r#"{{"cachedUsageUtilization":{{"fetchedAtMs":{ms},"utilization":{{"limits":[
               {{"kind":"session","percent":{session_pct},"resets_at":"2026-09-08T22:00:00+00:00"}}]}}}}}}"#
@@ -386,11 +483,30 @@ mod tests {
     }
 
     #[test]
-    fn readings_under_ten_percent_report_what_they_topped_out_at() {
+    fn readings_under_ten_percent_are_shown_but_imply_no_limit() {
         let eng = engine_at("low", Some(&cache_json(4)), true);
         assert_eq!(eng.cache_diag.reason, "too_low");
         assert_eq!(eng.cache_diag.best_pct, Some(4.0));
-        assert!(eng.settings.calibration.session.is_none(), "4% must not anchor");
+        let a = eng.settings.calibration.session.expect("4% still anchors the display");
+        assert_eq!(a.pct, 4.0);
+        assert_eq!(a.implied_limit, 0.0, "4% must not imply a limit");
+    }
+
+    #[test]
+    fn a_low_reading_keeps_the_limit_an_earlier_one_implied() {
+        let mut eng = engine_at("keeplimit", Some(&cache_json(50)), true);
+        let first = eng.settings.calibration.session.unwrap().implied_limit;
+        assert!(first > 0.0);
+
+        // A later, lower reading: the percentage is worth having, the limit
+        // it would imply is not.
+        let path = eng.usage_cache_path().unwrap();
+        std::fs::write(&path, cache_json_at(4, utc(NOW).timestamp_millis() + 1)).unwrap();
+        eng.absorb_usage_cache();
+
+        let a = eng.settings.calibration.session.unwrap();
+        assert_eq!(a.pct, 4.0);
+        assert_eq!(a.implied_limit, first, "the earlier limit carries forward");
     }
 
     #[test]
@@ -406,7 +522,8 @@ mod tests {
     fn a_usable_reading_with_no_transcripts_is_diagnosed_as_no_usage() {
         let eng = engine_at("nousage", Some(&cache_json(50)), false);
         assert_eq!(eng.cache_diag.reason, "no_usage");
-        assert!(eng.settings.calibration.session.is_none());
+        // Nothing to divide by, so no limit — but the reading still shows.
+        assert_eq!(eng.settings.calibration.session.unwrap().implied_limit, 0.0);
     }
 
     #[test]

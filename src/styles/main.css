@@ -22,6 +22,7 @@ h1{font-family:"IBM Plex Serif",Georgia,serif;font-size:24px;font-weight:600;let
 .notice{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:9px 13px;border-radius:var(--r);background:var(--accent-soft);color:var(--ink-2);font-size:12.5px;margin-bottom:16px;line-height:1.45}
 .notice b{color:var(--ink);font-weight:600}
 .notice.warn{background:color-mix(in srgb,var(--warn) 14%,var(--surface))}
+.notice .btn.tiny{font-size:10.5px;padding:1px 7px;margin:0 2px;vertical-align:1px}
 
 /* The not-calibrated card: a task, not a warning. Steps first, manual entry
    demoted to an ordinary button at the bottom. */
@@ -34,6 +35,18 @@ h1{font-family:"IBM Plex Serif",Georgia,serif;font-size:24px;font-weight:600;let
 .setup .btn.tiny{font-size:10.5px;padding:1px 7px;margin-left:5px;vertical-align:1px}
 .setup .sfoot{display:flex;gap:9px;align-items:center;margin-top:13px;flex-wrap:wrap}
 .setup .serr{margin:9px 0 0;color:var(--crit)}
+.setup .swhy.warn{color:var(--crit)}
+
+/* The three ways in. Ranked, so the ordering has to read as a ranking:
+   accuracy tag on the right of each name, tightest option first. */
+.sroutes{margin-top:13px;border-top:1px solid var(--line);padding-top:11px}
+.sroutes .srhead{font-size:11.5px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;font-family:"IBM Plex Mono",ui-monospace,monospace}
+.sroutes ol{margin:9px 0 0;padding-left:19px;display:flex;flex-direction:column;gap:9px}
+.sroutes li{color:var(--ink-2);line-height:1.45}
+.sroutes .stag{display:inline-block;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-family:"IBM Plex Mono",ui-monospace,monospace;color:var(--faint);border:1px solid var(--line);border-radius:99px;padding:0 6px;margin:0 5px 0 2px;vertical-align:1px}
+.sroutes li:first-child .stag{color:var(--accent);border-color:var(--accent)}
+.sroutes .sact{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:7px}
+.sroutes .shint{font-size:11.5px;color:var(--faint)}
 
 /* Manual entry, folded away until asked for. */
 #f_manual>summary{cursor:pointer;font-size:12.5px;color:var(--ink-2);padding:7px 2px;list-style-position:outside}
@@ -116,6 +129,15 @@ legend{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10px;letter-
 .frow{display:grid;grid-template-columns:150px 1fr;gap:10px;align-items:center;font-size:13px}
 .frow label{color:var(--ink-2)}
 .frow .hint{grid-column:2;font-size:11.5px;color:var(--faint);margin-top:-5px}
+.frow .hint code,.frow .hint .btn.tiny{font-size:10.5px}
+.frow .hint code{font-family:"IBM Plex Mono",ui-monospace,monospace;background:var(--sunk);border:1px solid var(--line);border-radius:5px;padding:1px 4px;color:var(--ink)}
+.frow .btn.tiny{padding:1px 7px;vertical-align:1px}
+/* Live readings: optional, and the legend says so without shouting. */
+legend .opt{font-size:9.5px;letter-spacing:.1em;color:var(--faint);border:1px solid var(--line);border-radius:99px;padding:0 6px;margin-left:6px}
+#f_token{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;flex:1;min-width:0}
+#f_connstate{font-size:12px;color:var(--faint);line-height:1.4}
+#f_connstate.good{color:var(--ok)}
+#f_connstate.bad{color:var(--crit)}
 .frow input[type=text],.frow input[type=number],.frow select{font:inherit;font-size:13px;color:var(--ink);background:var(--ground);border:1px solid var(--line);border-radius:6px;padding:6px 9px;width:100%}
 .frow input:focus-visible,.frow select:focus-visible{outline:2px solid var(--accent);outline-offset:0}
 .inline{display:flex;gap:8px;align-items:center}

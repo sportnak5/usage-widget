@@ -35,11 +35,13 @@ if (inTauri) {
   const devSettings: Settings = {
     claude_dir: null, plan: "Max (20x)", boost: null, refresh_secs: 60,
     calibration: { session_reset_at: null, auto_fetched_at: null, manual_at: null, weekly_reset: null, session: null, weekly: null, fable: null },
-    widget: null, show_widget: true, widget_on_top: false, theme: null,
+    widget: null, show_widget: true, widget_on_top: false, theme: null, live_readings: false,
   };
   invoke = (async (cmd: string) => {
     switch (cmd) {
-      case "get_snapshot": case "refresh_now": case "calibrate": case "update_settings": return devSnapshot();
+      case "get_snapshot": case "refresh_now": case "calibrate": case "update_settings":
+      case "set_live_readings": return devSnapshot();
+      case "check_live_readings": return "Dev fixture — no credential is read here.";
       case "get_settings": return devSettings;
       case "get_home": return "/Users/me";
       case "get_autostart": return false;
@@ -56,6 +58,11 @@ export const refreshNow = () => invoke<Snapshot>("refresh_now");
 export const getSettings = () => invoke<Settings>("get_settings");
 export const getHome = () => invoke<string>("get_home");
 export const calibrate = (input: CalibrationInput) => invoke<Snapshot>("calibrate", { input });
+/** Switching on is refused unless a real fetch works first, so the toggle can
+ *  never sit on while quietly doing nothing. */
+export const setLiveReadings = (enabled: boolean) => invoke<Snapshot>("set_live_readings", { enabled });
+/** Exercise the whole path without changing any setting. */
+export const checkLiveReadings = () => invoke<string>("check_live_readings");
 export const updateSettings = (patch: Partial<Pick<Settings, "claude_dir" | "refresh_secs" | "show_widget" | "widget_on_top" | "plan" | "boost">>) =>
   invoke<Snapshot>("update_settings", { patch });
 export const openMain = () => invoke<void>("open_main");

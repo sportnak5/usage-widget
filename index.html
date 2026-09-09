@@ -55,16 +55,27 @@
   </div>
 
   <footer>
-    <b>How these numbers are built.</b> Every assistant turn in the Claude Code transcripts is read, deduplicated on message id (forks and resumes copy turns into new files), then priced at published API rates per model and token kind. Calibration scales each window so it matches the percentage the Usage tab reported, which turns "share of my usage" into "share of that limit." Percentages are estimates; the ring colors track burn rate against the window's remaining time, not raw fill.
+    <b>How these numbers are built.</b> Every assistant turn in the Claude Code transcripts is read, deduplicated on message id (forks and resumes copy turns into new files), then priced at published API rates per model and token kind. Calibration turns "share of my usage" into "share of that limit." With live readings connected, each dial starts from the percentage Anthropic reports and adds only what you've spent since that fetch — so it can be behind by at most one refresh. Without them, the whole percentage is inferred from a scale worked out the last time a reading was seen, which drifts: the real meter counts every surface on your account, and these transcripts only cover Claude Code on this machine. Percentages are estimates; the ring colors track burn rate against the window's remaining time, not raw fill.
     <div class="scan" id="scan"></div>
   </footer>
 </div>
 
 <dialog id="settings">
   <form method="dialog" id="settingsForm">
-    <div class="dhead"><h2>Calibrate &amp; settings</h2><span class="stamp">Token Ledger calibrates itself from Claude Code — manual entry is the fallback</span></div>
+    <div class="dhead"><h2>Calibrate &amp; settings</h2><span class="stamp">Turn on live readings for exact percentages — or let Claude Code's <code>/usage</code> cache do it, or type them in</span></div>
     <div class="dbody">
       <div id="f_setup"></div>
+      <fieldset id="f_conn">
+        <legend>Live readings <span class="opt">optional</span></legend>
+        <div class="frow"><span class="hint">On, Token Ledger asks Anthropic for your usage percentages on every refresh, so the dials show the same numbers as the Usage tab instead of estimating between <code>/usage</code> runs. This is the most accurate mode, and it costs no tokens — it reads the meter, it doesn't talk to a model.</span></div>
+        <div class="frow"><label for="f_live">Live readings</label>
+          <div class="inline">
+            <input type="checkbox" id="f_live"><span>read Claude Code's login and fetch my percentages</span>
+            <button class="btn" type="button" id="f_live_check">Check</button>
+          </div></div>
+        <div class="frow"><span id="f_connstate">Off</span></div>
+        <div class="frow"><span class="hint">Token Ledger reads the login Claude Code already stores on this machine — the Keychain on macOS, <code>%USERPROFILE%\.claude\.credentials.json</code> on Windows, <code>~/.claude/.credentials.json</code> on Linux — and sends it to Anthropic's usage endpoint, nowhere else. It is read only: never copied, never written back, and never refreshed, because renewing that login is Claude Code's job and rotating it could sign you out of your terminal. macOS asks your permission the first time. Leave this off and nothing breaks — Token Ledger falls back to Claude Code's cached reading, or to percentages you type in below.</span></div>
+      </fieldset>
       <details id="f_manual">
         <summary>Enter the percentages by hand instead</summary>
       <fieldset>
