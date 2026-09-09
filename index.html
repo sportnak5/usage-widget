@@ -11,9 +11,7 @@
 <div class="wrap">
   <header>
     <div class="id">
-      <div class="eyebrow">Claude Code · local transcript ledger</div>
-      <h1>Where the tokens went</h1>
-      <p>The same three limits the Usage tab shows — opened up, so each ring is divided by what filled it.</p>
+      <h1>Token Ledger</h1>
     </div>
     <div class="tools">
       <span class="tier" id="tier"></span>
@@ -113,7 +111,9 @@
         <div class="frow"><label for="f_dir">Claude config dir</label><input type="text" id="f_dir" placeholder="auto (~/.claude or $CLAUDE_CONFIG_DIR)"></div>
         <div class="frow"><span class="hint">Changing this discards the index and rescans.</span></div>
         <div class="frow"><label for="f_refresh">Refresh every</label><div class="inline"><input type="number" id="f_refresh" min="15" max="3600" step="15" value="60"><span>seconds</span></div></div>
-        <div class="frow"><label for="f_widget">Desktop widget</label><div class="inline"><input type="checkbox" id="f_widget" checked><span>show the floating widget</span></div></div>
+        <div class="frow"><label for="f_widget">Desktop widget</label><div class="inline"><input type="checkbox" id="f_widget" checked><span>show the widget</span></div></div>
+        <div class="frow"><label for="f_ontop">Widget layer</label><div class="inline"><input type="checkbox" id="f_ontop"><span>float above other windows</span></div></div>
+        <div class="frow"><span class="hint">Off, the widget sits at desktop level: other windows cover it, the way a homescreen widget behaves.</span></div>
         <div class="frow"><label for="f_auto">Start at login</label><div class="inline"><input type="checkbox" id="f_auto"><span>launch Token Ledger when you sign in</span></div></div>
       </fieldset>
     </div>

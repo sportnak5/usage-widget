@@ -1,10 +1,9 @@
 body{background:var(--ground)}
 .wrap{max-width:960px;margin:0 auto;padding:22px 22px 56px}
 h1,h2,h3{margin:0;text-wrap:balance}
-header{display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px 20px;padding-bottom:16px;border-bottom:1px solid var(--line);margin-bottom:18px}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;padding-bottom:16px;border-bottom:1px solid var(--line);margin-bottom:18px}
 header .id{flex:1 1 320px;min-width:0}
 h1{font-family:"IBM Plex Serif",Georgia,serif;font-size:24px;font-weight:600;letter-spacing:-.01em;line-height:1.15}
-header p{margin:5px 0 0;color:var(--muted);font-size:13px;max-width:62ch}
 .tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .tier{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;font-weight:600;color:var(--ink-2);border:1px solid var(--line);border-radius:var(--r);padding:4px 9px;background:var(--surface)}
 .stamp{font-size:11.5px;color:var(--faint);font-family:"IBM Plex Mono",ui-monospace,monospace}
