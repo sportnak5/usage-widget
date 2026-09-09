@@ -2,6 +2,7 @@
 //!
 //!   usage-probe            read Claude Code's login, fetch, print the numbers
 //!   usage-probe --where    say where the credential was found, and stop
+//!   usage-probe --why      say what each credential lookup did, and stop
 //!
 //! Answers the question the settings toggle asks, without touching settings,
 //! so a failure can be diagnosed from a terminal. The credential is never
@@ -18,6 +19,13 @@ fn main() {
             .take_while(|l| l.starts_with("//!"))
             .map(|l| l.trim_start_matches("//!").trim_start())
             .collect::<Vec<_>>().join("\n"));
+        return;
+    }
+
+    if flag("--why") {
+        for (account, outcome) in usageapi::credential_attempts() {
+            println!("  {account:24} {outcome}");
+        }
         return;
     }
 

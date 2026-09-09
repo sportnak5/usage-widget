@@ -19,6 +19,8 @@
 //! stale when the user hasn't used Claude Code in hours — exactly when their
 //! usage isn't moving either.
 
+use std::sync::Mutex;
+
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -176,8 +178,56 @@ fn parse_credentials(raw: &str) -> Option<(String, Option<i64>)> {
     Some((tok, o.get("expiresAt").and_then(Value::as_i64)))
 }
 
+/// The credential is read once and held for the life of the process.
+///
+/// This exists for the user, not for speed. On macOS, opening an item another
+/// application created raises a password dialog, and "Allow" — as opposed to
+/// "Always Allow" — grants exactly one read. Reading per refresh put that
+/// dialog on screen every sixty seconds, which is unusable.
+///
+/// There is no time-based expiry because a clock is the wrong trigger: the
+/// only two things that invalidate this copy are the token passing its own
+/// `expiresAt`, and Anthropic rejecting it. Both are checked, so a wall-clock
+/// TTL would only add prompts without catching anything sooner.
+struct Cached {
+    token: String,
+    source: Source,
+    /// The token's own expiry, when it carries one.
+    expires: Option<i64>,
+}
+
+static CACHE: Mutex<Option<Cached>> = Mutex::new(None);
+
+/// Drop the cached credential so the next call goes back to the store. Called
+/// when Anthropic rejects what we sent: Claude Code renews its own login, so
+/// a rejection usually means the copy we are holding has been superseded.
+pub fn forget_cached_credential() {
+    if let Ok(mut c) = CACHE.lock() {
+        *c = None;
+    }
+}
+
 /// Claude Code's access token, read in place. Never written, never refreshed.
 pub fn claude_token() -> Result<(String, Source), FetchError> {
+    if let Ok(c) = CACHE.lock() {
+        if let Some(c) = c.as_ref() {
+            if !past_expiry(c.expires) {
+                return Ok((c.token.clone(), c.source));
+            }
+        }
+    }
+    let (token, source, expires) = read_credential()?;
+    if let Ok(mut c) = CACHE.lock() {
+        *c = Some(Cached { token: token.clone(), source, expires });
+    }
+    Ok((token, source))
+}
+
+fn past_expiry(expires: Option<i64>) -> bool {
+    matches!(expires, Some(ms) if ms > 0 && ms < Utc::now().timestamp_millis())
+}
+
+fn read_credential() -> Result<(String, Source, Option<i64>), FetchError> {
     // macOS only. Claude Code stores the credential as a file everywhere
     // else, so asking the Windows Credential Manager or the Linux secret
     // service for it can only ever miss — and on Linux a locked keyring can
@@ -185,15 +235,25 @@ pub fn claude_token() -> Result<(String, Source), FetchError> {
     #[cfg(target_os = "macos")]
     for account in keychain_accounts() {
         let Ok(e) = keyring::Entry::new(CC_SERVICE, &account) else { continue };
-        let Ok(raw) = e.get_password() else { continue };
-        if let Some((tok, expires)) = parse_credentials(&raw) {
-            return check_expiry(tok, expires).map(|t| (t, Source::Keychain));
+        match e.get_password() {
+            Ok(raw) => {
+                if let Some((tok, expires)) = parse_credentials(&raw) {
+                    return check_expiry(tok, expires).map(|t| (t, Source::Keychain, expires));
+                }
+            }
+            // Only a missing item justifies trying the next name. Every other
+            // failure — above all a denied or cancelled password dialog — must
+            // stop the loop: carrying on would raise the same dialog again for
+            // each remaining candidate, which is why switching this on asked
+            // for the password three or four times over.
+            Err(keyring::Error::NoEntry) => continue,
+            Err(_) => break,
         }
     }
     let path = credentials_file().ok_or(FetchError::NoCredential)?;
     let raw = std::fs::read_to_string(&path).map_err(|_| FetchError::NoCredential)?;
     let (tok, expires) = parse_credentials(&raw).ok_or(FetchError::NoCredential)?;
-    check_expiry(tok, expires).map(|t| (t, Source::File))
+    check_expiry(tok, expires).map(|t| (t, Source::File, expires))
 }
 
 /// Reported, never acted on: renewing the login is Claude Code's job.
@@ -204,6 +264,47 @@ fn check_expiry(tok: String, expires: Option<i64>) -> Result<String, FetchError>
     }
 }
 
+/// What each lookup did, for diagnosing a machine where this doesn't work.
+/// Reports outcomes only — never the credential itself.
+pub fn credential_attempts() -> Vec<(String, String)> {
+    let mut out = Vec::new();
+    #[cfg(target_os = "macos")]
+    for account in keychain_accounts() {
+        let label = if account.is_empty() { "<empty>".to_string() } else { account.clone() };
+        let (outcome, stop) = match keyring::Entry::new(CC_SERVICE, &account) {
+            Err(e) => (format!("keychain entry error: {e}"), false),
+            Ok(e) => match e.get_password() {
+                Err(keyring::Error::NoEntry) => ("no such item".to_string(), false),
+                Err(e) => (format!("keychain: {e}"), true),
+                Ok(raw) => match parse_credentials(&raw) {
+                    Some((_, exp)) => (format!("read ok, {} bytes, expires {exp:?}", raw.len()), true),
+                    None => (format!("read ok, {} bytes, but no accessToken in it", raw.len()), true),
+                },
+            },
+        };
+        out.push((format!("keychain/{label}"), outcome));
+        // Same rule as the real read: never raise a second password dialog
+        // just to fill in a diagnostic table.
+        if stop {
+            break;
+        }
+    }
+    match credentials_file() {
+        None => out.push(("file".into(), "no home directory".into())),
+        Some(p) => {
+            let outcome = match std::fs::read_to_string(&p) {
+                Err(e) => format!("{e}"),
+                Ok(raw) => match parse_credentials(&raw) {
+                    Some((_, exp)) => format!("read ok, {} bytes, expires {:?}", raw.len(), exp),
+                    None => format!("read ok, {} bytes, but no accessToken in it", raw.len()),
+                },
+            };
+            out.push((format!("file/{}", p.display()), outcome));
+        }
+    }
+    out
+}
+
 /// Whether a credential is there to be read at all — what the settings panel
 /// reports before the user switches live readings on.
 pub fn credential_source() -> Result<Source, FetchError> {
@@ -211,9 +312,21 @@ pub fn credential_source() -> Result<Source, FetchError> {
 }
 
 /// Fetch using Claude Code's credential.
+///
+/// A rejection retries once with a freshly read credential: the cached copy
+/// may simply have been superseded by Claude Code renewing its login, and
+/// making the user do something about that would be wrong when re-reading
+/// fixes it.
 pub fn fetch() -> Result<UsageCache, FetchError> {
     let (tok, _) = claude_token()?;
-    fetch_with(&tok)
+    match fetch_with(&tok) {
+        Err(e) if e.is_auth() => {
+            forget_cached_credential();
+            let (tok, _) = claude_token()?;
+            fetch_with(&tok)
+        }
+        other => other,
+    }
 }
 
 /// Fetch with an explicit token, so the settings dialog can exercise the whole
