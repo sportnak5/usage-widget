@@ -1,0 +1,38 @@
+[package]
+name = "token-ledger"
+version = "0.1.0"
+description = "Claude Code usage: the three limits, opened up by what filled them."
+authors = ["Crawford Nakayama"]
+edition = "2021"
+default-run = "token-ledger"
+rust-version = "1.77"
+
+[lib]
+name = "token_ledger"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[[bin]]
+name = "token-ledger"
+path = "src/main.rs"
+
+[[bin]]
+name = "ledger-cli"
+path = "src/bin/cli.rs"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon", "image-png", "macos-private-api"] }
+tauri-plugin-autostart = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+chrono = { version = "0.4", features = ["serde"] }
+dirs = "6"
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+panic = "abort"
+strip = true

@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Token Ledger</title>
+  <link rel="stylesheet" href="/src/styles/tokens.css">
+  <link rel="stylesheet" href="/src/styles/main.css">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="id">
+      <div class="eyebrow">Claude Code · local transcript ledger</div>
+      <h1>Where the tokens went</h1>
+      <p>The same three limits the Usage tab shows — opened up, so each ring is divided by what filled it.</p>
+    </div>
+    <div class="tools">
+      <span class="tier" id="tier"></span>
+      <span class="stamp" id="stamp"></span>
+      <button class="btn" id="refresh" title="Rescan transcripts now">Refresh</button>
+      <button class="btn primary" id="calibrate">Calibrate</button>
+      <button class="btn icon" id="themebtn" aria-label="Switch theme">
+        <svg class="sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+        <svg class="moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg>
+      </button>
+    </div>
+  </header>
+
+  <div id="notices"></div>
+
+  <div class="bigwrap">
+    <div class="bigbar">
+      <span class="eyebrow">Ring breakdown</span>
+      <div class="segbtns" id="modeBtns" role="group" aria-label="Ring breakdown">
+        <button data-m="by_model" aria-pressed="true">By model</button>
+        <button data-m="by_session" aria-pressed="false">By conversation</button>
+      </div>
+    </div>
+    <div class="bigdials" id="bigdials"></div>
+    <div class="legend" id="legend"></div>
+  </div>
+
+  <div class="bar">
+    <h2 id="listTitle"></h2>
+    <div class="segbtns" id="groupBtns" role="group" aria-label="Group by">
+      <button data-g="by_session" aria-pressed="true">Sessions</button>
+      <button data-g="by_project" aria-pressed="false">Projects</button>
+      <button data-g="by_model" aria-pressed="false">Models</button>
+    </div>
+  </div>
+  <div class="list">
+    <div class="lhead">
+      <span></span><span>Name</span><span class="r h-raw">Raw tokens</span><span class="r h-mix">Mix</span><span class="r">Of this limit</span>
+    </div>
+    <div id="rows"></div>
+  </div>
+
+  <footer>
+    <b>How these numbers are built.</b> Every assistant turn in the Claude Code transcripts is read, deduplicated on message id (forks and resumes copy turns into new files), then priced at published API rates per model and token kind. Calibration scales each window so it matches the percentage the Usage tab reported, which turns "share of my usage" into "share of that limit." Percentages are estimates; the ring colors track burn rate against the window's remaining time, not raw fill.
+    <div class="scan" id="scan"></div>
+  </footer>
+</div>
+
+<dialog id="settings">
+  <form method="dialog" id="settingsForm">
+    <div class="dhead"><h2>Calibrate &amp; settings</h2><span class="stamp">read these off the Usage tab in Claude Code</span></div>
+    <div class="dbody">
+      <div class="notice" id="f_src" style="margin:0"></div>
+      <fieldset>
+        <legend>Usage tab right now</legend>
+        <div class="frow"><label for="f_session">Current session</label>
+          <div class="inline"><input type="number" id="f_session" min="0" max="999" step="1" placeholder="78"><span>% used · resets in</span>
+            <input type="number" id="f_rh" min="0" max="5" step="1" placeholder="3"><span>hr</span>
+            <input type="number" id="f_rm" min="0" max="59" step="1" placeholder="46"><span>min</span></div></div>
+        <div class="frow"><label for="f_weekly">Weekly · all models</label>
+          <div class="inline"><input type="number" id="f_weekly" min="0" max="999" step="1" placeholder="28"><span>% used</span></div></div>
+        <div class="frow"><label for="f_fable">Weekly · Fable</label>
+          <div class="inline"><input type="number" id="f_fable" min="0" max="999" step="1" placeholder="53"><span>% used</span></div></div>
+        <div class="frow"><label for="f_wd">Weekly reset</label>
+          <div class="inline"><select id="f_wd"><option>Mon</option><option>Tue</option><option>Wed</option><option>Thu</option><option>Fri</option><option>Sat</option><option>Sun</option></select>
+            <span>at</span><input type="number" id="f_wh" min="0" max="23" step="1" value="1"><span>:</span><input type="number" id="f_wm" min="0" max="59" step="1" value="0"><span>(local, 24h)</span></div></div>
+        <div class="frow"><span class="hint">Leave a percentage blank to keep its current anchor. Enter 0 to clear it.</span></div>
+      </fieldset>
+      <fieldset>
+        <legend>Plan</legend>
+        <div class="frow"><label for="f_plan">Plan label</label><input type="text" id="f_plan" placeholder="Max (20x)"></div>
+        <div class="frow"><label for="f_boost">Boost note</label><input type="text" id="f_boost" placeholder="Weekly limit 50% higher through Sep 13"></div>
+      </fieldset>
+      <fieldset>
+        <legend>App</legend>
+        <div class="frow"><label for="f_dir">Claude config dir</label><input type="text" id="f_dir" placeholder="auto (~/.claude or $CLAUDE_CONFIG_DIR)"></div>
+        <div class="frow"><span class="hint">Changing this discards the index and rescans.</span></div>
+        <div class="frow"><label for="f_refresh">Refresh every</label><div class="inline"><input type="number" id="f_refresh" min="15" max="3600" step="15" value="60"><span>seconds</span></div></div>
+        <div class="frow"><label for="f_widget">Desktop widget</label><div class="inline"><input type="checkbox" id="f_widget" checked><span>show the floating widget</span></div></div>
+        <div class="frow"><label for="f_auto">Start at login</label><div class="inline"><input type="checkbox" id="f_auto"><span>launch Token Ledger when you sign in</span></div></div>
+      </fieldset>
+    </div>
+    <div class="dfoot">
+      <span class="err" id="f_err"></span>
+      <button class="btn" type="button" id="f_cancel">Cancel</button>
+      <button class="btn primary" type="submit" id="f_save">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>

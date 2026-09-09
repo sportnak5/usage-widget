@@ -1,0 +1,62 @@
+/* Palette and type for both windows. Light is the base; dark redefines only
+   tokens, guarded so an explicit choice beats the OS in either direction. */
+:root{
+  --ground:#EDF0F5; --surface:#FFFFFF; --sunk:#E3E8F0; --line:#D3DAE6; --line-soft:#E6EBF2;
+  --ink:#151A22; --ink-2:#3D4756; --muted:#5F6B7E; --faint:#8894A6;
+  --accent:#3B4CC0; --accent-soft:#E5E8FA;
+  --ok:#2E8B62; --warn:#B8871F; --hot:#C25C2C; --crit:#A32E28;
+  --m-fable51:#6D4AA8; --m-fable5:#9370CB; --m-opus5:#3B4CC0; --m-opus48:#6270D6;
+  --m-sonnet5:#20807E; --m-haiku:#7A8698; --m-rest:#B9C2D0;
+  --c0:#3B4CC0; --c1:#7A4DA8; --c2:#1F7F7C; --c3:#B0741E; --c4:#A8456A;
+  --c5:#4E79C0; --c6:#5E7D3C; --c7:#8A6248;
+  --shadow:0 1px 2px rgba(21,26,34,.06),0 8px 24px -12px rgba(21,26,34,.18);
+  --r:7px; --gauge-s:76; --gauge-l:40; --ring:#DDE3EC;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#0F131A; --surface:#171C25; --sunk:#10141B; --line:#2A323F; --line-soft:#222933;
+  --ink:#E6EAF1; --ink-2:#BAC4D2; --muted:#8D99AC; --faint:#6B7688;
+  --accent:#8390F0; --accent-soft:#242B45;
+  --ok:#4FBE8B; --warn:#DDAB43; --hot:#E17F4C; --crit:#E0655C;
+  --m-fable51:#9A79D8; --m-fable5:#B9A0E6; --m-opus5:#8390F0; --m-opus48:#A3ADF5;
+  --m-sonnet5:#3FB0AD; --m-haiku:#8C99AC; --m-rest:#39414F;
+  --c0:#8390F0; --c1:#A87FDC; --c2:#3FB0AD; --c3:#DDA84F; --c4:#DE7FA0;
+  --c5:#7FA8E8; --c6:#96C46A; --c7:#C99A78;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
+  --gauge-s:74; --gauge-l:60; --ring:#252D39;
+}}
+:root[data-theme="dark"]{
+  --ground:#0F131A; --surface:#171C25; --sunk:#10141B; --line:#2A323F; --line-soft:#222933;
+  --ink:#E6EAF1; --ink-2:#BAC4D2; --muted:#8D99AC; --faint:#6B7688;
+  --accent:#8390F0; --accent-soft:#242B45;
+  --ok:#4FBE8B; --warn:#DDAB43; --hot:#E17F4C; --crit:#E0655C;
+  --m-fable51:#9A79D8; --m-fable5:#B9A0E6; --m-opus5:#8390F0; --m-opus48:#A3ADF5;
+  --m-sonnet5:#3FB0AD; --m-haiku:#8C99AC; --m-rest:#39414F;
+  --c0:#8390F0; --c1:#A87FDC; --c2:#3FB0AD; --c3:#DDA84F; --c4:#DE7FA0;
+  --c5:#7FA8E8; --c6:#96C46A; --c7:#C99A78;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
+  --gauge-s:74; --gauge-l:60; --ring:#252D39;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.mono{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-variant-numeric:tabular-nums}
+.eyebrow{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--faint);font-weight:500}
+/* anything on the pace ramp */
+.gauge-color{color:hsl(var(--h) calc(var(--gauge-s) * 1%) calc(var(--gauge-l) * var(--lx,1) * 1%))}
+.gauge-fill{fill:hsl(var(--h) calc(var(--gauge-s) * 1%) calc(var(--gauge-l) * var(--lx,1) * 1%))}
+[style*="--gauge-muted"] .gauge-fill,[style*="--gauge-muted"] .gauge-color{fill:var(--faint);color:var(--faint)}
+.arc{fill:none;stroke-linecap:butt;transition:stroke-dasharray .9s cubic-bezier(.22,1,.36,1),stroke-width .12s}
+.arc.muted{opacity:.45}
+.ring-bg{fill:none;stroke:var(--ring)}
+.num{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600;font-variant-numeric:tabular-nums}
+.pcs{font-weight:500;opacity:.66}
+.segbtns{display:flex;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--surface)}
+.segbtns button{border:0;background:transparent;font:inherit;font-size:12.5px;font-weight:500;color:var(--muted);
+  padding:5px 12px;cursor:pointer;transition:background .12s,color .12s}
+.segbtns button+button{border-left:1px solid var(--line)}
+.segbtns button[aria-pressed="true"]{background:var(--accent);color:#fff}
+.segbtns button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+button{font-family:inherit}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Token Ledger</title>
+  <link rel="stylesheet" href="/src/styles/tokens.css">
+  <link rel="stylesheet" href="/src/styles/widget.css">
+</head>
+<body>
+  <div class="widget" id="widget">
+    <div class="wrow">
+      <div class="dials" id="dials"></div>
+      <button class="chev" id="chev" aria-expanded="false" aria-controls="wtop5" aria-label="Show top sessions">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+    </div>
+    <div class="wtop5" id="wtop5" hidden></div>
+  </div>
+  <script type="module" src="/src/widget.ts"></script>
+</body>
+</html>

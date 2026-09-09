@@ -1,0 +1,1651 @@
+{
+  "generated_at": "2026-09-08T23:28:40.092526Z",
+  "plan": "Max (20x)",
+  "boost": "Weekly Claude Code limit is 50% higher through September 13",
+  "calibrated": true,
+  "windows": [
+    {
+      "id": "session",
+      "label": "Current session",
+      "sub": "5-hour rolling window",
+      "start": "2026-09-08T23:20:01.639Z",
+      "reset": "2026-09-09T04:20:01.639Z",
+      "boundary_known": true,
+      "idle": false,
+      "calibrated": true,
+      "pct": 9.28,
+      "pace": 3.22,
+      "ramp": 0.836,
+      "elapsed_frac": 0.029,
+      "total_cost": 17.48,
+      "total_raw": 18865034,
+      "messages": 23,
+      "limit": 188.38,
+      "kinds": {
+        "input": 106,
+        "output": 20566,
+        "cache_write": 391466,
+        "cache_read": 18452896
+      },
+      "by_model": [
+        {
+          "key": "claude-opus-5",
+          "title": null,
+          "title_kind": null,
+          "cost": 9.19,
+          "raw": 17611680,
+          "n": 20,
+          "first": "2026-09-08T23:20:01.639Z",
+          "last": "2026-09-08T23:28:25.811Z",
+          "share": 52.57,
+          "pct": 4.88,
+          "models": [
+            {
+              "model": "claude-opus-5",
+              "cost": 9.19,
+              "input": 40,
+              "output": 9928,
+              "cache_write": 14438,
+              "cache_read": 17587274
+            }
+          ]
+        },
+        {
+          "key": "claude-fable-5-1",
+          "title": null,
+          "title_kind": null,
+          "cost": 8.29,
+          "raw": 1253354,
+          "n": 3,
+          "first": "2026-09-08T23:26:21.459Z",
+          "last": "2026-09-08T23:27:39.716Z",
+          "share": 47.43,
+          "pct": 4.4,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 8.29,
+              "input": 66,
+              "output": 10638,
+              "cache_write": 377028,
+              "cache_read": 865622
+            }
+          ]
+        }
+      ],
+      "by_project": [
+        {
+          "key": "/Users/crawfordnakayama",
+          "title": null,
+          "title_kind": null,
+          "cost": 7.52,
+          "raw": 413393,
+          "n": 1,
+          "first": "2026-09-08T23:26:21.459Z",
+          "last": "2026-09-08T23:26:21.459Z",
+          "share": 43.05,
+          "pct": 3.99,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 7.52,
+              "input": 2,
+              "output": 897,
+              "cache_write": 373406,
+              "cache_read": 39088
+            }
+          ]
+        },
+        {
+          "key": "/Users/crawfordnakayama/DTCloudSource",
+          "title": null,
+          "title_kind": null,
+          "cost": 7.36,
+          "raw": 14063144,
+          "n": 16,
+          "first": "2026-09-08T23:20:01.639Z",
+          "last": "2026-09-08T23:26:50.174Z",
+          "share": 42.1,
+          "pct": 3.91,
+          "models": [
+            {
+              "model": "claude-opus-5",
+              "cost": 7.36,
+              "input": 32,
+              "output": 8612,
+              "cache_write": 12011,
+              "cache_read": 14042489
+            }
+          ]
+        },
+        {
+          "key": "/Users/crawfordnakayama/DTCloudSource/Projects",
+          "title": null,
+          "title_kind": null,
+          "cost": 1.83,
+          "raw": 3548536,
+          "n": 4,
+          "first": "2026-09-08T23:27:06.418Z",
+          "last": "2026-09-08T23:28:25.811Z",
+          "share": 10.47,
+          "pct": 0.97,
+          "models": [
+            {
+              "model": "claude-opus-5",
+              "cost": 1.83,
+              "input": 8,
+              "output": 1316,
+              "cache_write": 2427,
+              "cache_read": 3544785
+            }
+          ]
+        },
+        {
+          "key": "/Users/crawfordnakayama/usage_app/src-tauri",
+          "title": null,
+          "title_kind": null,
+          "cost": 0.77,
+          "raw": 839961,
+          "n": 2,
+          "first": "2026-09-08T23:26:54.416Z",
+          "last": "2026-09-08T23:27:39.716Z",
+          "share": 4.39,
+          "pct": 0.41,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 0.77,
+              "input": 64,
+              "output": 9741,
+              "cache_write": 3622,
+              "cache_read": 826534
+            }
+          ]
+        }
+      ],
+      "by_session": [
+        {
+          "key": [
+            "7e80391a-3209-4450-b70e-cccfe2aa3dce",
+            "/Users/crawfordnakayama/DTCloudSource"
+          ],
+          "title": "Packages and allowances in catalog",
+          "title_kind": "custom",
+          "cost": 9.19,
+          "raw": 17611680,
+          "n": 20,
+          "first": "2026-09-08T23:20:01.639Z",
+          "last": "2026-09-08T23:28:25.811Z",
+          "share": 52.57,
+          "pct": 4.88,
+          "models": [
+            {
+              "model": "claude-opus-5",
+              "cost": 9.19,
+              "input": 40,
+              "output": 9928,
+              "cache_write": 14438,
+              "cache_read": 17587274
+            }
+          ]
+        },
+        {
+          "key": [
+            "f61278b4-7287-4e15-9ed7-ed9b4ce75075",
+            "/Users/crawfordnakayama/usage_app/src-tauri"
+          ],
+          "title": "Usage widget implementation",
+          "title_kind": "custom",
+          "cost": 8.29,
+          "raw": 1253354,
+          "n": 3,
+          "first": "2026-09-08T23:26:21.459Z",
+          "last": "2026-09-08T23:27:39.716Z",
+          "share": 47.43,
+          "pct": 4.4,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 8.29,
+              "input": 66,
+              "output": 10638,
+              "cache_write": 377028,
+              "cache_read": 865622
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "weekly",
+      "label": "Weekly · all models",
+      "sub": "resets weekly",
+      "start": "2026-09-08T06:00:00Z",
+      "reset": "2026-09-15T06:00:00Z",
+      "boundary_known": true,
+      "idle": false,
+      "calibrated": true,
+      "pct": 33.8,
+      "pace": 3.25,
+      "ramp": 0.839,
+      "elapsed_frac": 0.104,
+      "total_cost": 304.85,
+      "total_raw": 413729079,
+      "messages": 1052,
+      "limit": 901.97,
+      "kinds": {
+        "input": 19792,
+        "output": 1190102,
+        "cache_write": 6780762,
+        "cache_read": 405738423
+      },
+      "by_model": [
+        {
+          "key": "claude-fable-5-1",
+          "title": null,
+          "title_kind": null,
+          "cost": 178.44,
+          "raw": 223758558,
+          "n": 703,
+          "first": "2026-09-08T14:07:19.637Z",
+          "last": "2026-09-08T23:27:39.716Z",
+          "share": 58.53,
+          "pct": 19.78,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 178.44,
+              "input": 19078,
+              "output": 917984,
+              "cache_write": 3880590,
+              "cache_read": 218940906
+            }
+          ]
+        },
+        {
+          "key": "claude-opus-5",
+          "title": null,
+          "title_kind": null,
+          "cost": 124.65,
+          "raw": 189467887,
+          "n": 346,
+          "first": "2026-09-08T13:11:56.418Z",
+          "last": "2026-09-08T23:28:25.811Z",
+          "share": 40.89,
+          "pct": 13.82,
+          "models": [
+            {
+              "model": "claude-opus-5",
+              "cost": 124.65,
+              "input": 692,
+              "output": 269780,
+              "cache_write": 2453199,
+              "cache_read": 186744216
+            }
+          ]
+        },
+        {
+          "key": "claude-sonnet-5",
+          "title": null,
+          "title_kind": null,
+          "cost": 1.7,
+          "raw": 460217,
+          "n": 1,
+          "first": "2026-09-08T18:56:28.709Z",
+          "last": "2026-09-08T18:56:28.709Z",
+          "share": 0.56,
+          "pct": 0.19,
+          "models": [
+            {
+              "model": "claude-sonnet-5",
+              "cost": 1.7,
+              "input": 2,
+              "output": 616,
+              "cache_write": 420441,
+              "cache_read": 39158
+            }
+          ]
+        },
+        {
+          "key": "claude-haiku-4-5-20251001",
+          "title": null,
+          "title_kind": null,
+          "cost": 0.06,
+          "raw": 42417,
+          "n": 2,
+          "first": "2026-09-08T18:42:55.783Z",
+          "last": "2026-09-08T18:43:06.119Z",
+          "share": 0.02,
+          "pct": 0.01,
+          "models": [
+            {
+              "model": "claude-haiku-4-5-20251001",
+              "cost": 0.06,
+              "input": 20,
+              "output": 1722,
+              "cache_write": 26532,
+              "cache_read": 14143
+            }
+          ]
+        }
+      ],
+      "by_project": [
+        {
+          "key": "/Users/crawfordnakayama/DTCloudSource",
+          "title": null,
+          "title_kind": null,
+          "cost": 140.24,
+          "raw": 200301208,
+          "n": 418,
+          "first": "2026-09-08T14:10:29.988Z",
+          "last": "2026-09-08T23:26:50.174Z",
+          "share": 46.0,
+          "pct": 15.55,
+          "models": [
+            {
+              "model": "claude-opus-5",
+              "cost": 87.24,
+              "input": 390,
+              "output": 142767,
+              "cache_write": 2000374,
+              "cache_read": 127330248
+            },
+            {
+              "model": "claude-fable-5-1",
+              "cost": 51.3,
+              "input": 6398,
+              "output": 222440,
+              "cache_write": 1143305,
+              "cache_read": 68995069
+            },
+            {
+              "model": "claude-sonnet-5",
+              "cost": 1.7,
+              "input": 2,
+              "output": 616,
+              "cache_write": 420441,
+              "cache_read": 39158
+            }
+          ]
+        },
+        {
+          "key": "/Users/crawfordnakayama/日本語",
+          "title": null,
+          "title_kind": null,
+          "cost": 61.54,
+          "raw": 68400054,
+          "n": 252,
+          "first": "2026-09-08T14:07:19.637Z",
+          "last": "2026-09-08T20:12:57.971Z",
+          "share": 20.19,
+          "pct": 6.82,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 61.54,
+              "input": 6742,
+              "output": 377547,
+              "cache_write": 1295612,
+              "cache_read": 66720153
+            }
+          ]
+        },
+        {
+          "key": "/Users/crawfordnakayama",
+          "title": null,
+          "title_kind": null,
+          "cost": 25.48,
+          "raw": 17125336,
+          "n": 91,
+          "first": "2026-09-08T13:11:56.418Z",
+          "last": "2026-09-08T23:26:21.459Z",
+          "share": 8.36,
+          "pct": 2.82,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 13.92,
+              "input": 298,
+              "output": 22758,
+              "cache_write": 582655,
+              "cache_read": 4494045
+            },
+            {
+              "model": "claude-opus-5",
+              "cost": 11.56,
+              "input": 154,
+              "output": 94160,
+              "cache_write": 340988,
+              "cache_read": 11590278
+            }
+          ]
+        },
+        {
+          "key": "/Users/crawfordnakayama/DTCloudSource/Projects",
+          "title": null,
+          "title_kind": null,
+          "cost": 21.16,
+          "raw": 43830610,
+          "n": 70,
+          "first": "2026-09-08T16:25:20.894Z",
+          "last": "2026-09-08T23:28:25.811Z",
+          "share": 6.94,
+          "pct": 2.35,
+          "models": [
+            {
+              "model": "claude-opus-5",
+              "cost": 17.04,
+              "input": 88,
+              "output": 15050,
+              "cache_write": 52634,
+              "cache_read": 32278695
+            },
+            {
+              "model": "claude-fable-5-1",
+              "cost": 4.12,
+              "input": 802,
+              "output": 15061,
+              "cache_write": 24786,
+              "cache_read": 11443494
+            }
+          ]
+        },
+        {
+          "key": "/Users/crawfordnakayama/tasks",
+          "title": null,
+          "title_kind": null,
+          "cost": 18.18,
+          "raw": 18944814,
+          "n": 65,
+          "first": "2026-09-08T13:11:58.406Z",
+          "last": "2026-09-08T19:04:33.758Z",
+          "share": 5.96,
+          "pct": 2.02,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 18.13,
+              "input": 1316,
+              "output": 87668,
+              "cache_write": 457869,
+              "cache_read": 18295067
+            },
+            {
+              "model": "claude-opus-5",
+              "cost": 0.06,
+              "input": 4,
+              "output": 32,
+              "cache_write": 388,
+              "cache_read": 102470
+            }
+          ]
+        },
+        {
+          "key": "/Users/crawfordnakayama/usage_app",
+          "title": null,
+          "title_kind": null,
+          "cost": 10.95,
+          "raw": 18843866,
+          "n": 57,
+          "first": "2026-09-08T21:52:13.190Z",
+          "last": "2026-09-08T22:25:24.933Z",
+          "share": 3.59,
+          "pct": 1.21,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 10.95,
+              "input": 1524,
+              "output": 82280,
+              "cache_write": 107756,
+              "cache_read": 18652306
+            }
+          ]
+        },
+        {
+          "key": "/Users/crawfordnakayama/DTCloudSource/WebApps/App/src/app",
+          "title": null,
+          "title_kind": null,
+          "cost": 9.7,
+          "raw": 18281763,
+          "n": 34,
+          "first": "2026-09-08T16:10:39.088Z",
+          "last": "2026-09-08T21:48:33.100Z",
+          "share": 3.18,
+          "pct": 1.08,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 6.59,
+              "input": 802,
+              "output": 38916,
+              "cache_write": 78556,
+              "cache_read": 12252446
+            },
+            {
+              "model": "claude-opus-5",
+              "cost": 3.11,
+              "input": 16,
+              "output": 3002,
+              "cache_write": 8500,
+              "cache_read": 5899525
+            }
+          ]
+        },
+        {
+          "key": "/Users/crawfordnakayama/DTCloudSource/WebApps/App",
+          "title": null,
+          "title_kind": null,
+          "cost": 9.3,
+          "raw": 20679673,
+          "n": 36,
+          "first": "2026-09-08T16:35:31.357Z",
+          "last": "2026-09-08T21:26:02.110Z",
+          "share": 3.05,
+          "pct": 1.03,
+          "models": [
+            {
+              "model": "claude-opus-5",
+              "cost": 4.81,
+              "input": 24,
+              "output": 6769,
+              "cache_write": 33730,
+              "cache_read": 8613062
+            },
+            {
+              "model": "claude-fable-5-1",
+              "cost": 4.49,
+              "input": 618,
+              "output": 12107,
+              "cache_write": 44401,
+              "cache_read": 11968962
+            }
+          ]
+        },
+        {
+          "key": "/Users/crawfordnakayama/usage_app/src-tauri",
+          "title": null,
+          "title_kind": null,
+          "cost": 2.42,
+          "raw": 3645594,
+          "n": 10,
+          "first": "2026-09-08T22:02:53.237Z",
+          "last": "2026-09-08T23:27:39.716Z",
+          "share": 0.79,
+          "pct": 0.27,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 2.42,
+              "input": 320,
+              "output": 19656,
+              "cache_write": 26835,
+              "cache_read": 3598783
+            }
+          ]
+        },
+        {
+          "key": "/Users/crawfordnakayama/日本語/Design",
+          "title": null,
+          "title_kind": null,
+          "cost": 2.07,
+          "raw": 358007,
+          "n": 2,
+          "first": "2026-09-08T14:09:42.366Z",
+          "last": "2026-09-08T14:10:34.066Z",
+          "share": 0.68,
+          "pct": 0.23,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 2.07,
+              "input": 64,
+              "output": 12162,
+              "cache_write": 69640,
+              "cache_read": 276141
+            }
+          ]
+        },
+        {
+          "key": "/Users/crawfordnakayama/usage_app/src-tauri/src/ledger",
+          "title": null,
+          "title_kind": null,
+          "cost": 1.38,
+          "raw": 526529,
+          "n": 2,
+          "first": "2026-09-08T21:55:45.279Z",
+          "last": "2026-09-08T21:57:36.480Z",
+          "share": 0.45,
+          "pct": 0.15,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 1.38,
+              "input": 64,
+              "output": 17922,
+              "cache_write": 18162,
+              "cache_read": 490381
+            }
+          ]
+        },
+        {
+          "key": "/Users/crawfordnakayama/usage_app/src-tauri/src",
+          "title": null,
+          "title_kind": null,
+          "cost": 0.53,
+          "raw": 273348,
+          "n": 1,
+          "first": "2026-09-08T21:58:50.416Z",
+          "last": "2026-09-08T21:58:50.416Z",
+          "share": 0.17,
+          "pct": 0.06,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 0.53,
+              "input": 32,
+              "output": 6705,
+              "cache_write": 6622,
+              "cache_read": 259989
+            }
+          ]
+        }
+      ],
+      "by_session": [
+        {
+          "key": [
+            "7e80391a-3209-4450-b70e-cccfe2aa3dce",
+            "/Users/crawfordnakayama/DTCloudSource"
+          ],
+          "title": "Packages and allowances in catalog",
+          "title_kind": "custom",
+          "cost": 158.62,
+          "raw": 274588982,
+          "n": 484,
+          "first": "2026-09-08T15:16:01.292Z",
+          "last": "2026-09-08T23:28:25.811Z",
+          "share": 52.03,
+          "pct": 17.59,
+          "models": [
+            {
+              "model": "claude-opus-5",
+              "cost": 110.12,
+              "input": 474,
+              "output": 158168,
+              "cache_write": 2016926,
+              "cache_read": 171997203
+            },
+            {
+              "model": "claude-fable-5-1",
+              "cost": 48.49,
+              "input": 7164,
+              "output": 239912,
+              "cache_write": 576473,
+              "cache_read": 99592662
+            }
+          ]
+        },
+        {
+          "key": [
+            "f61278b4-7287-4e15-9ed7-ed9b4ce75075",
+            "/Users/crawfordnakayama"
+          ],
+          "title": "Usage widget implementation",
+          "title_kind": "custom",
+          "cost": 41.54,
+          "raw": 41540422,
+          "n": 168,
+          "first": "2026-09-08T19:19:05.900Z",
+          "last": "2026-09-08T23:27:39.716Z",
+          "share": 13.62,
+          "pct": 4.6,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 29.42,
+              "input": 2270,
+              "output": 149544,
+              "cache_write": 749080,
+              "cache_read": 27762115
+            },
+            {
+              "model": "claude-opus-5",
+              "cost": 12.11,
+              "input": 166,
+              "output": 101928,
+              "cache_write": 334367,
+              "cache_read": 12440952
+            }
+          ]
+        },
+        {
+          "key": [
+            "6e16d3e6-ffeb-4016-8219-06e3c70a7362",
+            "/Users/crawfordnakayama/日本語"
+          ],
+          "title": "Reader and vocab app bugs",
+          "title_kind": "custom",
+          "cost": 27.71,
+          "raw": 36544976,
+          "n": 97,
+          "first": "2026-09-08T14:07:19.637Z",
+          "last": "2026-09-08T16:39:31.154Z",
+          "share": 9.09,
+          "pct": 3.07,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 27.71,
+              "input": 2716,
+              "output": 187232,
+              "cache_write": 467242,
+              "cache_read": 35887786
+            }
+          ]
+        },
+        {
+          "key": [
+            "7d8c0284-ea69-43a9-a840-ba69fcc617f7",
+            "/Users/crawfordnakayama/日本語"
+          ],
+          "title": "Local translation model",
+          "title_kind": "custom",
+          "cost": 18.87,
+          "raw": 17592879,
+          "n": 82,
+          "first": "2026-09-08T14:08:34.207Z",
+          "last": "2026-09-08T17:00:13.815Z",
+          "share": 6.19,
+          "pct": 2.09,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 18.87,
+              "input": 2240,
+              "output": 115888,
+              "cache_write": 439618,
+              "cache_read": 17035133
+            }
+          ]
+        },
+        {
+          "key": [
+            "f073766f-8caa-4861-8dd9-e613edfeacf3",
+            "/Users/crawfordnakayama/tasks"
+          ],
+          "title": "Board task sequencing and performance",
+          "title_kind": "custom",
+          "cost": 18.13,
+          "raw": 18841920,
+          "n": 63,
+          "first": "2026-09-08T18:34:53.428Z",
+          "last": "2026-09-08T19:04:33.758Z",
+          "share": 5.95,
+          "pct": 2.01,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 18.13,
+              "input": 1316,
+              "output": 87668,
+              "cache_write": 457869,
+              "cache_read": 18295067
+            }
+          ]
+        },
+        {
+          "key": [
+            "3478f7e5-ffaa-48d5-b18e-a9aab1144dca",
+            "/Users/crawfordnakayama/日本語"
+          ],
+          "title": "Uncommitted changes review",
+          "title_kind": "custom",
+          "cost": 17.03,
+          "raw": 14620206,
+          "n": 75,
+          "first": "2026-09-08T17:00:46.951Z",
+          "last": "2026-09-08T20:12:57.971Z",
+          "share": 5.59,
+          "pct": 1.89,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 17.03,
+              "input": 1850,
+              "output": 86589,
+              "cache_write": 458392,
+              "cache_read": 14073375
+            }
+          ]
+        },
+        {
+          "key": [
+            "6b2af53a-213a-482d-96cb-5da80a3cec17",
+            "/Users/crawfordnakayama/DTCloudSource"
+          ],
+          "title": "Packages and allowances in catalog (fork)",
+          "title_kind": "custom",
+          "cost": 10.99,
+          "raw": 967189,
+          "n": 2,
+          "first": "2026-09-08T18:51:00.743Z",
+          "last": "2026-09-08T18:56:28.709Z",
+          "share": 3.6,
+          "pct": 1.22,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 9.29,
+              "input": 2,
+              "output": 1188,
+              "cache_write": 460982,
+              "cache_read": 44800
+            },
+            {
+              "model": "claude-sonnet-5",
+              "cost": 1.7,
+              "input": 2,
+              "output": 616,
+              "cache_write": 420441,
+              "cache_read": 39158
+            }
+          ]
+        },
+        {
+          "key": [
+            "8cfd75ec-69ff-4a28-9a90-413aeb0572e4",
+            "/Users/crawfordnakayama/DTCloudSource"
+          ],
+          "title": "Proposals tool component usability",
+          "title_kind": "custom",
+          "cost": 4.98,
+          "raw": 2917421,
+          "n": 21,
+          "first": "2026-09-08T14:10:29.988Z",
+          "last": "2026-09-08T14:18:40.830Z",
+          "share": 1.63,
+          "pct": 0.55,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 4.98,
+              "input": 586,
+              "output": 26016,
+              "cache_write": 149258,
+              "cache_read": 2741561
+            }
+          ]
+        },
+        {
+          "key": [
+            "358b6ed6-ded9-4a76-9e30-8156809700a1",
+            "/Users/crawfordnakayama/DTCloudSource"
+          ],
+          "title": "PR deployment status across environments",
+          "title_kind": "custom",
+          "cost": 4.2,
+          "raw": 3600950,
+          "n": 31,
+          "first": "2026-09-08T15:14:55.986Z",
+          "last": "2026-09-08T15:30:05.340Z",
+          "share": 1.38,
+          "pct": 0.47,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 4.2,
+              "input": 932,
+              "output": 23499,
+              "cache_write": 107202,
+              "cache_read": 3469317
+            }
+          ]
+        },
+        {
+          "key": [
+            "8c784f60-c08d-4acd-b094-31a6604eae4c",
+            "/Users/crawfordnakayama/DTCloudSource"
+          ],
+          "title": "Database changes review",
+          "title_kind": "custom",
+          "cost": 2.08,
+          "raw": 2212103,
+          "n": 22,
+          "first": "2026-09-08T20:02:42.539Z",
+          "last": "2026-09-08T20:53:34.451Z",
+          "share": 0.68,
+          "pct": 0.23,
+          "models": [
+            {
+              "model": "claude-opus-5",
+              "cost": 2.08,
+              "input": 44,
+              "output": 9420,
+              "cache_write": 78312,
+              "cache_read": 2124327
+            }
+          ]
+        },
+        {
+          "key": [
+            "19a9de17-5114-492a-b6c4-ff8f186aab0d",
+            "/Users/crawfordnakayama/Library/Application Support/Claude/scratch-workspaces/cc90827f-08e3-45de-b52e-6e5bd25efb07/e6fbf55b-1e7f-4429-bdbc-6783f6bc6914/scratch-2026-09-08-f4c0ea"
+          ],
+          "title": "Coaching changes detection via unsupervised learning",
+          "title_kind": "custom",
+          "cost": 0.32,
+          "raw": 54014,
+          "n": 1,
+          "first": "2026-09-08T16:35:27Z",
+          "last": "2026-09-08T16:35:27Z",
+          "share": 0.11,
+          "pct": 0.04,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 0.32,
+              "input": 2,
+              "output": 448,
+              "cache_write": 14474,
+              "cache_read": 39090
+            }
+          ]
+        },
+        {
+          "key": [
+            "07b86171-e12d-414e-bdb8-b0d1fcbebd82",
+            "/Users/crawfordnakayama"
+          ],
+          "title": "Stale backlog nudge",
+          "title_kind": "custom",
+          "cost": 0.19,
+          "raw": 102802,
+          "n": 2,
+          "first": "2026-09-08T13:11:56.418Z",
+          "last": "2026-09-08T13:11:58.406Z",
+          "share": 0.06,
+          "pct": 0.02,
+          "models": [
+            {
+              "model": "claude-opus-5",
+              "cost": 0.19,
+              "input": 4,
+              "output": 132,
+              "cache_write": 14206,
+              "cache_read": 88460
+            }
+          ]
+        },
+        {
+          "key": [
+            "8a622158-5efe-4214-b78a-9a08cb9905c6",
+            "/Users/crawfordnakayama/tasks"
+          ],
+          "title": "Stale backlog nudge",
+          "title_kind": "custom",
+          "cost": 0.14,
+          "raw": 102798,
+          "n": 2,
+          "first": "2026-09-08T14:01:12.299Z",
+          "last": "2026-09-08T14:01:14.494Z",
+          "share": 0.05,
+          "pct": 0.02,
+          "models": [
+            {
+              "model": "claude-opus-5",
+              "cost": 0.14,
+              "input": 4,
+              "output": 132,
+              "cache_write": 9388,
+              "cache_read": 93274
+            }
+          ]
+        },
+        {
+          "key": [
+            "a06e60d6-f222-4720-be2a-6d27776db207",
+            "/private/var/folders/5v/d7mr56w50q90f0tm5w_s8z7r0000gn/T/board-loe-pIslDL/worktrees/baseline"
+          ],
+          "title": "Classify this task as exactly one of: question, rese…",
+          "title_kind": "prompt",
+          "cost": 0.05,
+          "raw": 21443,
+          "n": 1,
+          "first": "2026-09-08T18:42:55.783Z",
+          "last": "2026-09-08T18:42:55.783Z",
+          "share": 0.02,
+          "pct": 0.01,
+          "models": [
+            {
+              "model": "claude-haiku-4-5-20251001",
+              "cost": 0.05,
+              "input": 10,
+              "output": 1139,
+              "cache_write": 20294,
+              "cache_read": 0
+            }
+          ]
+        },
+        {
+          "key": [
+            "02822420-cc6e-4954-a123-832022d8bb17",
+            "/private/var/folders/5v/d7mr56w50q90f0tm5w_s8z7r0000gn/T/board-loe-pIslDL/worktrees/baseline"
+          ],
+          "title": "Classify this task as exactly one of: question, rese…",
+          "title_kind": "prompt",
+          "cost": 0.02,
+          "raw": 20974,
+          "n": 1,
+          "first": "2026-09-08T18:43:06.119Z",
+          "last": "2026-09-08T18:43:06.119Z",
+          "share": 0.01,
+          "pct": 0.0,
+          "models": [
+            {
+              "model": "claude-haiku-4-5-20251001",
+              "cost": 0.02,
+              "input": 10,
+              "output": 583,
+              "cache_write": 6238,
+              "cache_read": 14143
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fable",
+      "label": "Weekly · Fable",
+      "sub": "resets weekly",
+      "start": "2026-09-08T06:00:00Z",
+      "reset": "2026-09-15T06:00:00Z",
+      "boundary_known": true,
+      "idle": false,
+      "calibrated": true,
+      "pct": 59.06,
+      "pace": 5.68,
+      "ramp": 1.0,
+      "elapsed_frac": 0.104,
+      "total_cost": 178.44,
+      "total_raw": 223758558,
+      "messages": 703,
+      "limit": 302.15,
+      "kinds": {
+        "input": 19078,
+        "output": 917984,
+        "cache_write": 3880590,
+        "cache_read": 218940906
+      },
+      "by_model": [
+        {
+          "key": "claude-fable-5-1",
+          "title": null,
+          "title_kind": null,
+          "cost": 178.44,
+          "raw": 223758558,
+          "n": 703,
+          "first": "2026-09-08T14:07:19.637Z",
+          "last": "2026-09-08T23:27:39.716Z",
+          "share": 100.0,
+          "pct": 59.06,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 178.44,
+              "input": 19078,
+              "output": 917984,
+              "cache_write": 3880590,
+              "cache_read": 218940906
+            }
+          ]
+        }
+      ],
+      "by_project": [
+        {
+          "key": "/Users/crawfordnakayama/日本語",
+          "title": null,
+          "title_kind": null,
+          "cost": 61.54,
+          "raw": 68400054,
+          "n": 252,
+          "first": "2026-09-08T14:07:19.637Z",
+          "last": "2026-09-08T20:12:57.971Z",
+          "share": 34.49,
+          "pct": 20.37,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 61.54,
+              "input": 6742,
+              "output": 377547,
+              "cache_write": 1295612,
+              "cache_read": 66720153
+            }
+          ]
+        },
+        {
+          "key": "/Users/crawfordnakayama/DTCloudSource",
+          "title": null,
+          "title_kind": null,
+          "cost": 51.3,
+          "raw": 70367212,
+          "n": 222,
+          "first": "2026-09-08T14:10:29.988Z",
+          "last": "2026-09-08T18:54:35.160Z",
+          "share": 28.75,
+          "pct": 16.98,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 51.3,
+              "input": 6398,
+              "output": 222440,
+              "cache_write": 1143305,
+              "cache_read": 68995069
+            }
+          ]
+        },
+        {
+          "key": "/Users/crawfordnakayama/tasks",
+          "title": null,
+          "title_kind": null,
+          "cost": 18.13,
+          "raw": 18841920,
+          "n": 63,
+          "first": "2026-09-08T18:34:53.428Z",
+          "last": "2026-09-08T19:04:33.758Z",
+          "share": 10.16,
+          "pct": 6.0,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 18.13,
+              "input": 1316,
+              "output": 87668,
+              "cache_write": 457869,
+              "cache_read": 18295067
+            }
+          ]
+        },
+        {
+          "key": "/Users/crawfordnakayama",
+          "title": null,
+          "title_kind": null,
+          "cost": 13.92,
+          "raw": 5099756,
+          "n": 14,
+          "first": "2026-09-08T21:51:54.527Z",
+          "last": "2026-09-08T23:26:21.459Z",
+          "share": 7.8,
+          "pct": 4.61,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 13.92,
+              "input": 298,
+              "output": 22758,
+              "cache_write": 582655,
+              "cache_read": 4494045
+            }
+          ]
+        },
+        {
+          "key": "/Users/crawfordnakayama/usage_app",
+          "title": null,
+          "title_kind": null,
+          "cost": 10.95,
+          "raw": 18843866,
+          "n": 57,
+          "first": "2026-09-08T21:52:13.190Z",
+          "last": "2026-09-08T22:25:24.933Z",
+          "share": 6.14,
+          "pct": 3.62,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 10.95,
+              "input": 1524,
+              "output": 82280,
+              "cache_write": 107756,
+              "cache_read": 18652306
+            }
+          ]
+        },
+        {
+          "key": "/Users/crawfordnakayama/DTCloudSource/WebApps/App/src/app",
+          "title": null,
+          "title_kind": null,
+          "cost": 6.59,
+          "raw": 12370720,
+          "n": 26,
+          "first": "2026-09-08T16:10:39.088Z",
+          "last": "2026-09-08T18:53:45.048Z",
+          "share": 3.69,
+          "pct": 2.18,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 6.59,
+              "input": 802,
+              "output": 38916,
+              "cache_write": 78556,
+              "cache_read": 12252446
+            }
+          ]
+        },
+        {
+          "key": "/Users/crawfordnakayama/DTCloudSource/WebApps/App",
+          "title": null,
+          "title_kind": null,
+          "cost": 4.49,
+          "raw": 12026088,
+          "n": 24,
+          "first": "2026-09-08T16:35:31.357Z",
+          "last": "2026-09-08T18:54:02.545Z",
+          "share": 2.52,
+          "pct": 1.49,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 4.49,
+              "input": 618,
+              "output": 12107,
+              "cache_write": 44401,
+              "cache_read": 11968962
+            }
+          ]
+        },
+        {
+          "key": "/Users/crawfordnakayama/DTCloudSource/Projects",
+          "title": null,
+          "title_kind": null,
+          "cost": 4.12,
+          "raw": 11484143,
+          "n": 26,
+          "first": "2026-09-08T16:25:20.894Z",
+          "last": "2026-09-08T16:35:25.289Z",
+          "share": 2.31,
+          "pct": 1.36,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 4.12,
+              "input": 802,
+              "output": 15061,
+              "cache_write": 24786,
+              "cache_read": 11443494
+            }
+          ]
+        },
+        {
+          "key": "/Users/crawfordnakayama/usage_app/src-tauri",
+          "title": null,
+          "title_kind": null,
+          "cost": 2.42,
+          "raw": 3645594,
+          "n": 10,
+          "first": "2026-09-08T22:02:53.237Z",
+          "last": "2026-09-08T23:27:39.716Z",
+          "share": 1.36,
+          "pct": 0.8,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 2.42,
+              "input": 320,
+              "output": 19656,
+              "cache_write": 26835,
+              "cache_read": 3598783
+            }
+          ]
+        },
+        {
+          "key": "/Users/crawfordnakayama/日本語/Design",
+          "title": null,
+          "title_kind": null,
+          "cost": 2.07,
+          "raw": 358007,
+          "n": 2,
+          "first": "2026-09-08T14:09:42.366Z",
+          "last": "2026-09-08T14:10:34.066Z",
+          "share": 1.16,
+          "pct": 0.69,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 2.07,
+              "input": 64,
+              "output": 12162,
+              "cache_write": 69640,
+              "cache_read": 276141
+            }
+          ]
+        },
+        {
+          "key": "/Users/crawfordnakayama/usage_app/src-tauri/src/ledger",
+          "title": null,
+          "title_kind": null,
+          "cost": 1.38,
+          "raw": 526529,
+          "n": 2,
+          "first": "2026-09-08T21:55:45.279Z",
+          "last": "2026-09-08T21:57:36.480Z",
+          "share": 0.77,
+          "pct": 0.46,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 1.38,
+              "input": 64,
+              "output": 17922,
+              "cache_write": 18162,
+              "cache_read": 490381
+            }
+          ]
+        },
+        {
+          "key": "/Users/crawfordnakayama/usage_app/src-tauri/src",
+          "title": null,
+          "title_kind": null,
+          "cost": 0.53,
+          "raw": 273348,
+          "n": 1,
+          "first": "2026-09-08T21:58:50.416Z",
+          "last": "2026-09-08T21:58:50.416Z",
+          "share": 0.3,
+          "pct": 0.18,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 0.53,
+              "input": 32,
+              "output": 6705,
+              "cache_write": 6622,
+              "cache_read": 259989
+            }
+          ]
+        }
+      ],
+      "by_session": [
+        {
+          "key": [
+            "7e80391a-3209-4450-b70e-cccfe2aa3dce",
+            "/Users/crawfordnakayama/DTCloudSource"
+          ],
+          "title": "Packages and allowances in catalog",
+          "title_kind": "custom",
+          "cost": 48.49,
+          "raw": 100416211,
+          "n": 247,
+          "first": "2026-09-08T15:16:01.292Z",
+          "last": "2026-09-08T18:54:35.160Z",
+          "share": 27.18,
+          "pct": 16.05,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 48.49,
+              "input": 7164,
+              "output": 239912,
+              "cache_write": 576473,
+              "cache_read": 99592662
+            }
+          ]
+        },
+        {
+          "key": [
+            "f61278b4-7287-4e15-9ed7-ed9b4ce75075",
+            "/Users/crawfordnakayama/usage_app"
+          ],
+          "title": "Usage widget implementation",
+          "title_kind": "custom",
+          "cost": 29.42,
+          "raw": 28663009,
+          "n": 85,
+          "first": "2026-09-08T21:51:54.527Z",
+          "last": "2026-09-08T23:27:39.716Z",
+          "share": 16.49,
+          "pct": 9.74,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 29.42,
+              "input": 2270,
+              "output": 149544,
+              "cache_write": 749080,
+              "cache_read": 27762115
+            }
+          ]
+        },
+        {
+          "key": [
+            "6e16d3e6-ffeb-4016-8219-06e3c70a7362",
+            "/Users/crawfordnakayama/日本語"
+          ],
+          "title": "Reader and vocab app bugs",
+          "title_kind": "custom",
+          "cost": 27.71,
+          "raw": 36544976,
+          "n": 97,
+          "first": "2026-09-08T14:07:19.637Z",
+          "last": "2026-09-08T16:39:31.154Z",
+          "share": 15.53,
+          "pct": 9.17,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 27.71,
+              "input": 2716,
+              "output": 187232,
+              "cache_write": 467242,
+              "cache_read": 35887786
+            }
+          ]
+        },
+        {
+          "key": [
+            "7d8c0284-ea69-43a9-a840-ba69fcc617f7",
+            "/Users/crawfordnakayama/日本語"
+          ],
+          "title": "Local translation model",
+          "title_kind": "custom",
+          "cost": 18.87,
+          "raw": 17592879,
+          "n": 82,
+          "first": "2026-09-08T14:08:34.207Z",
+          "last": "2026-09-08T17:00:13.815Z",
+          "share": 10.57,
+          "pct": 6.24,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 18.87,
+              "input": 2240,
+              "output": 115888,
+              "cache_write": 439618,
+              "cache_read": 17035133
+            }
+          ]
+        },
+        {
+          "key": [
+            "f073766f-8caa-4861-8dd9-e613edfeacf3",
+            "/Users/crawfordnakayama/tasks"
+          ],
+          "title": "Board task sequencing and performance",
+          "title_kind": "custom",
+          "cost": 18.13,
+          "raw": 18841920,
+          "n": 63,
+          "first": "2026-09-08T18:34:53.428Z",
+          "last": "2026-09-08T19:04:33.758Z",
+          "share": 10.16,
+          "pct": 6.0,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 18.13,
+              "input": 1316,
+              "output": 87668,
+              "cache_write": 457869,
+              "cache_read": 18295067
+            }
+          ]
+        },
+        {
+          "key": [
+            "3478f7e5-ffaa-48d5-b18e-a9aab1144dca",
+            "/Users/crawfordnakayama/日本語"
+          ],
+          "title": "Uncommitted changes review",
+          "title_kind": "custom",
+          "cost": 17.03,
+          "raw": 14620206,
+          "n": 75,
+          "first": "2026-09-08T17:00:46.951Z",
+          "last": "2026-09-08T20:12:57.971Z",
+          "share": 9.55,
+          "pct": 5.64,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 17.03,
+              "input": 1850,
+              "output": 86589,
+              "cache_write": 458392,
+              "cache_read": 14073375
+            }
+          ]
+        },
+        {
+          "key": [
+            "6b2af53a-213a-482d-96cb-5da80a3cec17",
+            "/Users/crawfordnakayama/DTCloudSource"
+          ],
+          "title": "Packages and allowances in catalog (fork)",
+          "title_kind": "custom",
+          "cost": 9.29,
+          "raw": 506972,
+          "n": 1,
+          "first": "2026-09-08T18:51:00.743Z",
+          "last": "2026-09-08T18:51:00.743Z",
+          "share": 5.21,
+          "pct": 3.07,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 9.29,
+              "input": 2,
+              "output": 1188,
+              "cache_write": 460982,
+              "cache_read": 44800
+            }
+          ]
+        },
+        {
+          "key": [
+            "8cfd75ec-69ff-4a28-9a90-413aeb0572e4",
+            "/Users/crawfordnakayama/DTCloudSource"
+          ],
+          "title": "Proposals tool component usability",
+          "title_kind": "custom",
+          "cost": 4.98,
+          "raw": 2917421,
+          "n": 21,
+          "first": "2026-09-08T14:10:29.988Z",
+          "last": "2026-09-08T14:18:40.830Z",
+          "share": 2.79,
+          "pct": 1.65,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 4.98,
+              "input": 586,
+              "output": 26016,
+              "cache_write": 149258,
+              "cache_read": 2741561
+            }
+          ]
+        },
+        {
+          "key": [
+            "358b6ed6-ded9-4a76-9e30-8156809700a1",
+            "/Users/crawfordnakayama/DTCloudSource"
+          ],
+          "title": "PR deployment status across environments",
+          "title_kind": "custom",
+          "cost": 4.2,
+          "raw": 3600950,
+          "n": 31,
+          "first": "2026-09-08T15:14:55.986Z",
+          "last": "2026-09-08T15:30:05.340Z",
+          "share": 2.35,
+          "pct": 1.39,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 4.2,
+              "input": 932,
+              "output": 23499,
+              "cache_write": 107202,
+              "cache_read": 3469317
+            }
+          ]
+        },
+        {
+          "key": [
+            "19a9de17-5114-492a-b6c4-ff8f186aab0d",
+            "/Users/crawfordnakayama/Library/Application Support/Claude/scratch-workspaces/cc90827f-08e3-45de-b52e-6e5bd25efb07/e6fbf55b-1e7f-4429-bdbc-6783f6bc6914/scratch-2026-09-08-f4c0ea"
+          ],
+          "title": "Coaching changes detection via unsupervised learning",
+          "title_kind": "custom",
+          "cost": 0.32,
+          "raw": 54014,
+          "n": 1,
+          "first": "2026-09-08T16:35:27Z",
+          "last": "2026-09-08T16:35:27Z",
+          "share": 0.18,
+          "pct": 0.11,
+          "models": [
+            {
+              "model": "claude-fable-5-1",
+              "cost": 0.32,
+              "input": 2,
+              "output": 448,
+              "cache_write": 14474,
+              "cache_read": 39090
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "scan": {
+    "files_total": 7123,
+    "files_in_window": 1063,
+    "files_read": 3,
+    "bytes_read": 559276,
+    "lines_seen": 332,
+    "records_added": 57,
+    "duplicates_skipped": 35,
+    "records_retained": 17431,
+    "duration_ms": 81
+  },
+  "index_records": 17431,
+  "usage_cache": {
+    "fetched_at": "2026-09-08T22:24:13.214Z",
+    "session": {
+      "percent": 92.0,
+      "resets_at": "2026-09-08T23:20:00.189988Z"
+    },
+    "weekly": {
+      "percent": 31.0,
+      "resets_at": "2026-09-15T06:00:00.190008Z"
+    },
+    "fable": {
+      "percent": 56.0,
+      "resets_at": "2026-09-15T06:00:00.190180Z"
+    }
+  },
+  "calibration_source": "auto"
+}
