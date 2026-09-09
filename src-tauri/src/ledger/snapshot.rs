@@ -10,6 +10,7 @@ use super::index::{Index, ScanStats};
 use super::pricing::PriceTable;
 use super::record::{Rec, TitleKind, Usage};
 use super::usagecache::UsageCache;
+use crate::engine::CacheDiag;
 use super::windows::{ramp, resolve, Calibration, Window};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -97,6 +98,8 @@ pub struct Snapshot {
     pub usage_cache: Option<UsageCache>,
     /// Where the anchors came from: "auto" (Claude Code's cache), "manual", or "none".
     pub calibration_source: String,
+    /// Why the cache did or didn't calibrate us — drives the setup guidance.
+    pub cache_diag: CacheDiag,
 }
 
 #[derive(Default)]
@@ -155,6 +158,7 @@ pub fn build_snapshot(
     scan: ScanStats,
     limits: &Limits,
     usage_cache: Option<UsageCache>,
+    cache_diag: CacheDiag,
 ) -> Snapshot {
     let ts = index.timestamps_sorted();
     let windows = resolve(cal, now, &ts);
@@ -275,6 +279,7 @@ pub fn build_snapshot(
         scan,
         index_records: index.len(),
         usage_cache,
+        cache_diag,
         calibration_source: match (cal.manual_at, cal.auto_fetched_at) {
             (Some(m), Some(a)) if m > a => "manual",
             (_, Some(_)) => "auto",
@@ -324,7 +329,7 @@ mod tests {
             ("2", "2026-09-08T19:00:00Z", "s2", "claude-fable-5-1", 1_000_000),
         ]);
         let cal = Calibration { session_reset_at: Some(utc("2026-09-08T22:00:00Z")), ..Default::default() };
-        let snap = build_snapshot(&idx, &PriceTable::default(), &cal, "Max", None, utc("2026-09-08T20:00:00Z"), ScanStats::default(), &Limits::default(), None);
+        let snap = build_snapshot(&idx, &PriceTable::default(), &cal, "Max", None, utc("2026-09-08T20:00:00Z"), ScanStats::default(), &Limits::default(), None, CacheDiag::default());
         let [s, w, f] = <[WindowOut; 3]>::try_from(snap.windows).ok().unwrap();
         assert_eq!(s.messages, 2);
         assert!((w.total_cost - 75.0).abs() < 1e-6, "25 + 50 dollars of output");
@@ -345,7 +350,7 @@ mod tests {
         let mut cal = Calibration { session_reset_at: Some(utc("2026-09-08T22:00:00Z")), ..Default::default() };
         // The tab said 50% while our weighted total was $100 → cap is $200.
         cal.session = Some(Anchor { pct: 50.0, captured_at: now, implied_limit: 200.0 });
-        let snap = build_snapshot(&idx, &PriceTable::default(), &cal, "Max", None, now, ScanStats::default(), &Limits::default(), None);
+        let snap = build_snapshot(&idx, &PriceTable::default(), &cal, "Max", None, now, ScanStats::default(), &Limits::default(), None, CacheDiag::default());
         let s = &snap.windows[0];
         assert_eq!(s.pct, Some(50.0));
         assert_eq!(s.by_session[0].share, 75.0);

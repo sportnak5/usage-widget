@@ -64,11 +64,14 @@
 
 <dialog id="settings">
   <form method="dialog" id="settingsForm">
-    <div class="dhead"><h2>Calibrate &amp; settings</h2><span class="stamp">read these off the Usage tab in Claude Code</span></div>
+    <div class="dhead"><h2>Calibrate &amp; settings</h2><span class="stamp">Token Ledger calibrates itself from Claude Code — manual entry is the fallback</span></div>
     <div class="dbody">
-      <div class="notice" id="f_src" style="margin:0"></div>
+      <div id="f_setup"></div>
+      <details id="f_manual">
+        <summary>Enter the percentages by hand instead</summary>
       <fieldset>
         <legend>Usage tab right now</legend>
+        <div class="frow"><span class="hint">Only needed when <code>/usage</code> can't reach this machine's Claude Code — a reading from Claude Code itself replaces anything typed here as soon as one turns up.</span></div>
         <div class="frow"><label for="f_session">Current session</label>
           <div class="inline"><input type="number" id="f_session" min="0" max="999" step="1" placeholder="78"><span>% used · resets in</span>
             <input type="number" id="f_rh" min="0" max="5" step="1" placeholder="3"><span>hr</span>
@@ -82,6 +85,7 @@
             <span>at</span><input type="number" id="f_wh" min="0" max="23" step="1" value="1"><span>:</span><input type="number" id="f_wm" min="0" max="59" step="1" value="0"><span>(local, 24h)</span></div></div>
         <div class="frow"><span class="hint">Leave a percentage blank to keep its current anchor. Enter 0 to clear it.</span></div>
       </fieldset>
+      </details>
       <fieldset>
         <legend>Plan</legend>
         <div class="frow"><label for="f_plan">Plan label</label><input type="text" id="f_plan" placeholder="Max (20x)"></div>

@@ -24,6 +24,23 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px;max-width:62ch}
 .notice b{color:var(--ink);font-weight:600}
 .notice.warn{background:color-mix(in srgb,var(--warn) 14%,var(--surface))}
 
+/* The not-calibrated card: a task, not a warning. Steps first, manual entry
+   demoted to an ordinary button at the bottom. */
+.setup{display:block;padding:14px 16px}
+.setup .stitle{font-size:13px;color:var(--ink-2)}
+.setup .swhy{margin:7px 0 0;color:var(--ink-2)}
+.setup .ssteps{margin:10px 0 0;padding-left:19px;display:flex;flex-direction:column;gap:6px}
+.setup .ssteps li{padding-left:2px}
+.setup code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;background:var(--sunk);border:1px solid var(--line);border-radius:5px;padding:1px 5px;color:var(--ink)}
+.setup .btn.tiny{font-size:10.5px;padding:1px 7px;margin-left:5px;vertical-align:1px}
+.setup .sfoot{display:flex;gap:9px;align-items:center;margin-top:13px;flex-wrap:wrap}
+.setup .serr{margin:9px 0 0;color:var(--crit)}
+
+/* Manual entry, folded away until asked for. */
+#f_manual>summary{cursor:pointer;font-size:12.5px;color:var(--ink-2);padding:7px 2px;list-style-position:outside}
+#f_manual>summary:hover{color:var(--ink)}
+#f_manual[open]>summary{margin-bottom:6px}
+
 .bigwrap{background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:15px 18px 16px}
 .bigbar{display:flex;align-items:center;gap:12px;margin-bottom:12px}
 .bigbar .eyebrow{flex:1 1 auto}

@@ -30,7 +30,7 @@ function dial(w: WindowOut, i: number): string {
   }));
   const fill = w.pct === null ? 1 : Math.min(1, w.pct / 100);
   const title = w.pct === null
-    ? `${w.label} — not calibrated. Open the ledger to enter the Usage tab percentages.`
+    ? `${w.label} — not calibrated. Run /usage in a Claude Code terminal session; the ledger window explains the rest.`
     : `${w.label} — ${w.pct.toFixed(0)}% used, ${paceNote(w.pace)}, resets ${until(w.reset)}`;
   return `<button class="dial" data-i="${i}" aria-selected="${i === sel}" style="${paint(w.ramp)}" title="${esc(title)}">
     <svg width="64" height="64" viewBox="-32 -32 64 64" aria-hidden="true">
@@ -72,7 +72,7 @@ function renderRows(): void {
       }).join("");
   const note = snap.calibrated
     ? `<div class="wnote"><span>${esc(snap.plan)}</span><span>${hhmm(snap.generated_at)}</span></div>`
-    : `<div class="wnote"><span>not calibrated</span><button id="calib">enter Usage tab %</button></div>`;
+    : `<div class="wnote"><span>not calibrated</span><button id="calib">run /usage</button></div>`;
   $("wtop5").innerHTML = cap + body + note;
   $("wtop5").querySelector("#calib")?.addEventListener("click", (e) => { e.stopPropagation(); openSettings(); });
 }

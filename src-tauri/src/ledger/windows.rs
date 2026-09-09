@@ -5,7 +5,9 @@
 //! boundary is a fixed weekday and hour; the caps are *implied* from a
 //! percentage the user reads off that tab once:
 //!
-//!     implied_limit = weighted_total_at_capture / (pct / 100)
+//! ```text
+//! implied_limit = weighted_total_at_capture / (pct / 100)
+//! ```
 //!
 //! After that, every refresh estimates `pct = weighted_total_now / implied_limit`
 //! with no further input. Re-entering a percentage re-anchors the limit.

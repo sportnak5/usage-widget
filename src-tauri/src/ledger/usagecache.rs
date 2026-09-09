@@ -38,10 +38,40 @@ pub fn default_path(claude_dir: &Path) -> PathBuf {
         .unwrap_or_else(|| claude_dir.join(".claude.json"))
 }
 
+/// Why a read produced nothing — the three failures look identical to the
+/// caller of `read`, but the user needs different advice for each.
+pub enum Status {
+    /// No `.claude.json` at all: Claude Code has never run for this user, or
+    /// it lives somewhere we aren't looking (WSL, a custom config dir).
+    NoFile,
+    Unreadable(String),
+    /// The file is there but carries no `cachedUsageUtilization`: nothing has
+    /// fetched the Usage numbers yet.
+    NoKey,
+    Ok(UsageCache),
+}
+
+pub fn read_status(path: &Path) -> Status {
+    let bytes = match std::fs::read(path) {
+        Ok(b) => b,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Status::NoFile,
+        Err(e) => return Status::Unreadable(e.to_string()),
+    };
+    let v: Value = match serde_json::from_slice(&bytes) {
+        Ok(v) => v,
+        Err(e) => return Status::Unreadable(e.to_string()),
+    };
+    match v.get("cachedUsageUtilization").and_then(parse) {
+        Some(c) => Status::Ok(c),
+        None => Status::NoKey,
+    }
+}
+
 pub fn read(path: &Path) -> Option<UsageCache> {
-    let bytes = std::fs::read(path).ok()?;
-    let v: Value = serde_json::from_slice(&bytes).ok()?;
-    parse(v.get("cachedUsageUtilization")?)
+    match read_status(path) {
+        Status::Ok(c) => Some(c),
+        _ => None,
+    }
 }
 
 fn reading(v: &Value, pct_key: &str) -> Option<Reading> {

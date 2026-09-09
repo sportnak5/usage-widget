@@ -8,6 +8,7 @@ import {
 import { convColor, modelColor, paint, paceNote } from "./shared/color";
 import { entryName, esc, hhmm, setHome, short, tidy, tok, until, usd, when } from "./shared/format";
 import { grow, numText, ringArcs } from "./shared/ring";
+import { bindSetup, setupCard, setupPanel } from "./shared/setup";
 import {
   applyScheme, CUSTOM_ID, currentSchemeId, customScheme, GROUPS, paletteOf, SCHEMES, saveCustom, setScheme,
 } from "./shared/schemes";
@@ -27,6 +28,30 @@ let open: number | null = null;
 
 // ---------- header + notices ----------
 
+/// Re-read Claude Code's cached Usage numbers after the user has run `/usage`.
+/// A failed scan still republishes a snapshot (with a fresh diagnosis), so the
+/// error goes next to the button rather than into an alert.
+async function recheck(btn: HTMLButtonElement): Promise<void> {
+  const label = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Checking…";
+  try {
+    apply(await refreshNow());
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = label;
+    const box = btn.closest(".setup");
+    if (box) {
+      const p = document.createElement("p");
+      p.className = "serr";
+      p.textContent = String(e);
+      box.querySelector(".serr")?.remove();
+      box.appendChild(p);
+    }
+  }
+}
+
+
 function renderHeader(): void {
   if (!snap) return;
   $("tier").textContent = snap.plan;
@@ -35,10 +60,7 @@ function renderHeader(): void {
   const cache = snap.usage_cache;
   const cacheAge = cache ? (Date.now() - new Date(cache.fetched_at).getTime()) / 3.6e6 : null;
   if (!snap.calibrated) {
-    const why = cache
-      ? `Claude Code's cached Usage reading is from ${when(cache.fetched_at)} (${cacheAge!.toFixed(0)} h ago) and too low to anchor on. Run /usage in a Claude Code terminal session to refresh it (the desktop app's Usage tab does not), or enter the values by hand.`
-      : `No cached Usage reading was found in Claude Code's config. Read the three percentages off the Usage tab and enter them.`;
-    notices.push(`<div class="notice warn"><span><b>Not calibrated.</b> Rings show relative breakdown only. ${esc(why)}</span><button class="btn primary" data-open-settings>Calibrate</button></div>`);
+    notices.push(setupCard(snap));
   } else if (snap.calibration_source === "auto" && cache) {
     notices.push(`<div class="notice"><span><b>Auto-calibrated</b> from Claude Code's own Usage reading, fetched ${when(cache.fetched_at)}${cacheAge! > 24 ? ` — ${cacheAge!.toFixed(0)} h old; run /usage in a Claude Code terminal session to refresh it` : ""}.</span></div>`);
   }
@@ -50,7 +72,7 @@ function renderHeader(): void {
     notices.push(`<div class="notice warn"><span><b>Session boundary unknown.</b> No transcripts found yet, so the session dial is a rolling 5-hour window.</span></div>`);
   }
   $("notices").innerHTML = notices.join("");
-  $("notices").querySelectorAll<HTMLButtonElement>("[data-open-settings]").forEach((b) => b.addEventListener("click", openSettingsDialog));
+  bindSetup($("notices"), { recheck, settings: openSettingsDialog });
   const s = snap.scan;
   $("scan").textContent = `index: ${snap.index_records.toLocaleString()} unique turns · last scan ${s.files_in_window} of ${s.files_total} files in range, ${s.files_read} read, ${(s.bytes_read / 1e6).toFixed(1)} MB, +${s.records_added} new, ${s.duplicates_skipped} duplicates skipped, ${s.duration_ms} ms`;
 }
@@ -218,10 +240,13 @@ async function openSettingsDialog(): Promise<void> {
   try { ($("f_auto") as HTMLInputElement).checked = await getAutostart(); } catch { /* plugin unavailable in dev */ }
   const hint = (a: Settings["calibration"]["session"]) => a ? `anchored ${a.pct}% at ${when(a.captured_at)}` : "not set";
   const src = s.calibration.auto_fetched_at && (!s.calibration.manual_at || s.calibration.manual_at < s.calibration.auto_fetched_at)
-    ? `Currently anchored from Claude Code's cached Usage reading (${when(s.calibration.auto_fetched_at)}). Values you enter here take precedence until a newer reading appears.`
-    : s.calibration.manual_at ? `Currently anchored from your manual entry (${when(s.calibration.manual_at)}). A newer reading from Claude Code will replace it.`
-    : `Nothing anchored yet. Claude Code's cached Usage reading is applied automatically when it's fresh; enter values here to anchor now.`;
-  $("f_src").textContent = src;
+    ? `Anchored from Claude Code's cached Usage reading (${when(s.calibration.auto_fetched_at)}). Values you enter below take precedence until a newer reading appears.`
+    : s.calibration.manual_at ? `Anchored from your manual entry (${when(s.calibration.manual_at)}). A newer reading from Claude Code will replace it.`
+    : `Nothing anchored yet.`;
+  $("f_setup").innerHTML = setupPanel(snap, src);
+  bindSetup($("f_setup"), { recheck: async (b) => { await recheck(b); if (dlg.open) { dlg.close(); void openSettingsDialog(); } } });
+  // Manual entry is the fallback: closed unless it is already what's in use.
+  ($("f_manual") as HTMLDetailsElement).open = snap?.calibration_source === "manual";
   ($("f_session") as HTMLInputElement).placeholder = hint(s.calibration.session);
   ($("f_weekly") as HTMLInputElement).placeholder = hint(s.calibration.weekly);
   ($("f_fable") as HTMLInputElement).placeholder = hint(s.calibration.fable);

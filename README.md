@@ -45,9 +45,12 @@ reset times), and the app anchors to that whenever the reading is fresh and
 large enough to be precise (integer percentages under 10% are skipped). That
 cache is written when you run `/usage` inside a terminal `claude` session
 (the desktop app's Usage tab reads live and does not write it), so it can be
-days old. When it is stale or missing, the ledger window
-tells you and you can type the three percentages in yourself — a manual entry
-always wins over an older cached one.
+days old. When it is stale or missing, the ledger window names the specific
+reason — no config file at the path it looked at, no reading cached in it yet,
+a reading too low to anchor on — and walks you through running `/usage` and
+re-checking. Typing the three percentages in yourself is the fallback behind a
+disclosure, for machines `/usage` can't reach (Claude Code inside WSL or a
+container). A manual entry always wins over an older cached one.
 
 Data layer only, no GUI:
 

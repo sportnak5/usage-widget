@@ -75,6 +75,19 @@ export interface UsageCache {
   fable: Reading | null;
 }
 
+/** Why Claude Code's cached Usage reading did or didn't calibrate us. */
+export type CacheReason =
+  | "ok" | "no_dir" | "no_file" | "unreadable" | "no_key" | "no_readings" | "too_low" | "no_usage";
+
+export interface CacheDiag {
+  path: string;
+  projects_dir: string;
+  reason: CacheReason;
+  detail: string | null;
+  fetched_at: string | null;
+  best_pct: number | null;
+}
+
 export interface Snapshot {
   generated_at: string;
   plan: string;
@@ -85,6 +98,7 @@ export interface Snapshot {
   index_records: number;
   usage_cache: UsageCache | null;
   calibration_source: "auto" | "manual" | "none";
+  cache_diag: CacheDiag;
 }
 
 export interface WeeklyReset {
