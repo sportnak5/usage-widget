@@ -10,6 +10,10 @@ jobs:
       contents: write
     strategy:
       fail-fast: false
+      # One at a time: the first job to finish creates the draft release, and
+      # the rest find it. Run them together and each creates its own draft,
+      # scattering the installers across three of them.
+      max-parallel: 1
       matrix:
         include:
           - os: macos-latest
