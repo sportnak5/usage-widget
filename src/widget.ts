@@ -1,6 +1,7 @@
 // The widget window. Readouts, not controls: the only interactions are the
 // dial labels (re-scope the rows), the chevron (expand in place), ring hover
-// (model tooltip), drag on the chrome, and double-click to open the ledger.
+// (model tooltip), drag anywhere but the chevron and grip, and double-click to
+// open the ledger.
 import { applySavedTheme } from "./shared/theme";
 import {
   getHome, getSettings, getSnapshot, onSchemeChanged, onSnapshot, openMain, openSettings,
@@ -53,8 +54,7 @@ function dial(w: WindowOut, i: number): string {
 function renderDials(): void {
   if (!snap) return;
   $("dials").innerHTML = snap.windows.map(dial).join("");
-  document.querySelectorAll<HTMLButtonElement>(".dial").forEach((b) =>
-    b.addEventListener("click", (e) => { e.stopPropagation(); setWindow(Number(b.dataset.i)); }));
+  document.querySelectorAll<HTMLButtonElement>(".dial").forEach(armDial);
   grow($("dials"));
 }
 
@@ -83,6 +83,32 @@ function renderRows(): void {
     : `<div class="wnote"><span>not calibrated</span><button id="calib">run /usage</button></div>`;
   $("wtop5").innerHTML = cap + body + note;
   $("wtop5").querySelector("#calib")?.addEventListener("click", (e) => { e.stopPropagation(); openSettings(); });
+}
+
+// A dial is a control and part of the card's surface at once: a plain click
+// re-scopes the rows, but press-and-move drags the window and a double-press
+// opens the ledger, so the gauges aren't dead zones for either gesture.
+function armDial(b: HTMLButtonElement): void {
+  b.addEventListener("mousedown", (e) => {
+    if (e.button !== 0) return;
+    e.stopPropagation();
+    if (e.detail >= 2) { void openMain(); return; }
+    const x0 = e.screenX, y0 = e.screenY;
+    let dragged = false;
+    const off = () => {
+      window.removeEventListener("mousemove", move);
+      window.removeEventListener("mouseup", up);
+    };
+    const move = (m: MouseEvent) => {
+      if (Math.abs(m.screenX - x0) + Math.abs(m.screenY - y0) < 4) return;
+      dragged = true;
+      off();
+      void startDragging();
+    };
+    const up = () => { off(); if (!dragged) setWindow(Number(b.dataset.i)); };
+    window.addEventListener("mousemove", move);
+    window.addEventListener("mouseup", up);
+  });
 }
 
 function setWindow(i: number): void {
@@ -145,11 +171,10 @@ $("chev").addEventListener("click", async (e) => {
 $("widget").addEventListener("mousedown", (e) => {
   if (e.button !== 0) return;
   const t = e.target as HTMLElement;
-  if (t.closest("button, .arc, .wr, .grip")) return;
+  if (t.closest("button, .grip")) return;
   if (e.detail >= 2) { void openMain(); return; }
   void startDragging();
 });
-$("wtop5").addEventListener("dblclick", () => void openMain());
 document.addEventListener("contextmenu", (e) => e.preventDefault());
 
 (async () => {
