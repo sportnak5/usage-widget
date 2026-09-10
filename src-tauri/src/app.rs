@@ -4,7 +4,7 @@
 
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use chrono::Utc;
 use serde::Deserialize;
@@ -24,7 +24,37 @@ pub struct AppState {
     /// remembered position has been applied. Until the position *we* chose is
     /// on the window, a move is the window server talking, not the user.
     widget_placed: AtomicBool,
+    /// A move the window server reported that has not been written down yet.
+    widget_move: Mutex<Option<PendingMove>>,
+    /// The display layout as last seen, and when it last changed.
+    displays: Mutex<Displays>,
 }
+
+/// Where the widget was last reported, and when. Held back rather than saved,
+/// because a display appearing or disappearing relocates the widget exactly
+/// the way a drag does and only the timing tells them apart.
+struct PendingMove {
+    pos: LogicalPosition<f64>,
+    at: Instant,
+}
+
+/// Position, size and scale of one display: x, y, width, height, scale bits.
+type DisplayShape = (i32, i32, u32, u32, u64);
+
+struct Displays {
+    /// Every display, sorted. `None` until the first poll has run.
+    fingerprint: Option<Vec<DisplayShape>>,
+    changed_at: Instant,
+}
+
+/// How often the display layout is checked. A KVM switch takes the monitor
+/// away without warning, and nothing notifies an app that it happened.
+const DISPLAY_POLL: Duration = Duration::from_millis(400);
+/// How long after a display change a reported move is still the window server
+/// rearranging windows rather than the user dragging one.
+const DISPLAY_SETTLE: Duration = Duration::from_secs(2);
+/// How long a move has to stand before it is taken as the user's choice.
+const MOVE_SETTLE: Duration = Duration::from_millis(700);
 
 const WIDGET_MIN_W: f64 = 380.0;
 const WIDGET_MAX_W: f64 = 640.0;
@@ -75,23 +105,127 @@ fn show_main(app: &AppHandle) {
 fn show_widget(app: &AppHandle) {
     let Some(w) = app.get_webview_window("widget") else { return };
     let state = app.state::<AppState>();
-    let (geom, on_top) = {
-        let eng = lock(&state.engine);
-        (eng.settings.widget.clone(), eng.settings.widget_on_top)
-    };
+    let on_top = lock(&state.engine).settings.widget_on_top;
+    place_widget(app, &w);
+    state.widget_placed.store(true, Ordering::Relaxed);
+    apply_widget_layer(&w, on_top);
+    let _ = w.show();
+}
+
+/// Put the widget back on its remembered position. Runs at first show and
+/// again every time the set of displays changes.
+fn place_widget(app: &AppHandle, w: &tauri::WebviewWindow) {
+    let state = app.state::<AppState>();
+    let geom = lock(&state.engine).settings.widget.clone();
     let pos = geom
-        .filter(|g| on_a_monitor(&w, g.x, g.y))
+        .filter(|g| on_a_monitor(w, g.x, g.y))
         .map(|g| LogicalPosition { x: g.x as f64, y: g.y as f64 })
         // Saved on a display that is gone, or asleep: park it where it can be
         // seen rather than showing it off the edge of every screen.
-        .or_else(|| default_widget_position(&w));
+        .or_else(|| default_widget_position(w));
     if let Some(p) = pos {
         let (ox, oy) = crate::platform::desktop_offset(w.scale_factor().unwrap_or(1.0));
         let _ = w.set_position(tauri::Position::Logical(LogicalPosition { x: p.x - ox, y: p.y - oy }));
     }
-    state.widget_placed.store(true, Ordering::Relaxed);
-    apply_widget_layer(&w, on_top);
-    let _ = w.show();
+}
+
+/// Everything about the current display layout that moves windows around when
+/// it changes: where each display sits, how big it is, and how dense it is.
+fn monitor_fingerprint(w: &tauri::WebviewWindow) -> Option<Vec<DisplayShape>> {
+    let monitors = w.available_monitors().ok()?;
+    if monitors.is_empty() {
+        return None;
+    }
+    let mut v: Vec<_> = monitors
+        .iter()
+        .map(|m| {
+            let p = m.position();
+            let s = m.size();
+            (p.x, p.y, s.width, s.height, m.scale_factor().to_bits())
+        })
+        .collect();
+    v.sort();
+    Some(v)
+}
+
+/// One pass of the display watcher, on the main thread because that is the
+/// only place the window server answers questions about screens.
+fn poll_displays(app: &AppHandle) {
+    let Some(w) = app.get_webview_window("widget") else { return };
+    let state = app.state::<AppState>();
+    let now = Instant::now();
+
+    let Some(fingerprint) = monitor_fingerprint(&w) else { return };
+    let changed = {
+        let mut d = lock(&state.displays);
+        let first = d.fingerprint.is_none();
+        let changed = d.fingerprint.as_ref() != Some(&fingerprint);
+        if changed {
+            d.fingerprint = Some(fingerprint);
+            d.changed_at = now;
+        }
+        changed && !first
+    };
+    if changed {
+        // A monitor came or went — a KVM switch, a lid, a sleeping display.
+        // Whatever the window server did with the widget in response is not a
+        // move the user asked for, so drop it and go back to the saved spot.
+        *lock(&state.widget_move) = None;
+        if state.widget_placed.load(Ordering::Relaxed) {
+            place_widget(app, &w);
+        }
+        return;
+    }
+
+    let settled = {
+        let mut pending = lock(&state.widget_move);
+        let changed_at = lock(&state.displays).changed_at;
+        if now.duration_since(changed_at) < DISPLAY_SETTLE {
+            // Still settling: anything reported now — including the move our
+            // own re-placement caused — is the window server, so throw it out
+            // rather than hold it and write it down once the layout is quiet.
+            *pending = None;
+            None
+        } else {
+            match pending.as_ref() {
+                Some(m) if now.duration_since(m.at) >= MOVE_SETTLE => pending.take(),
+                _ => None,
+            }
+        }
+    };
+    if let Some(m) = settled {
+        commit_widget_move(app, m.pos);
+    }
+}
+
+/// Write down a move that has not settled yet, because the widget is about to
+/// be hidden or the app to quit and the pending position would go with it.
+fn flush_widget_move(app: &AppHandle) {
+    let state = app.state::<AppState>();
+    let pending = {
+        let mut p = lock(&state.widget_move);
+        let changed_at = lock(&state.displays).changed_at;
+        if Instant::now().duration_since(changed_at) < DISPLAY_SETTLE {
+            *p = None;
+            None
+        } else {
+            p.take()
+        }
+    };
+    if let Some(m) = pending {
+        commit_widget_move(app, m.pos);
+    }
+}
+
+/// Write a settled move into the saved geometry.
+fn commit_widget_move(app: &AppHandle, pos: LogicalPosition<f64>) {
+    let state = app.state::<AppState>();
+    let mut eng = lock(&state.engine);
+    let cur = eng.settings.widget.clone();
+    let expanded = cur.as_ref().map(|g| g.expanded).unwrap_or(false);
+    let scale = cur.as_ref().map(|g| g.scale).unwrap_or(1.0);
+    eng.settings.widget = Some(WidgetGeometry { x: pos.x as i32, y: pos.y as i32, expanded, scale });
+    let _ = eng.settings.save(&eng.settings_path);
 }
 
 /// The display holding the menu bar: on macOS the global coordinate space is
@@ -137,6 +271,9 @@ fn default_widget_position(w: &tauri::WebviewWindow) -> Option<LogicalPosition<f
 /// it is parked on a display that is no longer there.
 fn reset_widget_position(app: &AppHandle) {
     let Some(w) = app.get_webview_window("widget") else { return };
+    let state = app.state::<AppState>();
+    // Anything the window server was in the middle of reporting is stale now.
+    *lock(&state.widget_move) = None;
     if let Some(p) = default_widget_position(&w) {
         let _ = w.set_position(tauri::Position::Logical(p));
         let state = app.state::<AppState>();
@@ -165,6 +302,9 @@ fn apply_widget_layer(w: &tauri::WebviewWindow, on_top: bool) {
 fn toggle_widget(app: &AppHandle) {
     let Some(w) = app.get_webview_window("widget") else { return };
     let visible = w.is_visible().unwrap_or(false);
+    if visible {
+        flush_widget_move(app);
+    }
     let state = app.state::<AppState>();
     {
         let mut eng = lock(&state.engine);
@@ -319,6 +459,7 @@ fn open_settings(app: AppHandle) {
 #[tauri::command]
 fn hide_widget(app: AppHandle) {
     if let Some(w) = app.get_webview_window("widget") {
+        flush_widget_move(&app);
         let _ = w.hide();
     }
 }
@@ -392,6 +533,8 @@ pub fn run() {
             engine: Mutex::new(engine),
             snapshot: Mutex::new(None),
             widget_placed: AtomicBool::new(false),
+            widget_move: Mutex::new(None),
+            displays: Mutex::new(Displays { fingerprint: None, changed_at: Instant::now() }),
         })
         .invoke_handler(tauri::generate_handler![
             get_snapshot,
@@ -431,6 +574,17 @@ pub fn run() {
                 });
             }
 
+            // Screens can only be asked about from the main thread, so the
+            // timer lives here and the work is dispatched back.
+            let watcher = app.handle().clone();
+            std::thread::spawn(move || loop {
+                std::thread::sleep(DISPLAY_POLL);
+                let h = watcher.clone();
+                if watcher.run_on_main_thread(move || poll_displays(&h)).is_err() {
+                    return;
+                }
+            });
+
             let handle = app.handle().clone();
             std::thread::spawn(move || loop {
                 let _ = do_refresh(&handle);
@@ -450,6 +604,7 @@ pub fn run() {
                 let _ = window.hide();
                 if window.label() == "widget" {
                     let app = window.app_handle();
+                    flush_widget_move(app);
                     let state = app.state::<AppState>();
                     let mut eng = lock(&state.engine);
                     eng.settings.show_widget = false;
@@ -462,22 +617,17 @@ pub fn run() {
                 if !state.widget_placed.load(Ordering::Relaxed) {
                     return;
                 }
-                let mut eng = lock(&state.engine);
-                let cur = eng.settings.widget.clone();
-                let expanded = cur.as_ref().map(|g| g.expanded).unwrap_or(false);
-                let scale = cur.as_ref().map(|g| g.scale).unwrap_or(1.0);
                 // Moved carries physical pixels; set_position takes points, so
                 // storing raw pixels would double the position on every launch.
                 let sf = window.scale_factor().unwrap_or(1.0);
                 let p: LogicalPosition<f64> = pos.to_logical(sf);
                 let (ox, oy) = crate::platform::desktop_offset(sf);
-                eng.settings.widget = Some(WidgetGeometry {
-                    x: (p.x + ox) as i32,
-                    y: (p.y + oy) as i32,
-                    expanded,
-                    scale,
+                // Held, not saved: the display watcher decides whether this was
+                // the user or the window server shuffling windows about.
+                *lock(&state.widget_move) = Some(PendingMove {
+                    pos: LogicalPosition { x: p.x + ox, y: p.y + oy },
+                    at: Instant::now(),
                 });
-                let _ = eng.settings.save(&eng.settings_path);
             }
             _ => {}
         })
@@ -521,7 +671,10 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
                 show_main(app);
                 let _ = app.emit("open-settings", ());
             }
-            "quit" => app.exit(0),
+            "quit" => {
+                flush_widget_move(app);
+                app.exit(0)
+            }
             _ => {}
         })
         .on_tray_icon_event(|tray, event| {
