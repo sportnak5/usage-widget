@@ -27,8 +27,21 @@ if [ "$(uname -s)" = "Darwin" ] && [ "${BIN##*/}" = "token-ledger" ]; then
   if [ -n "$ID" ]; then
     # A fixed identifier: cargo's own is token_ledger-<hash of the build unit>,
     # which is stable in practice but not something to bet the grant on.
-    codesign --force --sign "$ID" --identifier com.tokenledger.dev "$BIN" 2>/dev/null \
-      || printf 'dev-sign: could not sign with "%s" — the Keychain will ask again\n' "$ID" >&2
+    #
+    # Retried, because the common failure is transient: on a rebuild the
+    # previous instance may still be exiting, and codesign cannot rewrite a
+    # Mach-O that is still mapped by a running process. The reason is printed
+    # rather than swallowed — a silent "it'll ask again" is not diagnosable.
+    n=0
+    until codesign --force --sign "$ID" --identifier com.tokenledger.dev "$BIN" 2>/tmp/dev-sign.err; do
+      n=$((n + 1))
+      if [ "$n" -ge 5 ]; then
+        printf 'dev-sign: could not sign with "%s" after %s tries — the Keychain will ask again\n' "$ID" "$n" >&2
+        sed 's/^/dev-sign:   /' /tmp/dev-sign.err >&2
+        break
+      fi
+      sleep 1
+    done
   else
     echo 'dev-sign: no code-signing identity found — the Keychain will ask again' >&2
   fi
