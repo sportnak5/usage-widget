@@ -10,6 +10,7 @@ use super::activity::Activity;
 use super::index::{Index, ScanStats};
 use super::pricing::PriceTable;
 use super::record::{Rec, TitleKind, Usage};
+use super::sessions::{device_label, RemoteSession};
 use super::usagecache::UsageCache;
 use crate::engine::CacheDiag;
 use crate::settings::{Settings, ThreadSort};
@@ -151,6 +152,18 @@ pub struct Snapshot {
     pub widget_rows: usize,
     /// Why the cache did or didn't calibrate us — drives the setup guidance.
     pub cache_diag: CacheDiag,
+    /// Conversations on the account, from every device signed into it — this
+    /// one included, flagged as such. Empty when live readings are off, which
+    /// is the only way to reach the endpoint they come from.
+    #[serde(default)]
+    pub remote_threads: Vec<RemoteSession>,
+    /// What to call this machine on rows that ran here.
+    #[serde(default)]
+    pub device_label: String,
+    /// Why the last session-list fetch failed, if one did. The rows above are
+    /// the last good ones, so this says they may be stale, not that they lie.
+    #[serde(default)]
+    pub remote_error: Option<String>,
 }
 
 #[derive(Default)]
@@ -486,6 +499,10 @@ pub fn build_snapshot(
         index_records: index.len(),
         usage_cache,
         cache_diag,
+        // The engine fills these: they come off the network, not the index.
+        remote_threads: Vec::new(),
+        device_label: device_label(),
+        remote_error: None,
         thread_sort: sort,
         list_rows: limits.list_rows,
         widget_rows: limits.widget_rows,

@@ -7,11 +7,12 @@ use std::path::PathBuf;
 use chrono::{DateTime, Duration, Utc};
 use serde::{Deserialize, Serialize};
 
+use crate::ledger::sessions;
 use crate::ledger::snapshot::{apply_activity, build_snapshot, window_total, Limits};
 use crate::ledger::usageapi::{self, FetchError};
 use crate::ledger::usagecache::{self, Reading, Status, UsageCache};
 use crate::ledger::windows::{resolve, Anchor, Window};
-use crate::ledger::{Activity, Index, ScanStats, Snapshot, WeeklyReset, WindowKind};
+use crate::ledger::{Activity, Index, RemoteSession, ScanStats, Snapshot, WeeklyReset, WindowKind};
 use crate::settings::{data_dir, Settings, ThreadSort};
 
 pub struct Engine {
@@ -26,6 +27,23 @@ pub struct Engine {
     /// Transcript tails, remembered between refreshes. Not persisted: it is a
     /// cache over files we can always read again.
     pub activity: Activity,
+    /// The account's session list, from every device. Not persisted: it is a
+    /// live reading, and a stale one on disk would be worse than none.
+    pub remote: Remote,
+}
+
+/// The last word from the account-wide session list.
+///
+/// Rows outlive a failed fetch on purpose: a dropped connection should not
+/// empty the list the user is looking at, it should mark it as possibly stale.
+#[derive(Clone, Debug, Default)]
+pub struct Remote {
+    pub rows: Vec<RemoteSession>,
+    /// When we last *asked*, successfully or not — what the throttle is
+    /// measured against, so a failing endpoint is not asked any harder than a
+    /// working one.
+    pub checked_at: Option<DateTime<Utc>>,
+    pub error: Option<String>,
 }
 
 /// Why auto-calibration did or didn't take, in enough detail for the UI to
@@ -95,6 +113,7 @@ impl Engine {
             usage_cache: None,
             cache_diag: CacheDiag::default(),
             activity: Activity::default(),
+            remote: Remote::default(),
         }
     }
 
@@ -170,7 +189,46 @@ impl Engine {
             let _ = self.settings.save(&self.settings_path);
         }
         self.absorb_usage_cache();
+        self.absorb_remote_sessions(now);
         scan
+    }
+
+    /// Pull the account's session list, so conversations running on the user's
+    /// other machines are visible here.
+    ///
+    /// Same shape as the Usage fetch and for the same reasons: gated on live
+    /// readings, because it is the same credential and the same consent;
+    /// throttled, because the endpoint next door rate-limits readily; and
+    /// never able to break a snapshot, because a failed fetch only annotates
+    /// the rows we already had.
+    pub fn absorb_remote_sessions(&mut self, now: DateTime<Utc>) {
+        if !self.settings.live_readings {
+            // Off is not a failure, and it must not leave rows on screen that
+            // nothing is refreshing any more.
+            self.remote = Remote::default();
+            return;
+        }
+        let just_checked = self
+            .remote
+            .checked_at
+            .map_or(false, |t| now - t < Duration::seconds(30) && now >= t);
+        if just_checked {
+            return;
+        }
+        self.remote.checked_at = Some(now);
+        match sessions::fetch() {
+            Ok(mut rows) => {
+                sessions::classify(&mut rows, &self.index.bridge_sessions());
+                // The local lists hold 8 days; a remote row older than that
+                // has nothing to sit beside.
+                let cutoff = now - Duration::days(crate::ledger::index::RETENTION_DAYS);
+                rows.retain(|r| r.last >= cutoff);
+                self.remote.rows = rows;
+                self.remote.error = None;
+            }
+            Err(FetchError::Off) => {}
+            Err(e) => self.remote.error = Some(e.message()),
+        }
     }
 
     /// Path of Claude Code's `.claude.json` for the configured directory.
@@ -379,6 +437,11 @@ impl Engine {
             self.settings.thread_sort,
         );
         apply_activity(&mut snap, &self.index, &mut self.activity, &self.settings, now);
+        // Not built from the index, so not `build_snapshot`'s to produce —
+        // and republished as-is when a window asks for a snapshot without a
+        // refresh, which is what keeps remote rows on screen between fetches.
+        snap.remote_threads = self.remote.rows.clone();
+        snap.remote_error = self.remote.error.clone();
         snap
     }
 
@@ -559,6 +622,43 @@ mod tests {
         assert_eq!(eng.cache_diag.reason, "no_usage");
         // Nothing to divide by, so no limit — but the reading still shows.
         assert_eq!(eng.settings.calibration.session.unwrap().implied_limit, 0.0);
+    }
+
+    /// The session list is the same credential and the same consent as the
+    /// Usage endpoint, so the same switch has to govern it — and switching it
+    /// off has to take the rows away, not freeze them on screen.
+    #[test]
+    fn remote_sessions_are_off_when_live_readings_are() {
+        let mut eng = engine_at("remote-off", None, true);
+        assert!(!eng.settings.live_readings);
+        eng.remote.rows = vec![RemoteSession { id: "cse_stale".into(), ..Default::default() }];
+        eng.remote.checked_at = Some(utc(NOW));
+        eng.remote.error = Some("something".into());
+
+        eng.absorb_remote_sessions(utc(NOW));
+        assert!(eng.remote.rows.is_empty());
+        assert!(eng.remote.checked_at.is_none(), "nothing was asked, so nothing was checked");
+        assert!(eng.remote.error.is_none());
+        assert!(eng.snapshot(utc(NOW)).remote_threads.is_empty());
+        // The label stands on its own: local rows are tagged with it whether
+        // or not any remote row ever arrives.
+        assert!(!eng.snapshot(utc(NOW)).device_label.is_empty());
+    }
+
+    /// A fetch inside the throttle window must not go near the network — the
+    /// endpoint's neighbour 429s readily, and a manual rescan can arrive on
+    /// top of the timer.
+    #[test]
+    fn a_recent_check_is_not_repeated() {
+        let mut eng = engine_at("remote-throttle", None, true);
+        eng.settings.live_readings = true;
+        eng.remote.rows = vec![RemoteSession { id: "cse_good".into(), ..Default::default() }];
+        eng.remote.checked_at = Some(utc(NOW));
+
+        eng.absorb_remote_sessions(utc(NOW) + Duration::seconds(5));
+        assert_eq!(eng.remote.checked_at, Some(utc(NOW)), "no second ask within 30s");
+        assert_eq!(eng.remote.rows.len(), 1);
+        assert!(eng.remote.error.is_none());
     }
 
     #[test]

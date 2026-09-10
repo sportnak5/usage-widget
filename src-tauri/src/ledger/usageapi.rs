@@ -50,7 +50,7 @@ pub fn clean(tok: &str) -> String {
 
 /// Keep the token out of anything we might display. Transport errors quote
 /// the header they choked on, which means they quote the token.
-fn redact(msg: &str, tok: &str) -> String {
+pub(crate) fn redact(msg: &str, tok: &str) -> String {
     if tok.is_empty() {
         return msg.to_string();
     }
