@@ -111,6 +111,9 @@ impl Engine {
     /// the user is asked — deliberately, while they are looking at settings.
     pub fn set_live_readings(&mut self, on: bool) -> Result<(), String> {
         if on {
+            // Turning it on is the user saying "look again", so a failure
+            // remembered from earlier in this run must not answer for the store.
+            usageapi::forget_cached_credential();
             usageapi::fetch().map_err(|e| e.message())?;
         }
         self.settings.live_readings = on;
@@ -120,6 +123,8 @@ impl Engine {
     /// Can live readings work here, without changing any setting? Drives the
     /// "Check" button and the first-run step.
     pub fn probe_live_readings(&self) -> Result<String, String> {
+        // Same for Check: it is the way back from a remembered failure.
+        usageapi::forget_cached_credential();
         let src = usageapi::credential_source().map_err(|e| e.message())?;
         let cache = usageapi::fetch().map_err(|e| e.message())?;
         let best = [cache.session, cache.weekly, cache.fable]

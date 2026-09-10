@@ -178,17 +178,25 @@ fn parse_credentials(raw: &str) -> Option<(String, Option<i64>)> {
     Some((tok, o.get("expiresAt").and_then(Value::as_i64)))
 }
 
-/// The credential is read once and held for the life of the process.
+/// The outcome of reading the credential, held for the life of the process —
+/// the failures as well as the successes.
 ///
 /// This exists for the user, not for speed. On macOS, opening an item another
 /// application created raises a password dialog, and "Allow" — as opposed to
 /// "Always Allow" — grants exactly one read. Reading per refresh put that
 /// dialog on screen every sixty seconds, which is unusable.
 ///
+/// Caching only the successes left two ways to do exactly that anyway: a
+/// login that reads fine but is past its own `expiresAt` never reached the
+/// cache, so the next refresh went back to the Keychain, and so on every
+/// minute forever; and a token Anthropic rejects made `fetch` drop the cache
+/// and read again, which then repeated per refresh. So a failure is now
+/// remembered as firmly as a success, and the way back is to say so — toggling
+/// live readings, or pressing Check — rather than to keep asking.
+///
 /// There is no time-based expiry because a clock is the wrong trigger: the
-/// only two things that invalidate this copy are the token passing its own
-/// `expiresAt`, and Anthropic rejecting it. Both are checked, so a wall-clock
-/// TTL would only add prompts without catching anything sooner.
+/// only things that invalidate this copy are the token passing its own
+/// `expiresAt`, Anthropic rejecting it, and the user asking us to look again.
 struct Cached {
     token: String,
     source: Source,
@@ -196,31 +204,58 @@ struct Cached {
     expires: Option<i64>,
 }
 
-static CACHE: Mutex<Option<Cached>> = Mutex::new(None);
+/// `None` means we have never looked. Otherwise it is whatever happened last
+/// time, good or bad, and we stand by it until something explicitly clears it.
+static CACHE: Mutex<Option<Result<Cached, FetchError>>> = Mutex::new(None);
 
-/// Drop the cached credential so the next call goes back to the store. Called
-/// when Anthropic rejects what we sent: Claude Code renews its own login, so
-/// a rejection usually means the copy we are holding has been superseded.
+/// Go back to the store on the next call. Called when Anthropic rejects what
+/// we sent — Claude Code renews its own login, so a rejection usually means
+/// the copy we are holding has been superseded — and whenever the user asks
+/// for live readings to be turned on or checked, which is their way of saying
+/// "the login is fixed now, look again".
 pub fn forget_cached_credential() {
     if let Ok(mut c) = CACHE.lock() {
         *c = None;
     }
 }
 
+/// Stop going back to the store until something clears this.
+fn remember_failure(e: FetchError) {
+    if let Ok(mut c) = CACHE.lock() {
+        *c = Some(Err(e));
+    }
+}
+
+/// What the remembered outcome is worth, or `None` to go back to the store.
+/// Split out so the decision can be tested without a Keychain — calling the
+/// real reader in a test raises the OS password dialog and hangs there.
+fn from_cache(c: Option<&Result<Cached, FetchError>>) -> Option<Result<(String, Source), FetchError>> {
+    match c {
+        // A token past its own expiry is worth one more look: Claude Code
+        // renews it in place, so the item may hold a newer one by now.
+        Some(Ok(hit)) if !past_expiry(hit.expires) => Some(Ok((hit.token.clone(), hit.source))),
+        Some(Err(e)) => Some(Err(e.clone())),
+        _ => None,
+    }
+}
+
 /// Claude Code's access token, read in place. Never written, never refreshed.
 pub fn claude_token() -> Result<(String, Source), FetchError> {
     if let Ok(c) = CACHE.lock() {
-        if let Some(c) = c.as_ref() {
-            if !past_expiry(c.expires) {
-                return Ok((c.token.clone(), c.source));
-            }
+        if let Some(hit) = from_cache(c.as_ref()) {
+            return hit;
         }
     }
-    let (token, source, expires) = read_credential()?;
+    let read = read_credential();
     if let Ok(mut c) = CACHE.lock() {
-        *c = Some(Cached { token: token.clone(), source, expires });
+        *c = Some(match &read {
+            Ok((token, source, expires)) => {
+                Ok(Cached { token: token.clone(), source: *source, expires: *expires })
+            }
+            Err(e) => Err(e.clone()),
+        });
     }
-    Ok((token, source))
+    read.map(|(token, source, _)| (token, source))
 }
 
 fn past_expiry(expires: Option<i64>) -> bool {
@@ -323,7 +358,16 @@ pub fn fetch() -> Result<UsageCache, FetchError> {
         Err(e) if e.is_auth() => {
             forget_cached_credential();
             let (tok, _) = claude_token()?;
-            fetch_with(&tok)
+            let again = fetch_with(&tok);
+            // Rejected again, on a copy we just re-read: the login itself is
+            // the problem, not our copy of it. Stop going back to the store,
+            // or every refresh from here on raises the dialog twice.
+            if let Err(e) = &again {
+                if e.is_auth() {
+                    remember_failure(e.clone());
+                }
+            }
+            again
         }
         other => other,
     }
@@ -453,5 +497,34 @@ mod tests {
         let u = v.get("utilization").unwrap_or(&v);
         let c = parse_utilization(u, Utc::now());
         assert!(c.session.is_none() && c.weekly.is_none() && c.fable.is_none());
+    }
+
+    /// The whole point of the cache is that the OS password dialog appears
+    /// once. A failure that isn't remembered brings it back every refresh, so
+    /// both outcomes have to stick — and only an explicit ask clears them.
+    #[test]
+    fn both_outcomes_stick_until_something_asks_again() {
+        let good = Ok(Cached { token: "tok".into(), source: Source::File, expires: None });
+        assert_eq!(from_cache(Some(&good)).unwrap().unwrap(), ("tok".to_string(), Source::File));
+
+        let bad: Result<Cached, FetchError> = Err(FetchError::Expired);
+        assert_eq!(from_cache(Some(&bad)).unwrap().unwrap_err(), FetchError::Expired,
+            "a remembered failure has to answer, or the dialog is back every refresh");
+
+        // A token past its own expiry is worth one more look — Claude Code
+        // renews in place — so this one goes back to the store exactly once,
+        // after which the reader's own verdict is what sticks.
+        let stale = Ok(Cached { token: "old".into(), source: Source::File, expires: Some(1) });
+        assert!(from_cache(Some(&stale)).is_none());
+
+        // Never looked at all.
+        assert!(from_cache(None).is_none());
+    }
+
+    #[test]
+    fn forgetting_is_the_way_back() {
+        *CACHE.lock().unwrap() = Some(Err(FetchError::Unauthorized));
+        forget_cached_credential();
+        assert!(CACHE.lock().unwrap().is_none(), "Check and the live-readings toggle need a way back");
     }
 }
