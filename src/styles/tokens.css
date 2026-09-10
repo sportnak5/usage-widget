@@ -10,6 +10,7 @@
   --c0:#3B4CC0; --c1:#7A4DA8; --c2:#1F7F7C; --c3:#B0741E; --c4:#A8456A;
   --c5:#4E79C0; --c6:#5E7D3C; --c7:#8A6248;
   --shadow:0 1px 2px rgba(21,26,34,.06),0 8px 24px -12px rgba(21,26,34,.18);
+  --shadow-menu:0 12px 30px -12px rgba(21,26,34,.35); --shadow-tip:0 8px 20px rgba(21,26,34,.18);
   --r:7px; --gauge-s:76; --gauge-l:40; --ring:#DDE3EC;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
@@ -22,6 +23,7 @@
   --c0:#8390F0; --c1:#A87FDC; --c2:#3FB0AD; --c3:#DDA84F; --c4:#DE7FA0;
   --c5:#7FA8E8; --c6:#96C46A; --c7:#C99A78;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
+  --shadow-menu:0 12px 30px -12px rgba(0,0,0,.7); --shadow-tip:0 8px 20px rgba(0,0,0,.55);
   --gauge-s:74; --gauge-l:60; --ring:#252D39;
 }}
 :root[data-theme="dark"]{
@@ -34,6 +36,7 @@
   --c0:#8390F0; --c1:#A87FDC; --c2:#3FB0AD; --c3:#DDA84F; --c4:#DE7FA0;
   --c5:#7FA8E8; --c6:#96C46A; --c7:#C99A78;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
+  --shadow-menu:0 12px 30px -12px rgba(0,0,0,.7); --shadow-tip:0 8px 20px rgba(0,0,0,.55);
   --gauge-s:74; --gauge-l:60; --ring:#252D39;
 }
 *{box-sizing:border-box}
@@ -46,12 +49,15 @@ body{color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe
 /* anything on the pace ramp */
 .gauge-color{color:hsl(var(--h) calc(var(--gauge-s) * 1%) calc(var(--gauge-l) * var(--lx,1) * 1%))}
 .gauge-fill{fill:hsl(var(--h) calc(var(--gauge-s) * 1%) calc(var(--gauge-l) * var(--lx,1) * 1%))}
+.gauge-stroke{stroke:hsl(var(--h) calc(var(--gauge-s) * 1%) calc(var(--gauge-l) * var(--lx,1) * 1%))}
 [style*="--gauge-muted"] .gauge-fill,[style*="--gauge-muted"] .gauge-color{fill:var(--faint);color:var(--faint)}
+[style*="--gauge-muted"].gauge-stroke,[style*="--gauge-muted"] .gauge-stroke{stroke:var(--faint)}
 .arc{fill:none;stroke-linecap:butt;transition:stroke-dasharray .9s cubic-bezier(.22,1,.36,1),stroke-dashoffset .9s cubic-bezier(.22,1,.36,1),stroke-width .12s}
 .arc.muted{opacity:.45}
 .ring-bg{fill:none;stroke:var(--ring)}
 .num{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600;font-variant-numeric:tabular-nums}
 .pcs{font-weight:500;opacity:.66}
+.segbtns[hidden]{display:none}
 .segbtns{display:flex;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--surface)}
 .segbtns button{border:0;background:transparent;font:inherit;font-size:12.5px;font-weight:500;color:var(--muted);
   padding:5px 12px;cursor:pointer;transition:background .12s,color .12s}

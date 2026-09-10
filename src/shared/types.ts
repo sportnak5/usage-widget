@@ -37,6 +37,30 @@ export interface Kinds {
   cache_read: number;
 }
 
+export type BucketId = "15m" | "30m" | "hour" | "6h" | "day" | "week" | "month";
+
+/** One bucket: `[key, weighted cost, raw tokens]`. The session key is the bare
+    session id, so it matches `by_session`'s `[session_id, cwd]` entries. */
+export interface SeriesBucket {
+  t: string;
+  by_session: [string, number, number][];
+  by_model: [string, number, number][];
+}
+
+export interface Series {
+  /** Granularity as emitted — "15m" for the session block, "hour" for a week.
+      The UI rolls up from here and offers nothing finer. */
+  bucket: BucketId;
+  /** Window open. */
+  start: string;
+  /** Window reset — the last bucket ends at `generated_at`, not here. */
+  end: string;
+  buckets: SeriesBucket[];
+}
+
+/** Everything below the per-bucket cut, folded into one key by snapshot.rs. */
+export const REST_KEY = "__rest";
+
 export interface WindowOut {
   id: WindowId;
   label: string;
@@ -58,6 +82,8 @@ export interface WindowOut {
   by_model: Entry[];
   by_project: Entry[];
   by_session: Entry[];
+  /** Optional: a snapshot fixture written before the timeline existed has none. */
+  series?: Series;
 }
 
 export interface ScanStats {

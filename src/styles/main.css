@@ -1,5 +1,7 @@
 body{background:var(--ground)}
-.wrap{max-width:960px;margin:0 auto;padding:22px 22px 56px}
+/* The cards use whatever the window gives them — the chart is the reason to
+   make this window big. Prose keeps its own reading measure below. */
+.wrap{max-width:min(1680px,100%);margin:0 auto;padding:22px 22px 56px}
 h1,h2,h3{margin:0;text-wrap:balance}
 header{display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;padding-bottom:16px;border-bottom:1px solid var(--line);margin-bottom:18px}
 header .id{flex:1 1 320px;min-width:0}
@@ -19,7 +21,7 @@ h1{font-family:"IBM Plex Serif",Georgia,serif;font-size:24px;font-weight:600;let
 :root[data-theme="dark"] .icon .sun{display:none}:root[data-theme="dark"] .icon .moon{display:block}
 :root[data-theme="light"] .icon .sun{display:block}:root[data-theme="light"] .icon .moon{display:none}
 
-.notice{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:9px 13px;border-radius:var(--r);background:var(--accent-soft);color:var(--ink-2);font-size:12.5px;margin-bottom:16px;line-height:1.45}
+.notice{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:9px 13px;max-width:1000px;border-radius:var(--r);background:var(--accent-soft);color:var(--ink-2);font-size:12.5px;margin-bottom:16px;line-height:1.45}
 .notice b{color:var(--ink);font-weight:600}
 .notice.warn{background:color-mix(in srgb,var(--warn) 14%,var(--surface))}
 .notice .btn.tiny{font-size:10.5px;padding:1px 7px;margin:0 2px;vertical-align:1px}
@@ -52,6 +54,58 @@ h1{font-family:"IBM Plex Serif",Georgia,serif;font-size:24px;font-weight:600;let
 #f_manual>summary{cursor:pointer;font-size:12.5px;color:var(--ink-2);padding:7px 2px;list-style-position:outside}
 #f_manual>summary:hover{color:var(--ink)}
 #f_manual[open]>summary{margin-bottom:6px}
+
+/* Usage over time. One cumulative line, split into a touching band per
+   contributor that was spending in that bucket. */
+.timeline{background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:15px 18px 14px;margin-bottom:16px}
+.tlbar{display:flex;align-items:center;gap:10px;margin-bottom:4px;flex-wrap:nowrap}
+.tlbar .eyebrow{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tlbar .segbtns button{white-space:nowrap}
+.tlbucket{position:relative;flex:none}
+.tlmenu{position:absolute;right:0;top:34px;min-width:158px;z-index:5;overflow:hidden;display:flex;flex-direction:column;
+  border:1px solid var(--line);border-radius:var(--r);background:var(--surface);box-shadow:var(--shadow-menu)}
+/* The author `display:flex` above would otherwise beat the UA's [hidden]. */
+.tlmenu[hidden]{display:none}
+.tlmenu button{text-align:left;border:0;border-bottom:1px solid var(--line-soft);background:transparent;font:inherit;
+  font-size:12.5px;padding:7px 11px;cursor:pointer;color:var(--ink-2)}
+.tlmenu button:last-child{border-bottom:0}
+.tlmenu button:hover{background:var(--sunk)}
+.tlmenu button[aria-checked="true"]{background:var(--accent-soft);color:var(--ink)}
+.tlmenu button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.tlsub{font-size:11.5px;color:var(--faint);margin-bottom:4px;font-family:"IBM Plex Mono",ui-monospace,monospace}
+/* The chart is drawn at this box's pixel size, so the plot grows with the
+   window in both directions rather than scaling its type up. */
+.tlchart{height:clamp(200px,calc(100vh - 430px),980px)}
+
+.tlsvg{display:block;overflow:visible}
+.band{transition:opacity .15s,stroke-width .12s}
+.tlsvg text{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.tlsvg .ax{font-size:9.5px;fill:var(--faint)}
+.tlsvg .ax.hi{fill:var(--muted)}
+.tlsvg .rax{font-size:9.5px}
+.tlgrid{stroke:var(--line-soft)}
+.tl100{stroke:var(--line);stroke-dasharray:4 4}
+.tlaxis{stroke:var(--line)}
+.tltrend{stroke-width:1.5;stroke-dasharray:2 4}
+.tltrend:not(.ramp){stroke:var(--faint)}
+.tlnow{fill:var(--ink)}
+.tlnowv{font-size:10.5px;font-weight:600;fill:var(--ink)}
+.tlmark{stroke:var(--m-rest)}
+.tlmark.dash{stroke-dasharray:3 3}
+/* The hover column, guide and tooltip never take the pointer themselves. */
+.tlg{pointer-events:none}
+.tlcol{fill:var(--ink);opacity:.045}
+.tlguide{stroke:var(--ink-2);opacity:.35}
+.tldot{fill:var(--surface);stroke:var(--ink-2);stroke-width:1.5}
+.tltip{fill:var(--surface);stroke:var(--line);filter:drop-shadow(var(--shadow-tip))}
+.tth{font-size:10px;font-weight:600;fill:var(--ink)}
+.ttv{font-size:10px;fill:var(--faint)}
+/* Scoped past `.tlsvg text`, which otherwise wins on specificity and silently
+   renders these two in the mono face. */
+.tlsvg .ttn{font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:11px;fill:var(--ink-2)}
+.tlsvg .tte{font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:11px;fill:var(--faint)}
+.ttr{font-size:10px;fill:var(--muted)}
+.ttm{font-size:9.5px;fill:var(--faint)}
 
 .bigwrap{background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:15px 18px 16px}
 .bigbar{display:flex;align-items:center;gap:12px;margin-bottom:12px}
@@ -114,7 +168,7 @@ td.c{color:var(--ink);font-weight:600}
 .dmeta{display:flex;flex-wrap:wrap;gap:6px 20px;margin-top:11px;font-size:11.5px;color:var(--muted)}
 .dmeta b{color:var(--ink-2);font-weight:500;font-family:"IBM Plex Mono",ui-monospace,monospace}
 
-footer{margin-top:28px;padding-top:16px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);line-height:1.6}
+footer{margin-top:28px;padding-top:16px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);line-height:1.6;max-width:1000px}
 footer b{color:var(--ink-2);font-weight:600}
 footer .scan{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;color:var(--faint);margin-top:6px}
 
@@ -169,4 +223,19 @@ legend .opt{font-size:9.5px;letter-spacing:.1em;color:var(--faint);border:1px so
 .citem .cl{display:flex;flex-direction:column;min-width:0}
 .citem .cl b{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .citem .cl code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10px;color:var(--faint)}
-@media (max-width:700px){.bigdials{grid-template-columns:1fr}.lhead,.row{grid-template-columns:14px minmax(0,1fr) 92px;gap:9px}.lhead .h-raw,.row .raw,.lhead .h-mix,.row .mix{display:none}.detail{padding-left:16px}.frow{grid-template-columns:1fr}.frow .hint{grid-column:1}}
+@media (max-width:700px){.bigdials{grid-template-columns:1fr}.tlbar{flex-wrap:wrap}.tlbar .eyebrow{flex:1 1 100%}.lhead,.row{grid-template-columns:14px minmax(0,1fr) 92px;gap:9px}.lhead .h-raw,.row .raw,.lhead .h-mix,.row .mix{display:none}.detail{padding-left:16px}.frow{grid-template-columns:1fr}.frow .hint{grid-column:1}}
+
+/* Conversation status. Two states earn a mark — the agent is still working,
+   or there is something you haven't read — and everything else gets an empty
+   cell of the same width, so the names stay on one line. */
+.tmark{width:8px;height:8px;border-radius:50%;justify-self:center}
+.tmark.new{background:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.tmark.work{border-radius:50%;border:1.6px solid var(--ring);border-top-color:var(--accent);
+  background:transparent;animation:tspin .8s linear infinite}
+@keyframes tspin{to{transform:rotate(360deg)}}
+.row.unread .name b{font-weight:700}
+.row.working .name em,.row.unread .name em{color:var(--muted)}
+@media (prefers-reduced-motion:reduce){
+  /* No spinner to watch, so the working mark has to read as a state on its own. */
+  .tmark.work{animation:none;border-color:var(--accent);border-right-color:transparent}
+}

@@ -27,6 +27,22 @@
 
   <div id="notices"></div>
 
+  <div class="timeline" id="timeline">
+    <div class="tlbar">
+      <span class="eyebrow" id="tlTitle">Usage over time</span>
+      <div class="segbtns" id="tlModeBtns" role="group" aria-label="Timeline breakdown">
+        <button data-m="by_session" aria-pressed="false">By conversation</button>
+        <button data-m="by_model" aria-pressed="true">By model</button>
+      </div>
+      <div class="tlbucket">
+        <button class="btn" id="tlBucketBtn" aria-haspopup="true" aria-expanded="false" aria-label="Bucket size">Hourly ▾</button>
+        <div class="tlmenu" id="tlMenu" role="menu" hidden></div>
+      </div>
+    </div>
+    <div class="tlsub" id="tlSub"></div>
+    <div class="tlchart" id="tlChart"></div>
+  </div>
+
   <div class="bigwrap">
     <div class="bigbar">
       <span class="eyebrow">Ring breakdown</span>

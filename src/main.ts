@@ -13,7 +13,12 @@ import { bindSetup, diagOf, setupCard, setupPanel } from "./shared/setup";
 import {
   applyScheme, CUSTOM_ID, currentSchemeId, customScheme, GROUPS, paletteOf, SCHEMES, saveCustom, setScheme,
 } from "./shared/schemes";
-import type { CalibrationInput, Entry, GroupKey, Settings, Snapshot, WeeklyReset, WindowOut } from "./shared/types";
+import {
+  allowedBuckets, BAND, BAND_HOVER, bucketLabel, bucketOf, chart, defaultBucket, guide, hitBucket, subline,
+} from "./shared/timeline";
+import { listRows, sortOf, statusMark } from "./shared/threads";
+import type { View } from "./shared/timeline";
+import type { BucketId, CalibrationInput, Entry, GroupKey, Settings, Snapshot, ThreadSort, WeeklyReset, WindowOut } from "./shared/types";
 
 applySavedTheme();
 applyScheme();
@@ -26,6 +31,11 @@ let sel = 0;
 let mode: "by_model" | "by_session" = "by_model";
 let group: GroupKey = "by_session";
 let open: number | null = null;
+// Timeline-only state. Kept off the `apply()` path so a refresh doesn't
+// fight the pointer: only renderTimeline() re-runs when these change.
+let bucket: BucketId = "hour";
+let hoverKey: string | null = null;
+let hoverBucket: number | null = null;
 
 // ---------- header + notices ----------
 
@@ -163,6 +173,126 @@ function renderLegend(): void {
     items.map((e, j) => `<span class="e"><i style="background:${segColor(e, j)}"></i><em title="${esc(segName(e))}">${esc(segName(e))}</em><b>${pctOf(e)}</b></span>`).join("") +
     (w.pct === null ? "" : `<span class="e"><i style="background:var(--m-rest)"></i><em>${head}</em><b>${Math.max(0, 100 - w.pct).toFixed(0)}%</b></span>`);
 }
+
+// ---------- usage over time ----------
+
+/// The chart is drawn at its container's pixel size, one viewBox unit per CSS
+/// pixel, so widening or heightening the window grows the plot instead of
+/// scaling the type up with it. CSS gives the box its height.
+function chartSize(): [number, number] {
+  const el = $("tlChart");
+  const w = el.clientWidth || 900;
+  const h = el.clientHeight || 300;
+  return [w, h];
+}
+
+const view = (): View => ({
+  mode, bucket, hoverKey, hoverBucket,
+  now: Date.parse(snap!.generated_at), size: chartSize(), sort: sortOf(snap),
+});
+
+/// The panel needs `series`, which a snapshot fixture written before the
+/// timeline existed doesn't carry. Hide it rather than draw an empty box.
+function renderTimeline(): void {
+  if (!snap) return;
+  const panel = $("timeline");
+  const w = snap.windows[sel];
+  if (!w.series) { panel.hidden = true; return; }
+  panel.hidden = false;
+  bucket = bucketOf(w, bucket);
+  const v = view();
+
+  $("tlTitle").textContent = `Usage over time — ${w.label}`;
+  $("tlSub").textContent = subline(w, v);
+  $("tlChart").innerHTML = chart(w, v);
+  ($("tlBucketBtn") as HTMLButtonElement).textContent = `${bucketLabel(w, bucket)} ▾`;
+
+  const svg = $("tlChart").querySelector<SVGSVGElement>(".tlsvg");
+  svg?.addEventListener("mousemove", (e) => {
+    const r = svg.getBoundingClientRect();
+    // The viewBox is 1:1 with the chart's pixels, so the pointer maps through
+    // the chart's own width — a fixed 900 here silently mis-hit every bucket
+    // as soon as the window was any other size.
+    const v2 = view();
+    const hit = hitBucket(w, v2, ((e.clientX - r.left) / r.width) * v2.size[0]);
+    if (hit !== hoverBucket) { hoverBucket = hit; drawGuide(); }
+  });
+  svg?.addEventListener("mouseleave", () => {
+    if (hoverBucket !== null) { hoverBucket = null; drawGuide(); }
+  });
+  drawGuide();
+}
+
+/// Hover repaints in place rather than through renderTimeline(): rebuilding the
+/// SVG under the cursor loses the pointer's own hover target. The bands running
+/// through the hovered bucket also thicken, so the tooltip's rows and the
+/// ribbon name the same conversations.
+function drawGuide(): void {
+  const g = document.getElementById("tlGuide");
+  if (g && snap) g.innerHTML = guide(snap.windows[sel], view());
+  document.querySelectorAll<SVGPathElement>("#tlChart .band").forEach((b) => {
+    const on = hoverBucket !== null
+      && hoverBucket >= Number(b.dataset.b0) && hoverBucket <= Number(b.dataset.b1);
+    b.setAttribute("stroke-width", String(on ? BAND_HOVER : BAND));
+  });
+}
+
+function setHoverKey(k: string | null): void {
+  if (k === hoverKey) return;
+  hoverKey = k;
+  document.querySelectorAll<SVGPathElement>("#tlChart .band").forEach((b) =>
+    b.setAttribute("opacity", !hoverKey || b.dataset.k === hoverKey ? "1" : "0.14"));
+}
+
+/// The bucket menu. A native `<select>` would do, but the list changes with the
+/// window and this keeps the trigger looking like every other `.btn`.
+function renderBucketMenu(): void {
+  if (!snap) return;
+  const w = snap.windows[sel];
+  const menu = $("tlMenu");
+  menu.innerHTML = allowedBuckets(w).map((b) =>
+    `<button type="button" role="menuitemradio" data-b="${b.id}" aria-checked="${b.id === bucket}">${b.label}</button>`).join("");
+  menu.querySelectorAll<HTMLButtonElement>("button").forEach((b) =>
+    b.addEventListener("click", () => {
+      bucket = b.dataset.b as BucketId;
+      hoverBucket = null;
+      closeBucketMenu();
+      renderTimeline();
+    }));
+}
+
+function closeBucketMenu(): void {
+  $("tlMenu").hidden = true;
+  $("tlBucketBtn").setAttribute("aria-expanded", "false");
+}
+
+$("tlBucketBtn").addEventListener("click", (e) => {
+  e.stopPropagation();
+  const menu = $("tlMenu");
+  if (menu.hidden) {
+    renderBucketMenu();
+    menu.hidden = false;
+    $("tlBucketBtn").setAttribute("aria-expanded", "true");
+  } else {
+    closeBucketMenu();
+  }
+});
+document.addEventListener("click", (e) => {
+  if (!$("tlMenu").hidden && !$("tlMenu").contains(e.target as Node)) closeBucketMenu();
+});
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeBucketMenu(); });
+// The chart is drawn at its box's pixel size, so it has to be redrawn whenever
+// that box changes — on the first layout as much as on a window resize. The
+// observer watches the box itself rather than the window, which also covers
+// the 700 px breakpoint where the sub-line and tooltip shed detail.
+let lastBox = "";
+new ResizeObserver((entries) => {
+  const r = entries[0].contentRect;
+  const box = `${Math.round(r.width)}x${Math.round(r.height)}`;
+  if (box === lastBox || r.width === 0) return;
+  lastBox = box;
+  renderTimeline();
+}).observe($("tlChart"));
 
 // ---------- list ----------
 

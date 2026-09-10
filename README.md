@@ -19,11 +19,14 @@ src-tauri/src/ledger/   the data layer — no Tauri, testable, shared with the C
   pricing.rs            API list-price weights (cache reads are 95% of raw volume)
   windows.rs            session / weekly windows, calibration anchors, pace ramp
   snapshot.rs           group-by model / project / conversation → JSON for the UI
+  activity.rs           tails the shown conversations: unread, and still working
 src-tauri/src/engine.rs owns index + settings; refresh, snapshot, calibrate
 src-tauri/src/app.rs    Tauri: two windows, tray, refresh loop, commands
 src-tauri/src/bin/cli.rs `ledger-cli` — the data layer end to end, no GUI
 src/widget.ts           the frameless desktop widget (widget.html)
 src/main.ts             the full ledger window + calibration dialog (index.html)
+src/shared/timeline.ts  usage over time: bucketing, the ribbon, the hover tooltip
+src/shared/threads.ts   the conversation list both windows share: ranking, status marks
 src/shared/             ring drawing, pace colors, formatting, the Rust bridge
 docs/HANDOFF.md         the verified schema, dedup rule, calibration math, open questions
 ```
@@ -75,6 +78,31 @@ macOS: `.app` and `.dmg` under `src-tauri/target/release/bundle/`. Windows:
 `.msi` and NSIS `.exe` (build on Windows, or let the GitHub workflow do both).
 The app is **not** sandboxed and cannot ship through the Mac App Store — it
 has to read `~/.claude`. Distribute as a notarized `.dmg`.
+
+## Usage over time
+
+Above the dials, the ledger window plots cumulative % of the selected limit
+against time, from the window opening to its reset — so the empty right-hand
+part of the plot is the time you have left. The line is drawn as several
+touching parallel bands, one per conversation (or model) that was spending in
+that bucket, so its thickness reads as concurrency: one conversation is a plain
+line, three at once is a ribbon. Bands peel out of the line when a conversation
+starts and melt back in when it goes quiet.
+
+Two dotted lines cross at *now*. To its left is the average rate so far. To its
+right is the **budget line**: the rate that spends exactly what's left over the
+time that's left, so it always arrives at 100% at the reset. One straight line
+through both means you're spending exactly on budget; a kink down means you
+spent early and have less per hour from here; a kink up means you have room.
+Its color is the same burn-rate ramp as the dial's number.
+
+Hover a bucket for its breakdown — the top 3 conversations *in that bucket*,
+ranked the way the list's **Top / Recent** toggle is set, with the bands running
+through it thickened to match. Hover a list row to isolate one band, click a dial to
+re-scope, and change the bucket size to re-aggregate. The backend emits 15-minute
+buckets for the session block and hourly ones for a week, always on local
+calendar edges; coarser sizes are rolled up in the browser, and nothing finer
+than the emitted grain is offered.
 
 ## The widget
 
