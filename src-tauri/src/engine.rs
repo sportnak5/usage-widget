@@ -7,12 +7,12 @@ use std::path::PathBuf;
 use chrono::{DateTime, Duration, Utc};
 use serde::{Deserialize, Serialize};
 
-use crate::ledger::snapshot::{build_snapshot, window_total, Limits};
+use crate::ledger::snapshot::{apply_activity, build_snapshot, window_total, Limits};
 use crate::ledger::usageapi::{self, FetchError};
 use crate::ledger::usagecache::{self, Reading, Status, UsageCache};
 use crate::ledger::windows::{resolve, Anchor, Window};
-use crate::ledger::{Index, ScanStats, Snapshot, WeeklyReset, WindowKind};
-use crate::settings::{data_dir, Settings};
+use crate::ledger::{Activity, Index, ScanStats, Snapshot, WeeklyReset, WindowKind};
+use crate::settings::{data_dir, Settings, ThreadSort};
 
 pub struct Engine {
     pub settings: Settings,
@@ -23,6 +23,9 @@ pub struct Engine {
     pub last_error: Option<String>,
     pub usage_cache: Option<UsageCache>,
     pub cache_diag: CacheDiag,
+    /// Transcript tails, remembered between refreshes. Not persisted: it is a
+    /// cache over files we can always read again.
+    pub activity: Activity,
 }
 
 /// Why auto-calibration did or didn't take, in enough detail for the UI to
@@ -91,6 +94,7 @@ impl Engine {
             last_error: None,
             usage_cache: None,
             cache_diag: CacheDiag::default(),
+            activity: Activity::default(),
         }
     }
 
@@ -151,6 +155,15 @@ impl Engine {
             }
         };
         self.last_error = scan.as_ref().err().cloned();
+        // Unread is measured against a baseline so an installed-today app
+        // doesn't open on a wall of badges for conversations that ended last
+        // week. Written through immediately: a baseline that isn't persisted
+        // would move to "now" on every refresh, and nothing would ever be
+        // unread.
+        if self.settings.unread_since.is_none() {
+            self.settings.unread_since = Some(now);
+            let _ = self.settings.save(&self.settings_path);
+        }
         self.absorb_usage_cache();
         scan
     }
@@ -346,8 +359,8 @@ impl Engine {
         self.settings.calibration.auto_fetched_at = Some(cache.fetched_at);
     }
 
-    pub fn snapshot(&self, now: DateTime<Utc>) -> Snapshot {
-        build_snapshot(
+    pub fn snapshot(&mut self, now: DateTime<Utc>) -> Snapshot {
+        let mut snap = build_snapshot(
             &self.index,
             &self.settings.prices,
             &self.settings.calibration,
@@ -355,10 +368,27 @@ impl Engine {
             self.settings.boost.as_deref(),
             now,
             self.last_scan.clone(),
-            &Limits::default(),
+            &Limits::from_settings(&self.settings),
             self.usage_cache.clone(),
             self.cache_diag.clone(),
-        )
+            self.settings.thread_sort,
+        );
+        apply_activity(&mut snap, &self.index, &mut self.activity, &self.settings, now);
+        snap
+    }
+
+    /// Rank the conversation lists by weight or by recency. One setting for
+    /// both windows — the snapshot carries it, so flipping it anywhere shows
+    /// up everywhere.
+    pub fn set_thread_sort(&mut self, sort: ThreadSort) {
+        self.settings.thread_sort = sort;
+    }
+
+    /// The user opened a conversation: everything the assistant has said in it
+    /// up to now counts as read.
+    pub fn mark_thread_read(&mut self, session: &str, now: DateTime<Utc>) {
+        let live = self.index.records().map(|r| r.session.clone()).collect();
+        self.settings.mark_seen(session, now, &live);
     }
 
     /// Anchor the implied limits to what the Usage tab says right now.

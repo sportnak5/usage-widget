@@ -17,7 +17,7 @@
       <span class="tier" id="tier"></span>
       <span class="stamp" id="stamp"></span>
       <button class="btn" id="refresh" title="Rescan transcripts now">Refresh</button>
-      <button class="btn primary" id="calibrate">Calibrate</button>
+      <button class="btn primary" id="calibrate" title="Settings, calibration and appearance">Settings</button>
       <button class="btn icon" id="themebtn" aria-label="Switch theme">
         <svg class="sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
         <svg class="moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg>
@@ -41,6 +41,10 @@
 
   <div class="bar">
     <h2 id="listTitle"></h2>
+    <div class="segbtns" id="sortBtns" role="group" aria-label="Rank conversations by">
+      <button data-s="usage" aria-pressed="true" title="Heaviest conversations first">Top</button>
+      <button data-s="recent" aria-pressed="false" title="Most recently active conversations first">Recent</button>
+    </div>
     <div class="segbtns" id="groupBtns" role="group" aria-label="Group by">
       <button data-g="by_session" aria-pressed="true">Sessions</button>
       <button data-g="by_project" aria-pressed="false">Projects</button>
@@ -49,7 +53,7 @@
   </div>
   <div class="list">
     <div class="lhead">
-      <span></span><span>Name</span><span class="r h-raw">Raw tokens</span><span class="r h-mix">Mix</span><span class="r">Of this limit</span>
+      <span></span><span></span><span>Name</span><span class="r h-raw">Raw tokens</span><span class="r h-mix">Mix</span><span class="r">Of this limit</span>
     </div>
     <div id="rows"></div>
   </div>
@@ -62,7 +66,7 @@
 
 <dialog id="settings">
   <form method="dialog" id="settingsForm">
-    <div class="dhead"><h2>Calibrate &amp; settings</h2><span class="stamp">Turn on live readings for exact percentages — or let Claude Code's <code>/usage</code> cache do it, or type them in</span></div>
+    <div class="dhead"><h2>Settings</h2><span class="stamp">Turn on live readings for exact percentages — or let Claude Code's <code>/usage</code> cache do it, or type them in</span></div>
     <div class="dbody">
       <div id="f_setup"></div>
       <fieldset id="f_conn">
@@ -121,8 +125,13 @@
         <legend>App</legend>
         <div class="frow"><label for="f_dir">Claude config dir</label><input type="text" id="f_dir" placeholder="auto (~/.claude or $CLAUDE_CONFIG_DIR)"></div>
         <div class="frow"><span class="hint">Changing this discards the index and rescans.</span></div>
-        <div class="frow"><label for="f_refresh">Refresh every</label><div class="inline"><input type="number" id="f_refresh" min="15" max="3600" step="15" value="60"><span>seconds</span></div></div>
+        <div class="frow"><label for="f_refresh">Refresh every</label><div class="inline"><input type="number" id="f_refresh" min="15" max="3600" step="15" value="15"><span>seconds</span></div></div>
+        <div class="frow"><span class="hint">Rescans are incremental — only bytes appended since the last one are read — so 15 seconds costs almost nothing on a warm index. It is also how quickly a conversation's <b>working</b> and <b>unread</b> marks catch up, which is the reason not to slow it down.</span></div>
         <div class="frow"><label for="f_widget">Desktop widget</label><div class="inline"><input type="checkbox" id="f_widget" checked><span>show the widget</span></div></div>
+        <div class="frow"><label for="f_rows">Conversations shown</label>
+          <div class="inline"><input type="number" id="f_rows" min="5" max="200" step="5" value="25"><span>in this window's list</span>
+            <input type="number" id="f_wrows" min="1" max="25" step="1" value="5"><span>in the widget</span></div></div>
+        <div class="frow"><span class="hint">The ledger ranks every conversation in the window and keeps this many; the widget takes the top few of the same list. Ranked by weight or by last activity — the <b>Top / Recent</b> toggle, which both windows share.</span></div>
         <div class="frow"><label for="f_ontop">Widget layer</label><div class="inline"><input type="checkbox" id="f_ontop"><span>float above other windows</span></div></div>
         <div class="frow"><span class="hint">Off, the widget sits at desktop level: other windows cover it, the way a homescreen widget behaves.</span></div>
         <div class="frow"><label for="f_auto">Start at login</label><div class="inline"><input type="checkbox" id="f_auto"><span>launch Token Ledger when you sign in</span></div></div>

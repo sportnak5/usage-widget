@@ -1,17 +1,18 @@
 // The widget window. Readouts, not controls: the only interactions are the
-// dial labels (re-scope the rows), the chevron (expand in place), ring hover
-// (model tooltip), drag anywhere but the chevron and grip, and double-click to
-// open the ledger.
+// dial labels (re-scope the rows), the chevron (expand in place), the ranking
+// toggle over the rows, ring hover (model tooltip), drag anywhere but those
+// and the grip, and double-click to open the ledger.
 import { applySavedTheme } from "./shared/theme";
 import {
   getHome, getSettings, getSnapshot, onSchemeChanged, onSnapshot, openMain, openSettings,
-  setWidgetExpanded, startDragging, startResizing,
+  setThreadSort, setWidgetExpanded, startDragging, startResizing,
 } from "./shared/bridge";
 import { modelColor, paint, paceNote } from "./shared/color";
 import { basename, esc, hhmm, setHome, short, tidy, tok, until } from "./shared/format";
 import { grow, numText, ringArcs } from "./shared/ring";
 import { applyScheme } from "./shared/schemes";
-import type { Snapshot, WindowOut } from "./shared/types";
+import { sortOf, sortToggle, statusMark, statusNote, widgetRows } from "./shared/threads";
+import type { Snapshot, ThreadSort, WindowOut } from "./shared/types";
 
 applySavedTheme();
 applyScheme();
@@ -61,17 +62,20 @@ function renderDials(): void {
 function renderRows(): void {
   if (!snap) return;
   const w = snap.windows[sel];
-  const rows = w.by_session.slice(0, 5);
-  const cap = `<span class="cap">Top sessions · ${SCOPE[sel]}</span>`;
+  // The backend keeps whichever window wants more, so the widget takes its
+  // own cut of the same ranked list.
+  const rows = w.by_session.slice(0, widgetRows(snap));
+  const sort = sortOf(snap);
+  const cap = `<span class="cap">Conversations · ${SCOPE[sel]}${sortToggle(sort)}</span>`;
   const body = rows.length === 0
     ? `<div class="wempty">Nothing in this window yet.</div>`
     : rows.map((e) => {
         const [sid, cwd] = e.key as [string, string];
         const pct = e.pct;
         const name = e.title || basename(cwd) || "untitled";
-        const tip = `${name}\n${tidy(cwd)}\n${pct === null ? e.share.toFixed(0) + "% of usage in this window" : pct.toFixed(1) + "% of the " + SCOPE[sel] + " limit"}`;
+        const tip = `${name}\n${tidy(cwd)}\n${pct === null ? e.share.toFixed(0) + "% of usage in this window" : pct.toFixed(1) + "% of the " + SCOPE[sel] + " limit"}${statusNote(e)}`;
         return `<div class="wr" style="${paint(pct === null ? null : pct / 100)}" title="${esc(tip)}" data-sid="${esc(sid)}">
-          <i style="background:${modelColor(e.models[0].model)}"></i>
+          ${statusMark(e)}<i style="background:${modelColor(e.models[0].model)}"></i>
           <span class="n">${esc(name)}</span>
           <span class="t">${tok(e.raw)}</span>
           <span class="g"><i style="width:${Math.max(2, Math.min(100, pct ?? e.share)).toFixed(1)}%"></i></span>
@@ -83,6 +87,15 @@ function renderRows(): void {
     : `<div class="wnote"><span>not calibrated</span><button id="calib">run /usage</button></div>`;
   $("wtop5").innerHTML = cap + body + note;
   $("wtop5").querySelector("#calib")?.addEventListener("click", (e) => { e.stopPropagation(); openSettings(); });
+  // The ranking lives in the backend, so the snapshot that comes back is also
+  // the one the ledger window is handed: flipping it here flips it there.
+  $("wtop5").querySelectorAll<HTMLButtonElement>("#wsort button").forEach((b) =>
+    b.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      const want = b.dataset.s as ThreadSort;
+      if (want === sortOf(snap)) return;
+      apply(await setThreadSort(want));
+    }));
 }
 
 // A dial is a control and part of the card's surface at once: a plain click

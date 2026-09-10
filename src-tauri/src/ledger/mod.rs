@@ -2,6 +2,7 @@
 //! the three limit windows, and aggregate. No Tauri here — `ledger-cli` runs
 //! this end to end without a GUI, and that is the acceptance test.
 
+pub mod activity;
 pub mod index;
 pub mod pricing;
 pub mod record;
@@ -10,6 +11,7 @@ pub mod usageapi;
 pub mod usagecache;
 pub mod windows;
 
+pub use activity::Activity;
 pub use index::{Index, ScanStats};
 pub use pricing::PriceTable;
 pub use record::{Rec, Title, Usage};

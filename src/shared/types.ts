@@ -22,6 +22,11 @@ export interface Entry {
   last: string;
   share: number;
   pct: number | null;
+  /** The assistant has finished saying something you haven't caught up on.
+      Conversations only; absent in a fixture written before this existed. */
+  unread?: boolean;
+  /** The agent is mid-turn right now. Conversations only. */
+  working?: boolean;
   models: ModelPart[];
 }
 
@@ -104,6 +109,12 @@ export interface Snapshot {
   index_records: number;
   usage_cache: UsageCache | null;
   calibration_source: "auto" | "manual" | "none";
+  /** Ranking the backend applied — the toggle's state in both windows. */
+  thread_sort?: ThreadSort;
+  /** How many conversations each window should draw. Absent in a fixture
+      written before these were configurable; each window falls back. */
+  list_rows?: number;
+  widget_rows?: number;
   cache_diag: CacheDiag;
 }
 
@@ -139,6 +150,9 @@ export interface Settings {
   show_widget: boolean;
   widget_on_top: boolean;
   theme: string | null;
+  thread_sort: ThreadSort;
+  list_rows: number;
+  widget_rows: number;
   /** Read Claude Code's own login and fetch percentages from Anthropic. */
   live_readings: boolean;
 }
@@ -154,3 +168,6 @@ export interface CalibrationInput {
 }
 
 export type GroupKey = "by_session" | "by_project" | "by_model";
+
+/** How the conversation lists are ranked. One setting behind both windows. */
+export type ThreadSort = "usage" | "recent";

@@ -82,7 +82,7 @@ h1{font-family:"IBM Plex Serif",Georgia,serif;font-size:24px;font-weight:600;let
 .bar h2{font-family:"IBM Plex Serif",Georgia,serif;font-size:17px;font-weight:600;flex:1 1 auto}
 .bar h2 span{color:var(--faint);font-family:"IBM Plex Sans",sans-serif;font-size:12.5px;font-weight:400;margin-left:7px}
 .list{border:1px solid var(--line);border-radius:10px;background:var(--surface);overflow:hidden;box-shadow:var(--shadow)}
-.lhead,.row{display:grid;grid-template-columns:16px minmax(0,1fr) 92px 74px 118px;gap:12px;align-items:center;padding:9px 16px}
+.lhead,.row{display:grid;grid-template-columns:16px 10px minmax(0,1fr) 92px 74px 118px;gap:12px;align-items:center;padding:9px 16px}
 .lhead{border-bottom:1px solid var(--line);background:var(--sunk)}
 .lhead span{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);font-weight:500}
 .lhead .r,.row .r{text-align:right}

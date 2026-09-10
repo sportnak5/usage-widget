@@ -15,7 +15,7 @@ use tauri_plugin_autostart::{MacosLauncher, ManagerExt};
 
 use crate::engine::{CalibrationInput, Engine};
 use crate::ledger::Snapshot;
-use crate::settings::{Settings, WidgetGeometry};
+use crate::settings::{Settings, ThreadSort, WidgetGeometry, MAX_LIST_ROWS, MAX_WIDGET_ROWS};
 
 pub struct AppState {
     engine: Mutex<Engine>,
@@ -384,6 +384,8 @@ pub struct SettingsPatch {
     pub refresh_secs: Option<u64>,
     pub show_widget: Option<bool>,
     pub widget_on_top: Option<bool>,
+    pub list_rows: Option<usize>,
+    pub widget_rows: Option<usize>,
     pub plan: Option<String>,
     pub boost: Option<String>,
     pub theme: Option<String>,
@@ -414,6 +416,12 @@ fn update_settings(app: AppHandle, patch: SettingsPatch) -> Result<Snapshot, Str
         if let Some(v) = patch.widget_on_top {
             eng.settings.widget_on_top = v;
         }
+        if let Some(n) = patch.list_rows {
+            eng.settings.list_rows = n.clamp(5, MAX_LIST_ROWS);
+        }
+        if let Some(n) = patch.widget_rows {
+            eng.settings.widget_rows = n.clamp(1, MAX_WIDGET_ROWS);
+        }
         if let Some(p) = patch.plan {
             eng.settings.plan = p;
         }
@@ -443,6 +451,28 @@ fn update_settings(app: AppHandle, patch: SettingsPatch) -> Result<Snapshot, Str
     } else {
         Ok(republish(&app))
     }
+}
+
+/// Rank the conversation lists by weight or by recency. One setting behind
+/// both windows: the republished snapshot carries the new order and the new
+/// toggle state, so the widget and the ledger can never disagree.
+#[tauri::command]
+fn set_thread_sort(app: AppHandle, sort: ThreadSort) -> Snapshot {
+    {
+        let state = app.state::<AppState>();
+        lock(&state.engine).set_thread_sort(sort);
+    }
+    republish(&app)
+}
+
+/// The user opened a conversation, so its unread badge is spent.
+#[tauri::command]
+fn mark_thread_read(app: AppHandle, session: String) -> Snapshot {
+    {
+        let state = app.state::<AppState>();
+        lock(&state.engine).mark_thread_read(&session, Utc::now());
+    }
+    republish(&app)
 }
 
 #[tauri::command]
@@ -545,6 +575,8 @@ pub fn run() {
             set_live_readings,
             check_live_readings,
             update_settings,
+            set_thread_sort,
+            mark_thread_read,
             open_main,
             open_settings,
             hide_widget,
@@ -649,7 +681,7 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
     let widget = MenuItem::with_id(app, "widget", "Show / Hide Widget", true, None::<&str>)?;
     let recenter = MenuItem::with_id(app, "recenter", "Reset Widget Position", true, None::<&str>)?;
     let refresh = MenuItem::with_id(app, "refresh", "Refresh Now", true, None::<&str>)?;
-    let calibrate = MenuItem::with_id(app, "calibrate", "Calibrate…", true, None::<&str>)?;
+    let calibrate = MenuItem::with_id(app, "calibrate", "Settings…", true, None::<&str>)?;
     let quit = MenuItem::with_id(app, "quit", "Quit Token Ledger", true, None::<&str>)?;
     let menu = Menu::with_items(
         app,

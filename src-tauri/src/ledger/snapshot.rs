@@ -3,14 +3,16 @@
 
 use std::collections::HashMap;
 
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Duration, Local, Timelike, Utc};
 use serde::{Deserialize, Serialize};
 
+use super::activity::Activity;
 use super::index::{Index, ScanStats};
 use super::pricing::PriceTable;
 use super::record::{Rec, TitleKind, Usage};
 use super::usagecache::UsageCache;
 use crate::engine::CacheDiag;
+use crate::settings::{Settings, ThreadSort};
 use super::windows::{ramp, resolve, Calibration, Window};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -47,6 +49,14 @@ pub struct Entry {
     pub share: f64,
     /// % of this window's *limit*. None until calibrated.
     pub pct: Option<f64>,
+    /// The assistant has spoken since you last typed and since you last opened
+    /// this row. Conversations only; always false for models and projects.
+    #[serde(default)]
+    pub unread: bool,
+    /// The agent is mid-turn right now — a tool call out, or a prompt with no
+    /// answer yet. Conversations only.
+    #[serde(default)]
+    pub working: bool,
     pub models: Vec<ModelPart>,
 }
 
@@ -98,6 +108,15 @@ pub struct Snapshot {
     pub usage_cache: Option<UsageCache>,
     /// Where the anchors came from: "auto" (Claude Code's cache), "manual", or "none".
     pub calibration_source: String,
+    /// How the conversation lists below are ranked. Part of the payload rather
+    /// than something each window remembers for itself, so a flip in one place
+    /// arrives in the other with the list it produced.
+    pub thread_sort: ThreadSort,
+    /// How many conversations each window shows. Carried here rather than read
+    /// from settings by each page, so a change reaches both on the next
+    /// snapshot instead of on the next reload.
+    pub list_rows: usize,
+    pub widget_rows: usize,
     /// Why the cache did or didn't calibrate us — drives the setup guidance.
     pub cache_diag: CacheDiag,
 }
@@ -127,12 +146,32 @@ impl Acc {
 
 pub struct Limits {
     pub projects: usize,
+    /// How many conversations to keep — the larger of the two window sizes.
     pub sessions: usize,
+    /// What each window will actually draw, passed through to the snapshot.
+    pub list_rows: usize,
+    pub widget_rows: usize,
 }
 
 impl Default for Limits {
     fn default() -> Self {
-        Limits { projects: 12, sessions: 25 }
+        Limits {
+            projects: 12,
+            sessions: crate::settings::DEFAULT_LIST_ROWS,
+            list_rows: crate::settings::DEFAULT_LIST_ROWS,
+            widget_rows: crate::settings::DEFAULT_WIDGET_ROWS,
+        }
+    }
+}
+
+impl Limits {
+    pub fn from_settings(s: &Settings) -> Limits {
+        Limits {
+            sessions: s.session_rows(),
+            list_rows: s.list_rows,
+            widget_rows: s.widget_rows,
+            ..Limits::default()
+        }
     }
 }
 
@@ -159,6 +198,7 @@ pub fn build_snapshot(
     limits: &Limits,
     usage_cache: Option<UsageCache>,
     cache_diag: CacheDiag,
+    sort: ThreadSort,
 ) -> Snapshot {
     let ts = index.timestamps_sorted();
     let windows = resolve(cal, now, &ts);
@@ -245,6 +285,8 @@ pub fn build_snapshot(
                 last: a.last.unwrap_or(now),
                 share: round2(share),
                 pct: pct.map(|p| round2(share / 100.0 * p)),
+                unread: false,
+                working: false,
                 models,
             }
         };
@@ -262,8 +304,33 @@ pub fn build_snapshot(
         for v in [&mut models, &mut projects, &mut sessions] {
             v.sort_by(|x, y| y.cost.total_cmp(&x.cost));
         }
+        // Ranking decides what survives the truncation, not just the order:
+        // "most recent" has to be able to surface a thread that would never
+        // make the top 25 by weight.
+        if sort == ThreadSort::Recent {
+            sessions.sort_by(|x, y| y.last.cmp(&x.last).then(y.cost.total_cmp(&x.cost)));
+        }
         projects.truncate(limits.projects);
         sessions.truncate(limits.sessions);
+
+        // Series keys track the ranked list, so a conversation the list dropped
+        // doesn't reappear as a band of its own.
+        let kept: std::collections::HashSet<String> = sessions
+            .iter()
+            .filter_map(|e| match &e.key {
+                EntryKey::Session([sid, _]) => Some(sid.clone()),
+                EntryKey::One(k) => Some(k.clone()),
+            })
+            .collect();
+        let buckets: Vec<SeriesBucket> = slots
+            .into_iter()
+            .enumerate()
+            .map(|(i, (sess, model))| SeriesBucket {
+                t: edges[i],
+                by_session: fold_bucket(sess, Some(&kept)),
+                by_model: fold_bucket(model, None),
+            })
+            .collect();
 
         outs.push(WindowOut {
             id: w.kind.id().to_string(),
@@ -304,6 +371,9 @@ pub fn build_snapshot(
         index_records: index.len(),
         usage_cache,
         cache_diag,
+        thread_sort: sort,
+        list_rows: limits.list_rows,
+        widget_rows: limits.widget_rows,
         calibration_source: match (cal.manual_at, cal.auto_fetched_at) {
             (Some(m), Some(a)) if m > a => "manual",
             (_, Some(_)) => "auto",
@@ -314,14 +384,56 @@ pub fn build_snapshot(
     }
 }
 
+/// Fill in each conversation's unread and working flags, in place.
+///
+/// A separate pass, and deliberately after the ranking: it reads transcripts
+/// off disk, and the ranked lists are what bound how many. Nothing here can
+/// change which rows are shown, only what they say about themselves.
+pub fn apply_activity(
+    snap: &mut Snapshot,
+    index: &Index,
+    activity: &mut Activity,
+    settings: &Settings,
+    now: DateTime<Utc>,
+) {
+    let mut seen: HashMap<String, (bool, bool)> = HashMap::new();
+    let mut used: std::collections::HashSet<std::path::PathBuf> = std::collections::HashSet::new();
+    for w in &mut snap.windows {
+        for e in &mut w.by_session {
+            let EntryKey::Session([sid, _]) = &e.key else { continue };
+            // The same conversation appears in all three windows; tail it once.
+            let (unread, working) = *seen.entry(sid.clone()).or_insert_with(|| {
+                match index.session_file(sid) {
+                    Some(path) => {
+                        used.insert(path.to_path_buf());
+                        let t = activity.tail(path);
+                        (t.unread(settings.seen_at(sid)), t.working(now))
+                    }
+                    None => (false, false),
+                }
+            });
+            e.unread = unread;
+            e.working = working;
+        }
+    }
+    // Only the ranked lists are ever tailed, so this is what bounds the cache.
+    activity.retain(&used);
+}
+
 fn round2(x: f64) -> f64 {
     (x * 100.0).round() / 100.0
+}
+
+/// Bucket costs are small; two decimals would round most of them to zero.
+fn round4(x: f64) -> f64 {
+    (x * 10_000.0).round() / 10_000.0
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::ledger::windows::Anchor;
+    use crate::settings::ThreadSort;
 
     fn utc(s: &str) -> DateTime<Utc> {
         DateTime::parse_from_rfc3339(s).unwrap().with_timezone(&Utc)
@@ -353,7 +465,7 @@ mod tests {
             ("2", "2026-09-08T19:00:00Z", "s2", "claude-fable-5-1", 1_000_000),
         ]);
         let cal = Calibration { session_reset_at: Some(utc("2026-09-08T22:00:00Z")), ..Default::default() };
-        let snap = build_snapshot(&idx, &PriceTable::default(), &cal, "Max", None, utc("2026-09-08T20:00:00Z"), ScanStats::default(), &Limits::default(), None, CacheDiag::default());
+        let snap = build_snapshot(&idx, &PriceTable::default(), &cal, "Max", None, utc("2026-09-08T20:00:00Z"), ScanStats::default(), &Limits::default(), None, CacheDiag::default(), ThreadSort::Usage);
         let [s, w, f] = <[WindowOut; 3]>::try_from(snap.windows).ok().unwrap();
         assert_eq!(s.messages, 2);
         assert!((w.total_cost - 75.0).abs() < 1e-6, "25 + 50 dollars of output");
@@ -374,7 +486,7 @@ mod tests {
         let mut cal = Calibration { session_reset_at: Some(utc("2026-09-08T22:00:00Z")), ..Default::default() };
         // The tab said 50% while our weighted total was $100 → cap is $200.
         cal.session = Some(Anchor { pct: 50.0, captured_at: now, implied_limit: 200.0 });
-        let snap = build_snapshot(&idx, &PriceTable::default(), &cal, "Max", None, now, ScanStats::default(), &Limits::default(), None, CacheDiag::default());
+        let snap = build_snapshot(&idx, &PriceTable::default(), &cal, "Max", None, now, ScanStats::default(), &Limits::default(), None, CacheDiag::default(), ThreadSort::Usage);
         let s = &snap.windows[0];
         assert_eq!(s.pct, Some(50.0));
         assert_eq!(s.by_session[0].share, 75.0);

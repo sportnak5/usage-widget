@@ -124,6 +124,18 @@ impl Index {
         self.titles.get(session)
     }
 
+    /// The transcript a session most recently wrote a billable turn to. A
+    /// resumed conversation keeps its id across files, so the newest record
+    /// names the file whose tail is the live one.
+    pub fn session_file(&self, session: &str) -> Option<&Path> {
+        self.recs
+            .iter()
+            .filter(|s| s.rec.session == session)
+            .max_by_key(|s| s.rec.ts)
+            .and_then(|s| self.files.get(s.file as usize))
+            .map(|f| f.path.as_path())
+    }
+
     pub fn len(&self) -> usize {
         self.recs.len()
     }

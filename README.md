@@ -86,6 +86,34 @@ has to read `~/.claude`. Distribute as a notarized `.dmg`.
   and resizes the window. Drag anywhere on the chrome; double-click opens the
   ledger. The tray icon toggles the widget; right-click for Refresh, Calibrate,
   Quit.
+- **TOP | RECENT** over the list ranks conversations by weight or by last
+  activity, the live side outlined. It is one setting in the backend, not a
+  per-window preference, so flipping it in the widget flips it in the ledger
+  and it survives a restart.
+- How many rows each list shows is yours to set — Settings → App. The widget
+  defaults to 5 and the ledger to 25; the backend keeps whichever is larger and
+  each window takes its own cut of that one ranked list.
+
+## Unread and still-working
+
+Conversations carry two marks, in the widget list and the ledger's:
+
+- A **spinner** — the agent is mid-turn: a tool call is out, or your prompt
+  has no answer yet. Read from the tail of that conversation's transcript, and
+  it stops after five quiet minutes, so a session killed mid-tool-call doesn't
+  spin forever.
+- A **dot** — the assistant has finished saying something since you last typed
+  and since you last opened the row. Claude Code keeps no read receipts, so the
+  app keeps its own: opening a row in the ledger clears it, and so does your
+  next message in that conversation. Everything that happened before unread
+  tracking started counts as read, so a first run isn't a wall of badges.
+
+Only the conversations actually on screen are tailed — at most a few dozen
+files, cached on `(size, mtime)` between refreshes — so this costs nothing on a
+7,000-file history. Both marks are only as fresh as the refresh interval, which
+is why it defaults to **15 seconds** rather than a minute: rescans read only the
+bytes appended since the last one, and a spinner that takes a minute to appear
+is worse than none.
 
 ## How the numbers work
 

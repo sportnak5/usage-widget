@@ -3,8 +3,8 @@
 import { applySavedTheme, bindThemeButton, effectiveTheme } from "./shared/theme";
 import {
   broadcastScheme, calibrate, checkLiveReadings, getAutostart, getHome, getSettings, getSnapshot,
-  onOpenSettings, onSchemeChanged, onSnapshot, refreshNow, setAutostart, setLiveReadings,
-  updateSettings,
+  markThreadRead, onOpenSettings, onSchemeChanged, onSnapshot, refreshNow, setAutostart,
+  setLiveReadings, setThreadSort, updateSettings,
 } from "./shared/bridge";
 import { convColor, modelColor, paint, paceNote } from "./shared/color";
 import { entryName, esc, hhmm, setHome, short, tidy, tok, until, usd, when } from "./shared/format";
@@ -173,6 +173,20 @@ function sublabel(e: Entry, g: GroupKey): string {
   return `${tidy(cwd)}  ·  ${sid.slice(0, 8)} · ${hhmm(e.first)}–${hhmm(e.last)} · ${usd(e.cost)}`;
 }
 
+/// The list header's count line. Which ranking produced it matters as much as
+/// how many rows there are — "25 conversations" means something different when
+/// the cut was by recency.
+function listCount(w: WindowOut, rows: Entry[]): string {
+  if (group !== "by_session") {
+    return `${rows.length} ${group === "by_project" ? "projects" : "models"} · ${w.messages} messages, ranked by weighted cost`;
+  }
+  const live = rows.filter((e) => e.working).length;
+  const unread = rows.filter((e) => e.unread).length;
+  const flags = [live ? `${live} working` : "", unread ? `${unread} unread` : ""].filter(Boolean);
+  const by = sortOf(snap) === "recent" ? "most recently active first" : "ranked by weighted cost";
+  return `${rows.length} conversations · ${w.messages} messages, ${by}${flags.length ? " · " + flags.join(", ") : ""}`;
+}
+
 function detail(e: Entry): string {
   const rows = e.models.map((m) => `<tr>
       <td class="k">${short(m.model)}</td>
@@ -195,8 +209,12 @@ function detail(e: Entry): string {
 
 function renderList(): void {
   if (!snap) return;
-  const w = snap.windows[sel], rows = w[group];
-  $("listTitle").innerHTML = `${esc(w.label)} <span>${rows.length} ${group === "by_session" ? "conversations" : group === "by_project" ? "projects" : "models"} · ${w.messages} messages, ranked by weighted cost</span>`;
+  const w = snap.windows[sel];
+  // Conversations are cut to the size you chose; the other groupings have
+  // ceilings of their own that nobody has ever wanted to change.
+  const rows = group === "by_session" ? w.by_session.slice(0, listRows(snap)) : w[group];
+  $("listTitle").innerHTML = `${esc(w.label)} <span>${esc(listCount(w, rows))}</span>`;
+  $("sortBtns").hidden = group !== "by_session";
   if (rows.length === 0) {
     $("rows").innerHTML = `<div class="empty">Nothing in this window yet.</div>`;
     return;
@@ -204,37 +222,87 @@ function renderList(): void {
   $("rows").innerHTML = rows.map((e, i) => {
     const mini = e.models.map((m) => `<i style="width:${(m.cost / (e.cost || 1) * 100).toFixed(2)}%;background:${modelColor(m.model)}"></i>`).join("");
     const pct = e.pct === null ? `${e.share.toFixed(1)}%<small>of usage</small>` : `${e.pct.toFixed(1)}%<small>${e.share.toFixed(0)}% of window</small>`;
-    return `<button class="row" data-i="${i}" aria-expanded="${open === i}">
+    return `<button class="row${e.working ? " working" : e.unread ? " unread" : ""}" data-i="${i}" aria-expanded="${open === i}">
         <span class="chip" style="background:${modelColor(e.models[0].model)}"></span>
+        ${statusMark(e)}
         <span class="name"><b>${esc(entryName(e, group))}</b><em>${esc(sublabel(e, group))}</em></span>
         <span class="raw r">${tok(e.raw)}</span>
         <span class="r mix"><span class="minibar">${mini}</span></span>
         <span class="pct r">${pct}</span>
       </button>` + (open === i ? detail(e) : "");
   }).join("");
-  document.querySelectorAll<HTMLButtonElement>(".row").forEach((b) =>
-    b.addEventListener("click", () => { const i = Number(b.dataset.i); open = open === i ? null : i; renderList(); }));
+  document.querySelectorAll<HTMLButtonElement>(".row").forEach((b) => {
+    b.addEventListener("click", () => {
+      const i = Number(b.dataset.i);
+      open = open === i ? null : i;
+      renderList();
+      // Opening a conversation is the only "you have read this" signal the app
+      // ever gets — Claude Code keeps no read receipts of its own. The badge
+      // clears in the widget too, because the backend republishes.
+      const e = rows[i];
+      if (open === i && group === "by_session" && e.unread) void markRead(e);
+    });
+    // Only when the list is grouped the same way the ribbon is keyed.
+    if (group !== mode) return;
+    const e = rows[Number(b.dataset.i)];
+    const key = mode === "by_model" ? (e.key as string) : (e.key as [string, string])[0];
+    b.addEventListener("mouseenter", () => setHoverKey(key));
+    b.addEventListener("mouseleave", () => setHoverKey(null));
+  });
+}
+
+/// Clear one row's badge without waiting for the round trip to come back:
+/// the click already told us, and a badge that lingers for a moment after you
+/// open the row reads as a bug.
+async function markRead(e: Entry): Promise<void> {
+  e.unread = false;
+  renderList();
+  const [sid] = e.key as [string, string];
+  try { apply(await markThreadRead(sid)); } catch { /* the next refresh will */ }
+}
+
+/// Ranking is one backend setting, so this returns the list both windows get.
+async function chooseSort(sort: ThreadSort): Promise<void> {
+  open = null;
+  try { apply(await setThreadSort(sort)); } catch { /* no backend in dev */ }
 }
 
 function setWindow(i: number): void {
   sel = i; open = null;
+  hoverKey = null; hoverBucket = null;
+  if (snap) bucket = defaultBucket(snap.windows[i]);
+  closeBucketMenu();
   document.querySelectorAll<HTMLElement>(".bigdial").forEach((d) => d.setAttribute("aria-selected", String(Number(d.dataset.i) === i)));
-  renderLegend(); renderList();
+  renderLegend(); renderTimeline(); renderList();
 }
 
 function apply(s: Snapshot): void {
+  const first = snap === null;
   snap = s;
-  renderHeader(); renderBig(); renderLegend(); renderList();
+  if (first) bucket = defaultBucket(s.windows[sel]);
+  // The ranking can change under us — the widget's toggle republishes to both
+  // windows — so the buttons follow the snapshot rather than a local variable.
+  const cur = sortOf(s);
+  document.querySelectorAll<HTMLButtonElement>("#sortBtns button")
+    .forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.s === cur)));
+  renderHeader(); renderBig(); renderLegend(); renderTimeline(); renderList();
 }
 
 // ---------- controls ----------
 
-document.querySelectorAll<HTMLButtonElement>("#modeBtns button").forEach((b) =>
-  b.addEventListener("click", () => {
-    mode = b.dataset.m as typeof mode;
-    document.querySelectorAll<HTMLButtonElement>("#modeBtns button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
-    renderBig(); renderLegend();
-  }));
+/// One `mode` drives the ring and the ribbon, so both toggles have to move
+/// together whichever one was clicked.
+function setMode(m: typeof mode): void {
+  mode = m;
+  hoverKey = null;
+  document.querySelectorAll<HTMLButtonElement>("#modeBtns button,#tlModeBtns button")
+    .forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.m === m)));
+  renderBig(); renderLegend(); renderTimeline(); renderList();
+}
+document.querySelectorAll<HTMLButtonElement>("#modeBtns button,#tlModeBtns button").forEach((b) =>
+  b.addEventListener("click", () => setMode(b.dataset.m as typeof mode)));
+document.querySelectorAll<HTMLButtonElement>("#sortBtns button").forEach((b) =>
+  b.addEventListener("click", () => void chooseSort(b.dataset.s as ThreadSort)));
 document.querySelectorAll<HTMLButtonElement>("#groupBtns button").forEach((b) =>
   b.addEventListener("click", () => {
     group = b.dataset.g as GroupKey; open = null;
@@ -272,6 +340,8 @@ async function openSettingsDialog(): Promise<void> {
   ($("f_boost") as HTMLInputElement).value = s.boost ?? "";
   ($("f_dir") as HTMLInputElement).value = s.claude_dir ?? "";
   ($("f_refresh") as HTMLInputElement).value = String(s.refresh_secs);
+  ($("f_rows") as HTMLInputElement).value = String(s.list_rows);
+  ($("f_wrows") as HTMLInputElement).value = String(s.widget_rows);
   ($("f_widget") as HTMLInputElement).checked = s.show_widget;
   ($("f_ontop") as HTMLInputElement).checked = s.widget_on_top;
   try { ($("f_auto") as HTMLInputElement).checked = await getAutostart(); } catch { /* plugin unavailable in dev */ }
@@ -358,6 +428,15 @@ $("f_live_check").addEventListener("click", checkLive);
 bindSetup($("f_conn"), { recheck });
 
 $("f_cancel").addEventListener("click", () => dlg.close());
+// Click the backdrop to dismiss. The press has to have started on the backdrop
+// too: dragging a selection out of a field and releasing over the dark area
+// otherwise closes the dialog and loses what was typed.
+let pressedBackdrop = false;
+dlg.addEventListener("mousedown", (e) => { pressedBackdrop = e.target === dlg; });
+dlg.addEventListener("click", (e) => {
+  if (pressedBackdrop && e.target === dlg) dlg.close();
+  pressedBackdrop = false;
+});
 $("settingsForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const save = $("f_save") as HTMLButtonElement;
@@ -375,9 +454,11 @@ $("settingsForm").addEventListener("submit", async (e) => {
     };
     await updateSettings({
       claude_dir: val("f_dir"),
-      refresh_secs: Number(val("f_refresh")) || 60,
+      refresh_secs: Number(val("f_refresh")) || 15,
       show_widget: ($("f_widget") as HTMLInputElement).checked,
       widget_on_top: ($("f_ontop") as HTMLInputElement).checked,
+      list_rows: Number(val("f_rows")) || 25,
+      widget_rows: Number(val("f_wrows")) || 5,
     });
     try { await setAutostart(($("f_auto") as HTMLInputElement).checked); } catch { /* ignore in dev */ }
     apply(await calibrate(input));
