@@ -12,9 +12,9 @@ pub fn pin_to_desktop(w: &tauri::WebviewWindow, pinned: bool) {
     use objc2::runtime::AnyObject;
 
     const CAN_JOIN_ALL_SPACES: usize = 1 << 0;
-    const MOVE_TO_ACTIVE_SPACE: usize = 1 << 1;
     const STATIONARY: usize = 1 << 4;
     const IGNORES_CYCLE: usize = 1 << 6;
+    const FULL_SCREEN_AUXILIARY: usize = 1 << 8;
 
     let Ok(ptr) = w.ns_window() else { return };
     if ptr.is_null() {
@@ -22,10 +22,15 @@ pub fn pin_to_desktop(w: &tauri::WebviewWindow, pinned: bool) {
     }
     // `stationary` is the flag Mission Control and Show Desktop honour: a
     // window carrying it is left alone while the app windows slide aside.
+    // Floating: `fullScreenAuxiliary` is what lets a window draw over an app
+    // that has taken over a Space. Without it the widget is confined to normal
+    // Spaces however high its window level, so it joins all Spaces too rather
+    // than following the active one — "move to active Space" is not honoured
+    // for full-screen Spaces at all.
     let behavior = if pinned {
         CAN_JOIN_ALL_SPACES | STATIONARY | IGNORES_CYCLE
     } else {
-        MOVE_TO_ACTIVE_SPACE
+        CAN_JOIN_ALL_SPACES | IGNORES_CYCLE | FULL_SCREEN_AUXILIARY
     };
     // Safety: `ns_window` hands back this window's live NSWindow, and
     // -setCollectionBehavior: takes one NSUInteger.
