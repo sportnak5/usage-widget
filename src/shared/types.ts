@@ -30,6 +30,28 @@ export interface Entry {
   models: ModelPart[];
 }
 
+/** One conversation the account knows about, on any machine signed into it.
+    Mirrors `RemoteSession` in src-tauri/src/ledger/sessions.rs. No usage of any
+    kind — the list carries state, not tokens — and no device name, because the
+    endpoint has none to give. */
+export interface RemoteThread {
+  /** `cse_…`, the account-wide id. */
+  id: string;
+  title: string | null;
+  /** The freshest thing that happened in it, anywhere. */
+  last: string;
+  working: boolean;
+  /** Stopped mid-task and waiting on the user. */
+  requires_action: boolean;
+  archived: boolean;
+  unread: boolean;
+  /** `owner/repo`, when the session reported one. The only hint at where. */
+  repo: string | null;
+  /** A local transcript vouched for it, so it ran on this machine. */
+  this_device: boolean;
+  local_session: string | null;
+}
+
 export interface Kinds {
   input: number;
   output: number;
@@ -142,6 +164,15 @@ export interface Snapshot {
   list_rows?: number;
   widget_rows?: number;
   cache_diag: CacheDiag;
+  /** Conversations on the account, every device included. Absent in a fixture
+      written before the session list existed, and empty when live readings are
+      off — that endpoint is the only way to reach them. */
+  remote_threads?: RemoteThread[];
+  /** What to call this machine on rows that ran here. */
+  device_label?: string;
+  /** Why the last session-list fetch failed. The rows above are the last good
+      ones, so this says they may be stale, not that they lie. */
+  remote_error?: string | null;
 }
 
 export interface WeeklyReset {

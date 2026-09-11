@@ -13,6 +13,7 @@ use std::path::PathBuf;
 
 use chrono::{Utc, Weekday};
 use token_ledger::engine::{CalibrationInput, Engine};
+use token_ledger::ledger::sessions::device_label;
 use token_ledger::ledger::WeeklyReset;
 
 fn main() {
@@ -99,6 +100,22 @@ fn main() {
         None => eprintln!("usage cache: none found at {:?}", engine.usage_cache_path()),
     }
 
+    let rows = &engine.remote.rows;
+    if let Some(e) = &engine.remote.error {
+        eprintln!("account sessions: {e}");
+    } else if !engine.settings.live_readings {
+        eprintln!("account sessions: live readings are off, so the account list can't be read");
+    }
+    if !rows.is_empty() {
+        let here = rows.iter().filter(|r| r.this_device).count();
+        eprintln!(
+            "account sessions: {} — {here} seen on {}, {} elsewhere",
+            rows.len(),
+            device_label(),
+            rows.len() - here
+        );
+    }
+
     let snap = engine.snapshot(now);
     if json {
         println!("{}", serde_json::to_string_pretty(&snap).unwrap());
@@ -123,6 +140,18 @@ fn main() {
         for e in w.by_session.iter().take(8) {
             let name = e.title.clone().unwrap_or_else(|| key(e));
             println!("   {:<44}{:>10.2}{:>7.1}%{:>8}", trunc(&name, 43), e.cost, e.share, e.pct.map(|p| format!("{p:.1}%")).unwrap_or_else(|| "—".into()));
+        }
+    }
+
+    // The account list is not per-window: it carries no usage, only state.
+    if !snap.remote_threads.is_empty() {
+        println!("\n== ACROSS DEVICES");
+        println!("   {:<44}{:>18}{:>16}", "CONVERSATION", "device", "state");
+        for r in snap.remote_threads.iter().take(15) {
+            let name = r.title.clone().unwrap_or_else(|| r.id.clone());
+            let device = if r.this_device { snap.device_label.clone() } else { "elsewhere".into() };
+            let state = if r.working { "working" } else if r.requires_action { "needs you" } else if r.archived { "archived" } else { "idle" };
+            println!("   {:<44}{:>18}{:>16}", trunc(&name, 43), trunc(&device, 17), state);
         }
     }
 }

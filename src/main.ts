@@ -16,7 +16,10 @@ import {
 import {
   allowedBuckets, BAND, BAND_HOVER, bucketLabel, bucketOf, chart, defaultBucket, guide, hitBucket, subline,
 } from "./shared/timeline";
-import { listRows, sortOf, statusMark } from "./shared/threads";
+import {
+  deviceTag, listRows, localRows, mergeThreads, sortOf, statusMark, statusOf, threadName,
+} from "./shared/threads";
+import type { ThreadRow } from "./shared/threads";
 import type { View } from "./shared/timeline";
 import type { BucketId, CalibrationInput, Entry, GroupKey, Settings, Snapshot, ThreadSort, WeeklyReset, WindowOut } from "./shared/types";
 
@@ -306,13 +309,19 @@ function sublabel(e: Entry, g: GroupKey): string {
 /// The list header's count line. Which ranking produced it matters as much as
 /// how many rows there are — "25 conversations" means something different when
 /// the cut was by recency.
-function listCount(w: WindowOut, rows: Entry[]): string {
+function listCount(w: WindowOut, rows: ThreadRow[]): string {
   if (group !== "by_session") {
     return `${rows.length} ${group === "by_project" ? "projects" : "models"} · ${w.messages} messages, ranked by weighted cost`;
   }
-  const live = rows.filter((e) => e.working).length;
-  const unread = rows.filter((e) => e.unread).length;
-  const flags = [live ? `${live} working` : "", unread ? `${unread} unread` : ""].filter(Boolean);
+  const marks = rows.map(statusOf);
+  const live = marks.filter((m) => m.working).length;
+  const unread = marks.filter((m) => m.unread).length;
+  const away = rows.filter((r) => r.remote).length;
+  const flags = [
+    live ? `${live} working` : "",
+    unread ? `${unread} unread` : "",
+    away ? `${away} on other devices` : "",
+  ].filter(Boolean);
   const by = sortOf(snap) === "recent" ? "most recently active first" : "ranked by weighted cost";
   return `${rows.length} conversations · ${w.messages} messages, ${by}${flags.length ? " · " + flags.join(", ") : ""}`;
 }
@@ -337,31 +346,59 @@ function detail(e: Entry): string {
     </div></div>`;
 }
 
+/// A conversation running on another machine: a name, a state and a time, and
+/// dashes where this machine's numbers would be. Not a button — there is no
+/// transcript here to expand, and nothing to mark read that this app owns.
+function remoteRow(row: ThreadRow & { remote: true }, snap: Snapshot | null): string {
+  const r = row.r;
+  const state = r.working ? "still working" : r.requires_action ? "waiting on you" : r.unread ? "unread" : "idle";
+  const tip = `${threadName(row)}\non another device — no token counts reach this machine\n${state} · last active ${when(r.last)}`;
+  return `<div class="row remote" title="${esc(tip)}">
+      <span class="chip ghost"></span>
+      ${statusMark(statusOf(row))}
+      <span class="name"><b>${esc(threadName(row))}</b><em>${deviceTag(row, snap)}${esc(`${state} · last active ${when(r.last)}`)}</em></span>
+      <span class="raw r">—</span>
+      <span class="r mix"></span>
+      <span class="pct r">—<small>not counted here</small></span>
+    </div>`;
+}
+
 function renderList(): void {
   if (!snap) return;
   const w = snap.windows[sel];
-  // Conversations are cut to the size you chose; the other groupings have
-  // ceilings of their own that nobody has ever wanted to change.
-  const rows = group === "by_session" ? w.by_session.slice(0, listRows(snap)) : w[group];
+  // Conversations are cut to the size you chose — after the account's other
+  // devices are merged in, so the cut is of the whole list and not of this
+  // machine's half. The other groupings have ceilings of their own that nobody
+  // has ever wanted to change.
+  const rows = group === "by_session"
+    ? mergeThreads(snap, w).slice(0, listRows(snap))
+    : localRows(w[group]);
   $("listTitle").innerHTML = `${esc(w.label)} <span>${esc(listCount(w, rows))}</span>`;
   $("sortBtns").hidden = group !== "by_session";
   if (rows.length === 0) {
     $("rows").innerHTML = `<div class="empty">Nothing in this window yet.</div>`;
     return;
   }
-  $("rows").innerHTML = rows.map((e, i) => {
+  $("rows").innerHTML = rows.map((row, i) => {
+    if (row.remote) return remoteRow(row, snap);
+    const e = row.e;
     const mini = e.models.map((m) => `<i style="width:${(m.cost / (e.cost || 1) * 100).toFixed(2)}%;background:${modelColor(m.model)}"></i>`).join("");
     const pct = e.pct === null ? `${e.share.toFixed(1)}%<small>of usage</small>` : `${e.pct.toFixed(1)}%<small>${e.share.toFixed(0)}% of window</small>`;
     return `<button class="row${e.working ? " working" : e.unread ? " unread" : ""}" data-i="${i}" aria-expanded="${open === i}">
         <span class="chip" style="background:${modelColor(e.models[0].model)}"></span>
         ${statusMark(e)}
-        <span class="name"><b>${esc(entryName(e, group))}</b><em>${esc(sublabel(e, group))}</em></span>
+        <span class="name"><b>${esc(entryName(e, group))}</b><em>${group === "by_session" ? deviceTag(row, snap) : ""}${esc(sublabel(e, group))}</em></span>
         <span class="raw r">${tok(e.raw)}</span>
         <span class="r mix"><span class="minibar">${mini}</span></span>
         <span class="pct r">${pct}</span>
       </button>` + (open === i ? detail(e) : "");
   }).join("");
-  document.querySelectorAll<HTMLButtonElement>(".row").forEach((b) => {
+  // Remote rows carry no `data-i`, which is what keeps expanding, read-marking
+  // and the ribbon's hover keyed to rows this machine actually recorded.
+  document.querySelectorAll<HTMLButtonElement>(".row[data-i]").forEach((b) => {
+    const row = rows[Number(b.dataset.i)];
+    if (row.remote) return;
+    const e = row.e;
     b.addEventListener("click", () => {
       const i = Number(b.dataset.i);
       open = open === i ? null : i;
@@ -369,12 +406,10 @@ function renderList(): void {
       // Opening a conversation is the only "you have read this" signal the app
       // ever gets — Claude Code keeps no read receipts of its own. The badge
       // clears in the widget too, because the backend republishes.
-      const e = rows[i];
       if (open === i && group === "by_session" && e.unread) void markRead(e);
     });
     // Only when the list is grouped the same way the ribbon is keyed.
     if (group !== mode) return;
-    const e = rows[Number(b.dataset.i)];
     const key = mode === "by_model" ? (e.key as string) : (e.key as [string, string])[0];
     b.addEventListener("mouseenter", () => setHoverKey(key));
     b.addEventListener("mouseleave", () => setHoverKey(null));

@@ -78,6 +78,10 @@ pub struct Title {
 pub enum Parsed {
     Usage(Rec),
     Title { session: String, title: Title },
+    /// A `bridge-session` record: this conversation is mirrored to the
+    /// account's session list under `bridge_id`, which is how a row in that
+    /// list is recognised as having run on this machine.
+    Bridge { session: String, bridge_id: String },
     Skip,
 }
 
@@ -161,6 +165,27 @@ pub fn parse_line(line: &str, want_prompt_title: impl Fn(&str) -> bool) -> Parse
                         session: sid.to_string(),
                         title: Title { kind: TitleKind::Prompt, text: clean_title(text) },
                     };
+                }
+            }
+        }
+    }
+
+    // Last, and only on lines nothing above claimed: transcripts quote other
+    // sessions' ids into tool output, so the id is only ours when it is the
+    // top-level key of a record whose own `type` says so.
+    if line.contains("bridge-session") {
+        if let Ok(v) = serde_json::from_str::<Value>(line) {
+            if v.get("type").and_then(Value::as_str) == Some("bridge-session") {
+                if let (Some(sid), Some(bid)) = (
+                    v.get("sessionId").and_then(Value::as_str),
+                    v.get("bridgeSessionId").and_then(Value::as_str),
+                ) {
+                    if !bid.is_empty() {
+                        return Parsed::Bridge {
+                            session: sid.to_string(),
+                            bridge_id: bid.to_string(),
+                        };
+                    }
                 }
             }
         }
@@ -269,6 +294,21 @@ mod tests {
         let t = clean_title(&"word ".repeat(40));
         assert!(t.ends_with('…'));
         assert!(t.chars().count() <= 53);
+    }
+
+    #[test]
+    fn bridge_id_is_taken_from_its_own_record_only() {
+        let line = r#"{"type":"bridge-session","sessionId":"sess-1","bridgeSessionId":"cse_01WXUkhusRARvhMQaULJu3rS","lastSequenceNum":0,"ownerAccountUuid":"acc"}"#;
+        let Parsed::Bridge { session, bridge_id } = parse_line(line, |_| true) else { panic!("expected bridge") };
+        assert_eq!(session, "sess-1");
+        assert_eq!(bridge_id, "cse_01WXUkhusRARvhMQaULJu3rS");
+
+        // A transcript that merely printed someone else's bridge id into tool
+        // output must not claim it: that would label a remote row as local.
+        let quoted = r#"{"type":"user","sessionId":"sess-2","message":{"role":"user","content":"grep found {\"type\":\"bridge-session\",\"bridgeSessionId\":\"cse_someoneelse\"}"}}"#;
+        assert!(!matches!(parse_line(quoted, |_| false), Parsed::Bridge { .. }));
+        let assistant = USAGE_LINE.replace(r#""cwd""#, r#""note":"bridge-session cse_x","cwd""#);
+        assert!(matches!(parse_line(&assistant, |_| true), Parsed::Usage(_)));
     }
 
     #[test]
