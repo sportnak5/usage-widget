@@ -319,15 +319,19 @@ fn reset_widget_position(app: &AppHandle) {
 /// Where the widget sits in the window stack: floating above everything, or
 /// parked below normal windows so it reads as part of the desktop.
 fn apply_widget_layer(w: &tauri::WebviewWindow, on_top: bool) {
-    // Both setters write the same underlying state (the window level on macOS,
-    // the topmost position on Windows), so the last call wins: clear the state
-    // we are leaving first, then apply the one we want.
-    if on_top {
-        let _ = w.set_always_on_bottom(false);
-        let _ = w.set_always_on_top(true);
-    } else {
-        let _ = w.set_always_on_top(false);
-        let _ = w.set_always_on_bottom(true);
+    // macOS is handled entirely by `pin_to_desktop`, which sets a window level
+    // these setters cannot reach. Elsewhere both setters write the same
+    // underlying state (the topmost position on Windows), so the last call
+    // wins: clear the state we are leaving first, then apply the one we want.
+    #[cfg(not(target_os = "macos"))]
+    {
+        if on_top {
+            let _ = w.set_always_on_bottom(false);
+            let _ = w.set_always_on_top(true);
+        } else {
+            let _ = w.set_always_on_top(false);
+            let _ = w.set_always_on_bottom(true);
+        }
     }
     crate::platform::pin_to_desktop(w, !on_top);
 }

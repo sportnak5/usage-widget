@@ -6,6 +6,12 @@
 
 /// Make the widget part of the desktop rather than another app window: it stays
 /// where it is when the desktop is revealed, and follows you between desktops.
+/// Unpinned, it is the reverse: above everything, full-screen apps included.
+///
+/// This owns the window level too, not just the collection behaviour: Tauri's
+/// always-on-top tops out at the floating level, which a full-screen Space
+/// still draws over, and it writes the level from a block queued on the main
+/// thread that would land after ours and undo it.
 #[cfg(target_os = "macos")]
 pub fn pin_to_desktop(w: &tauri::WebviewWindow, pinned: bool) {
     use objc2::msg_send;
@@ -15,6 +21,12 @@ pub fn pin_to_desktop(w: &tauri::WebviewWindow, pinned: bool) {
     const STATIONARY: usize = 1 << 4;
     const IGNORES_CYCLE: usize = 1 << 6;
     const FULL_SCREEN_AUXILIARY: usize = 1 << 8;
+
+    // NSWindowLevel values, not the CGWindowLevelKey indices of the same name.
+    // Status is the level menu-bar extras use — high enough to sit over a
+    // full-screen app, low enough to leave the Dock and menus alone.
+    const BELOW_NORMAL_LEVEL: isize = -1;
+    const STATUS_LEVEL: isize = 25;
 
     let Ok(ptr) = w.ns_window() else { return };
     if ptr.is_null() {
@@ -26,18 +38,23 @@ pub fn pin_to_desktop(w: &tauri::WebviewWindow, pinned: bool) {
     // that has taken over a Space. Without it the widget is confined to normal
     // Spaces however high its window level, so it joins all Spaces too rather
     // than following the active one — "move to active Space" is not honoured
-    // for full-screen Spaces at all.
-    let behavior = if pinned {
-        CAN_JOIN_ALL_SPACES | STATIONARY | IGNORES_CYCLE
+    // for full-screen Spaces at all. Level and behaviour are independent: the
+    // behaviour buys entry to the Space, the level decides what it covers, and
+    // the widget needs both.
+    let (behavior, level) = if pinned {
+        (CAN_JOIN_ALL_SPACES | STATIONARY | IGNORES_CYCLE, BELOW_NORMAL_LEVEL)
     } else {
-        CAN_JOIN_ALL_SPACES | IGNORES_CYCLE | FULL_SCREEN_AUXILIARY
+        (CAN_JOIN_ALL_SPACES | IGNORES_CYCLE | FULL_SCREEN_AUXILIARY, STATUS_LEVEL)
     };
-    // Safety: `ns_window` hands back this window's live NSWindow, and
-    // -setCollectionBehavior: takes one NSUInteger.
-    unsafe {
-        let ns = ptr as *mut AnyObject;
+    // NSWindow wants the main thread; the pointer is not `Send`, so it travels
+    // as an address. Safety: `ns_window` hands back this window's live NSWindow,
+    // which outlives the app, and the two setters take one NSUInteger/NSInteger.
+    let ns = ptr as usize;
+    let _ = w.run_on_main_thread(move || unsafe {
+        let ns = ns as *mut AnyObject;
         let _: () = msg_send![ns, setCollectionBehavior: behavior];
-    }
+        let _: () = msg_send![ns, setLevel: level];
+    });
 }
 
 #[cfg(target_os = "windows")]
