@@ -240,12 +240,12 @@ legend .opt{font-size:9.5px;letter-spacing:.1em;color:var(--faint);border:1px so
   .tmark.work{animation:none;border-color:var(--accent);border-right-color:transparent}
 }
 
-/* Which machine a conversation is on. A pill on the sub-line rather than a
-   column of its own: the grid is already six wide and sheds two under 700px. */
-.dtag{display:inline-block;margin-right:7px;padding:0 5px;border:1px solid var(--line);border-radius:99px;
-  font-family:"IBM Plex Sans",sans-serif;font-size:9.5px;letter-spacing:.04em;color:var(--muted);
-  vertical-align:1px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.dtag.away{color:var(--accent);border-color:var(--accent-soft)}
+/* A conversation running on some other machine. A pill on the sub-line rather
+   than a column of its own: the grid is already six wide and sheds two under
+   700px. Rows from this machine wear nothing — the tag marks the exception. */
+.dtag{display:inline-block;margin-right:7px;padding:0 5px;border-radius:99px;
+  font-family:"IBM Plex Sans",sans-serif;font-size:9.5px;letter-spacing:.04em;
+  vertical-align:1px;white-space:nowrap;color:var(--accent);border:1px solid var(--accent-soft)}
 /* Nothing on a row from another device is clickable — there is no transcript
    here to open — so it reads as a line of the list, not as a control. */
 .row.remote{cursor:default}

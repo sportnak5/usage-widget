@@ -68,22 +68,25 @@ html,body{background:transparent;overflow:hidden;user-select:none;-webkit-user-s
 .tsort button:hover{color:var(--ink-2)}
 .tsort button[aria-pressed="true"]{color:var(--ink);border-color:var(--line)}
 .tsort button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
-/* Same two states as the ledger's list, at the widget's scale — but riding at
-   the top right of the name instead of holding a column of their own, so the
-   row spends its width on the name. */
-.wr .tmark{flex:none;width:6px;height:6px;border-radius:50%;margin-top:1px}
-.wr .tmark.new{width:5px;height:5px;background:var(--accent);box-shadow:0 0 0 1.5px var(--accent-soft)}
-.wr .tmark.work{border:1.3px solid var(--ring);border-top-color:var(--accent);background:transparent;
-  animation:tspin .8s linear infinite}
+/* Working takes over the colour square rather than adding a mark of its own:
+   the widget is five rows wide enough for a name and a number, and a second
+   dot beside the first is two things to read where there is one thing to say.
+   Unread gets nothing here — the ledger window is where you go to act on it. */
+.wr i.load{border:1.3px solid var(--ring);border-top-color:var(--accent);border-radius:50%;
+  background:transparent;animation:tspin .8s linear infinite}
 @keyframes tspin{to{transform:rotate(360deg)}}
-@media (prefers-reduced-motion:reduce){.wr .tmark.work{animation:none;border-color:var(--accent);border-right-color:transparent}}
+@media (prefers-reduced-motion:reduce){.wr i.load{animation:none;border-color:var(--accent);border-right-color:transparent}}
 
-/* Which machine a row is on, at the widget's scale: no border, just a quieter
-   run of text after the name, so it can't be read as part of the title. */
-.wr .dtag{margin-left:5px;font-size:8.5px;letter-spacing:.05em;color:var(--faint)}
-.wr .dtag.away{color:var(--accent)}
-/* A remote row has no usage to draw. The gauge track would otherwise sit there
-   empty and read as "used nothing", which is not what is being said. */
-.wr.remote i{background:var(--ring)}
+/* "Remote" as a badge, not a run of text: it is the one word on the row that
+   is not the conversation's own, so it has to stop being read as part of the
+   title. `flex:none` keeps the name, not the badge, paying for a long title. */
+.wr .dtag{flex:none;margin-left:5px;padding:0 4px;border-radius:99px;
+  border:1px solid var(--accent-soft);color:var(--accent);
+  font-size:8px;letter-spacing:.04em;line-height:12px;font-weight:600}
+/* A remote row has no *percentage* to draw — the gauge is a share of this
+   machine's limit. The track would otherwise sit there empty and read as "used
+   nothing", which is not what is being said. Its token count is real but a
+   floor, so it is set quieter than a local one. */
+.wr.remote i:not(.load){background:var(--ring)}
 .wr.remote .t{color:var(--faint);font-weight:500}
 .wr.remote .g{background:transparent;box-shadow:none}

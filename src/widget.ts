@@ -12,7 +12,8 @@ import { basename, esc, hhmm, setHome, short, tidy, tok, until } from "./shared/
 import { grow, numText, ringArcs } from "./shared/ring";
 import { applyScheme } from "./shared/schemes";
 import {
-  deviceTag, mergeThreads, sortOf, sortToggle, statusMark, statusNote, statusOf, threadName, widgetRows,
+  mergeThreads, remoteTag, sortOf, sortToggle, statusNote, statusOf, threadName,
+  widgetRows,
 } from "./shared/threads";
 import type { Snapshot, ThreadSort, WindowOut } from "./shared/types";
 
@@ -61,6 +62,17 @@ function renderDials(): void {
   grow($("dials"));
 }
 
+/** The square in front of a row: the model's colour, or a spinner while the
+ *  agent is mid-turn. One cell doing both jobs — the widget is five rows of
+ *  four columns, and a row that is working has nothing to say about which
+ *  model it is working with that the user cannot wait a moment for. */
+function chip(working: boolean | undefined, color: string | null): string {
+  if (working) {
+    return `<i class="load" title="The agent is still working in this conversation" role="img" aria-label="still working"></i>`;
+  }
+  return `<i${color ? ` style="background:${color}"` : ""}></i>`;
+}
+
 function renderRows(): void {
   if (!snap) return;
   const w = snap.windows[sel];
@@ -73,17 +85,19 @@ function renderRows(): void {
   const body = rows.length === 0
     ? `<div class="wempty">Nothing in this window yet.</div>`
     : rows.map((row) => {
-        // A remote row has a name, a state and a time and nothing else — no
-        // token counts reach this machine — so its gauge cells stay empty
-        // rather than showing a zero that would read as "used nothing".
+        // A remote row has tokens once its event stream has been walked, but
+        // never a percentage: the gauge is this machine's share of a limit, and
+        // the row is not this machine's. So the count fills, the gauge stays
+        // empty rather than showing a zero that would read as "used nothing".
         if (row.remote) {
           const r = row.r;
           const st = statusOf(row);
-          const tip = `${threadName(row)}\non another device${r.repo ? " · " + r.repo : ""}\nlast active ${hhmm(r.last)}${statusNote(st)}`;
+          const has = r.models.length > 0;
+          const tip = `${threadName(row)}\non another device${r.repo ? " · " + r.repo : ""}\n${has ? `at least ${tok(r.raw)} tokens — output isn't reported for other devices\n` : ""}last active ${hhmm(r.last)}${statusNote(st)}`;
           return `<div class="wr remote" style="${paint(null)}" title="${esc(tip)}">
-          <i></i>
-          <span class="n"><span class="nt">${esc(threadName(row))}</span>${deviceTag(row, snap)}${st.working || st.unread ? statusMark(st) : ""}</span>
-          <span class="t">—</span><span class="g"></span><span class="p"></span>
+          ${chip(st.working, has ? modelColor(r.models[0].model) : null)}
+          <span class="n"><span class="nt">${esc(threadName(row))}</span>${remoteTag(row)}</span>
+          <span class="t">${has ? tok(r.raw) : "—"}</span><span class="g"></span><span class="p"></span>
         </div>`;
         }
         const e = row.e;
@@ -92,8 +106,8 @@ function renderRows(): void {
         const name = e.title || basename(cwd) || "untitled";
         const tip = `${name}\n${tidy(cwd)}\n${pct === null ? e.share.toFixed(0) + "% of usage in this window" : pct.toFixed(1) + "% of the " + SCOPE[sel] + " limit"}${statusNote(e)}`;
         return `<div class="wr" style="${paint(pct === null ? null : pct / 100)}" title="${esc(tip)}" data-sid="${esc(sid)}">
-          <i style="background:${modelColor(e.models[0].model)}"></i>
-          <span class="n"><span class="nt">${esc(name)}</span>${deviceTag(row, snap)}${e.working || e.unread ? statusMark(e) : ""}</span>
+          ${chip(e.working, modelColor(e.models[0].model))}
+          <span class="n"><span class="nt">${esc(name)}</span>${remoteTag(row)}</span>
           <span class="t">${tok(e.raw)}</span>
           <span class="g"><i style="width:${Math.max(2, Math.min(100, pct ?? e.share)).toFixed(1)}%"></i></span>
           <span class="p gauge-color">${pct === null ? e.share.toFixed(0) + "%" : pct.toFixed(1) + "%"}</span>
