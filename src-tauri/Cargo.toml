@@ -1,6 +1,6 @@
 [package]
 name = "token-ledger"
-version = "0.2.0"
+version = "0.3.0"
 description = "Claude Code usage: the three limits, opened up by what filled them."
 authors = ["Crawford Nakayama"]
 edition = "2021"
