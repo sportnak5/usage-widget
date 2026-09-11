@@ -23,8 +23,10 @@ pub fn pin_to_desktop(w: &tauri::WebviewWindow, pinned: bool) {
     const FULL_SCREEN_AUXILIARY: usize = 1 << 8;
 
     // NSWindowLevel values, not the CGWindowLevelKey indices of the same name.
-    // Status is the level menu-bar extras use — high enough to sit over a
-    // full-screen app, low enough to leave the Dock and menus alone.
+    // Status is the level menu-bar extras use, and the lowest one that actually
+    // draws over a full-screen app; floating (3) does not. It sits above the
+    // Dock (20) and the menu bar (24) as well, so a widget dragged over either
+    // covers it — the price of the full-screen overlay.
     const BELOW_NORMAL_LEVEL: isize = -1;
     const STATUS_LEVEL: isize = 25;
 
