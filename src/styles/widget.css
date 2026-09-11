@@ -71,3 +71,13 @@ html,body{background:transparent;overflow:hidden;user-select:none;-webkit-user-s
   animation:tspin .8s linear infinite}
 @keyframes tspin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.wr .tmark.work{animation:none;border-color:var(--accent);border-right-color:transparent}}
+
+/* Which machine a row is on, at the widget's scale: no border, just a quieter
+   run of text after the name, so it can't be read as part of the title. */
+.wr .dtag{margin-left:5px;font-size:8.5px;letter-spacing:.05em;color:var(--faint)}
+.wr .dtag.away{color:var(--accent)}
+/* A remote row has no usage to draw. The gauge track would otherwise sit there
+   empty and read as "used nothing", which is not what is being said. */
+.wr.remote i{background:var(--ring)}
+.wr.remote .t{color:var(--faint);font-weight:500}
+.wr.remote .g{background:transparent;box-shadow:none}
