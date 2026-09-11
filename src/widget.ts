@@ -75,8 +75,8 @@ function renderRows(): void {
         const name = e.title || basename(cwd) || "untitled";
         const tip = `${name}\n${tidy(cwd)}\n${pct === null ? e.share.toFixed(0) + "% of usage in this window" : pct.toFixed(1) + "% of the " + SCOPE[sel] + " limit"}${statusNote(e)}`;
         return `<div class="wr" style="${paint(pct === null ? null : pct / 100)}" title="${esc(tip)}" data-sid="${esc(sid)}">
-          ${statusMark(e)}<i style="background:${modelColor(e.models[0].model)}"></i>
-          <span class="n">${esc(name)}</span>
+          <i style="background:${modelColor(e.models[0].model)}"></i>
+          <span class="n"><span class="nt">${esc(name)}</span>${e.working || e.unread ? statusMark(e) : ""}</span>
           <span class="t">${tok(e.raw)}</span>
           <span class="g"><i style="width:${Math.max(2, Math.min(100, pct ?? e.share)).toFixed(1)}%"></i></span>
           <span class="p gauge-color">${pct === null ? e.share.toFixed(0) + "%" : pct.toFixed(1) + "%"}</span>
