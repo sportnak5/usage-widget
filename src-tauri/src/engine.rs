@@ -2,6 +2,7 @@
 //! refresh on demand, produce snapshots, take calibration input. The Tauri
 //! layer and `ledger-cli` are both thin shells over this.
 
+use std::collections::HashMap;
 use std::path::PathBuf;
 
 use chrono::{DateTime, Duration, Utc};
@@ -32,6 +33,14 @@ pub struct Engine {
     pub remote: Remote,
 }
 
+/// How often a batch of event walks may run. Slower than the list by design:
+/// the list is one request, this is one per session.
+const EVENT_FETCH_EVERY: i64 = 120;
+
+/// Sessions walked per pass. Small on purpose — a cold account catches up over
+/// a few minutes rather than firing eighty requests at once.
+const EVENT_BATCH: usize = 4;
+
 /// The last word from the account-wide session list.
 ///
 /// Rows outlive a failed fetch on purpose: a dropped connection should not
@@ -44,6 +53,14 @@ pub struct Remote {
     /// working one.
     pub checked_at: Option<DateTime<Utc>>,
     pub error: Option<String>,
+    /// What each remote session's own event stream has told us, keyed by
+    /// session id and kept between refreshes so each pass only asks for what
+    /// arrived since. Not persisted, for the same reason the rows are not.
+    pub events: HashMap<String, sessions::SessionEvents>,
+    /// When the last batch of event walks ran. Separate from `checked_at`:
+    /// these are per-session requests against a rate-limited endpoint, so they
+    /// go at their own, slower pace.
+    pub events_checked_at: Option<DateTime<Utc>>,
 }
 
 /// Why auto-calibration did or didn't take, in enough detail for the UI to
@@ -225,9 +242,77 @@ impl Engine {
                 rows.retain(|r| r.last >= cutoff);
                 self.remote.rows = rows;
                 self.remote.error = None;
+                // A session that dropped off the list will not come back on it,
+                // so its stream is dead weight.
+                let live: std::collections::HashSet<&str> =
+                    self.remote.rows.iter().map(|r| r.id.as_str()).collect();
+                self.remote.events.retain(|id, _| live.contains(id.as_str()));
             }
             Err(FetchError::Off) => {}
             Err(e) => self.remote.error = Some(e.message()),
+        }
+        self.absorb_remote_events(now);
+    }
+
+    /// Walk the event streams of a few remote conversations, so their rows can
+    /// carry tokens instead of dashes.
+    ///
+    /// This is one request per session per 200 events, against the endpoint
+    /// next door to the one that rate-limits — so it cannot ride the 30s
+    /// refresh the way the list does. Instead: a slower cadence, a small batch
+    /// per pass, freshest conversations first, and a kept cursor so a session
+    /// is walked in full once and tailed thereafter. Rows that ran on this
+    /// machine are skipped outright — the transcript on disk is better than
+    /// the stream, and it has the real output counts.
+    pub fn absorb_remote_events(&mut self, now: DateTime<Utc>) {
+        let recently = self
+            .remote
+            .events_checked_at
+            .map_or(false, |t| now - t < Duration::seconds(EVENT_FETCH_EVERY) && now >= t);
+        if recently {
+            return;
+        }
+        let mut due: Vec<(DateTime<Utc>, String)> = self
+            .remote
+            .rows
+            .iter()
+            .filter(|r| !r.this_device && !r.archived)
+            .filter(|r| {
+                self.remote
+                    .events
+                    .get(&r.id)
+                    .and_then(|e| e.synced_last)
+                    .map_or(true, |t| r.last > t)
+            })
+            .map(|r| (r.last, r.id.clone()))
+            .collect();
+        if due.is_empty() {
+            return;
+        }
+        // Freshest first: the conversation someone is watching finish is the
+        // one whose numbers are worth a request.
+        due.sort_by_key(|(last, _)| std::cmp::Reverse(*last));
+        due.truncate(EVENT_BATCH);
+
+        let tok = match crate::ledger::usageapi::claude_token() {
+            Ok((t, _)) => t,
+            // No credential is not an error to report twice; the list fetch
+            // that runs first already said so.
+            Err(_) => return,
+        };
+        self.remote.events_checked_at = Some(now);
+        for (last, id) in due {
+            let st = self.remote.events.entry(id.clone()).or_default();
+            match sessions::fetch_events(&tok, &id, st) {
+                // Only a walk that reached the end of the stream has seen
+                // everything up to `last`. A partial one keeps its cursor and
+                // stays due, so the next pass carries it on.
+                Ok(true) => st.synced_last = Some(last),
+                Ok(false) => {}
+                // Leave `synced_last` alone so the session is retried, but stop
+                // the batch: one failure here is rarely about one session.
+                Err(_) => break,
+            }
         }
     }
 
@@ -441,6 +526,26 @@ impl Engine {
         // and republished as-is when a window asks for a snapshot without a
         // refresh, which is what keeps remote rows on screen between fetches.
         snap.remote_threads = self.remote.rows.clone();
+        for row in &mut snap.remote_threads {
+            let Some(st) = self.remote.events.get(&row.id) else { continue };
+            if st.messages() == 0 {
+                continue;
+            }
+            row.models = st
+                .by_model()
+                .into_iter()
+                .map(|(model, u)| {
+                    let cost =
+                        self.settings.prices.lookup(&model).map_or(0.0, |e| e.rates.cost(&u));
+                    sessions::RemoteModel { model, cost, raw: u.raw() }
+                })
+                .collect();
+            // Heaviest first, so the row's chip takes the colour of the model
+            // that did the work, as a local row's does.
+            row.models.sort_by(|a, b| b.cost.total_cmp(&a.cost));
+            row.cost = row.models.iter().map(|m| m.cost).sum();
+            row.raw = row.models.iter().map(|m| m.raw).sum();
+        }
         snap.remote_error = self.remote.error.clone();
         snap
     }
@@ -627,6 +732,36 @@ mod tests {
     /// The session list is the same credential and the same consent as the
     /// Usage endpoint, so the same switch has to govern it — and switching it
     /// off has to take the rows away, not freeze them on screen.
+    #[test]
+    fn event_walks_skip_rows_this_machine_already_has_transcripts_for() {
+        let mut eng = engine_at("remote-events-local", None, true);
+        eng.remote.rows = vec![
+            RemoteSession { id: "cse_here".into(), this_device: true, ..Default::default() },
+            RemoteSession { id: "cse_gone".into(), archived: true, ..Default::default() },
+        ];
+
+        // Nothing is due, so nothing is asked — and in particular the keychain
+        // is not touched, which is what the assertion on `events_checked_at`
+        // is really pinning down.
+        eng.absorb_remote_events(utc(NOW));
+        assert!(eng.remote.events_checked_at.is_none());
+        assert!(eng.remote.events.is_empty());
+    }
+
+    #[test]
+    fn event_walks_go_at_their_own_slower_pace() {
+        let mut eng = engine_at("remote-events-throttle", None, true);
+        eng.remote.rows =
+            vec![RemoteSession { id: "cse_away".into(), last: utc(NOW), ..Default::default() }];
+        eng.remote.events_checked_at = Some(utc(NOW));
+
+        // A row is genuinely due, but the batch ran a moment ago: the 30s list
+        // refresh must not drag per-session requests along with it.
+        eng.absorb_remote_events(utc(NOW) + Duration::seconds(30));
+        assert_eq!(eng.remote.events_checked_at, Some(utc(NOW)));
+        assert!(eng.remote.events.is_empty());
+    }
+
     #[test]
     fn remote_sessions_are_off_when_live_readings_are() {
         let mut eng = engine_at("remote-off", None, true);

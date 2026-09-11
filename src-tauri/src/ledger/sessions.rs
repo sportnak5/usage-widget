@@ -20,6 +20,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
+use super::record::Usage;
 use super::usageapi::{self, clean, redact, FetchError};
 
 pub const ENDPOINT: &str = "https://api.anthropic.com/v1/code/sessions";
@@ -32,6 +33,16 @@ const UA: &str = concat!("token-ledger/", env!("CARGO_PKG_VERSION"));
 
 /// The largest page the endpoint serves.
 const PAGE: usize = 100;
+
+/// One session's event stream, per request. The endpoint accepts larger, but
+/// the walk below is bounded by pages, so a bigger page is a bigger blast
+/// radius on a retry for no gain.
+const EVENTS_PAGE: usize = 200;
+
+/// How far back through one session's stream a single pass will walk. A cold
+/// session of 2,400 events costs twelve requests once and nothing thereafter,
+/// because the cursor is kept.
+const MAX_EVENT_PAGES: usize = 12;
 
 /// A ceiling on the walk, not an expectation: an account with thousands of
 /// sessions must not turn one refresh into thirty requests against an endpoint
@@ -65,6 +76,28 @@ pub struct RemoteSession {
     pub this_device: bool,
     /// The local session id it ran as, when `this_device`.
     pub local_session: Option<String>,
+    /// Tokens the session's own event stream reports, per model, once it has
+    /// been walked. Empty means not walked yet, which is not the same as zero:
+    /// a row with no entry here shows dashes, not a total of nothing.
+    #[serde(default)]
+    pub models: Vec<RemoteModel>,
+    /// Weighted dollars across `models`. A **floor**: the event stream's output
+    /// token counts are a streaming placeholder, so the real figure is higher
+    /// (`docs/sessions-api.md` §2b).
+    #[serde(default)]
+    pub cost: f64,
+    #[serde(default)]
+    pub raw: u64,
+}
+
+/// What one model spent inside a remote conversation. Mirrors the local
+/// `ModelPart` closely enough that a row renders the same way, without
+/// reaching into `snapshot`, which reaches back here.
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+pub struct RemoteModel {
+    pub model: String,
+    pub cost: f64,
+    pub raw: u64,
 }
 
 /// Fetch the whole list with Claude Code's credential.
@@ -140,6 +173,9 @@ fn parse_row(v: &Value) -> Option<RemoteSession> {
         repo: repo_of(v),
         this_device: false,
         local_session: None,
+        models: Vec::new(),
+        cost: 0.0,
+        raw: 0,
     })
 }
 
@@ -155,6 +191,158 @@ fn repo_of(v: &Value) -> Option<String> {
         }
     }
     None
+}
+
+/// What one session's event stream has told us so far.
+///
+/// Keyed by assistant message id because the stream is *not* a set of distinct
+/// messages: each one is written 2-3 times as it streams, and the copies carry
+/// different partial usage. Summing the events double-counts; the map is the
+/// de-duplication, and `merge` keeps the largest value seen per field, since a
+/// later copy of a message has seen more of it than an earlier one.
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct SessionEvents {
+    msgs: HashMap<String, (String, Usage)>,
+    /// `sequence_num` of the last event read. The endpoint's cursor *is* that
+    /// number, so the next pass asks only for what arrived since — which is
+    /// what makes keeping this per session cheaper than re-walking.
+    pub cursor: Option<String>,
+    /// `last_event_at` of the row when we last walked it. Re-walking a session
+    /// that has not moved would spend a request to learn nothing.
+    pub synced_last: Option<DateTime<Utc>>,
+}
+
+impl SessionEvents {
+    /// Tokens per model, ordered by model so a snapshot does not reshuffle.
+    pub fn by_model(&self) -> Vec<(String, Usage)> {
+        let mut out: HashMap<&str, Usage> = HashMap::new();
+        for (model, u) in self.msgs.values() {
+            out.entry(model.as_str()).or_default().add(u);
+        }
+        let mut v: Vec<(String, Usage)> = out.into_iter().map(|(m, u)| (m.to_string(), u)).collect();
+        v.sort_by(|a, b| a.0.cmp(&b.0));
+        v
+    }
+
+    pub fn usage(&self) -> Usage {
+        let mut u = Usage::default();
+        for (_, m) in self.msgs.values() {
+            u.add(m);
+        }
+        u
+    }
+
+    pub fn messages(&self) -> usize {
+        self.msgs.len()
+    }
+
+    fn merge(&mut self, id: String, model: String, u: Usage) {
+        let slot = self.msgs.entry(id).or_insert_with(|| (model.clone(), Usage::default()));
+        slot.0 = model;
+        let c = &mut slot.1;
+        c.input = c.input.max(u.input);
+        c.output = c.output.max(u.output);
+        c.cache_5m = c.cache_5m.max(u.cache_5m);
+        c.cache_1h = c.cache_1h.max(u.cache_1h);
+        c.cache_read = c.cache_read.max(u.cache_read);
+    }
+}
+
+/// Walk one session's event stream forward from where the last pass stopped.
+///
+/// Ascending order is not a preference: the cursor is a high-water mark, so
+/// only a forward walk can be resumed. The output token counts that come back
+/// are a streaming placeholder and not the real figure — see
+/// `docs/sessions-api.md` §2b — so what this yields is a floor on the cost,
+/// which is why the UI marks it as one.
+///
+/// Returns whether the stream was read to its end. A long conversation can
+/// exhaust the page budget first, and the caller must not record it as caught
+/// up on the strength of a partial read — the cursor is kept either way, so the
+/// next pass picks the walk up rather than starting it again.
+pub fn fetch_events(tok: &str, id: &str, st: &mut SessionEvents) -> Result<bool, FetchError> {
+    let tok = clean(tok);
+    if tok.is_empty() || !tok.chars().all(|c| c.is_ascii_graphic()) {
+        return Err(FetchError::Malformed);
+    }
+    if !id.starts_with("cse_") || !id[4..].chars().all(|c| c.is_ascii_alphanumeric()) {
+        return Err(FetchError::Malformed);
+    }
+    for _ in 0..MAX_EVENT_PAGES {
+        let body = get_events(&tok, id, st.cursor.as_deref())?;
+        match absorb_events_page(&body, st).ok_or(FetchError::Shape)? {
+            Some(c) => st.cursor = Some(c),
+            None => return Ok(true),
+        }
+    }
+    Ok(false)
+}
+
+/// Fold one page into the state, returning the cursor to ask from next, or
+/// `None` when the page was the last.
+fn absorb_events_page(body: &Value, st: &mut SessionEvents) -> Option<Option<String>> {
+    let data = body.get("data")?.as_array()?;
+    for e in data {
+        if let Some((id, model, u)) = event_usage(e) {
+            st.merge(id, model, u);
+        }
+    }
+    // `next_cursor` is absent on the last page, as on the session list. The
+    // high-water mark still has to advance past what we just read, or a
+    // resumed walk would re-read it — so fall back to the last sequence number.
+    if let Some(c) = body.get("next_cursor").and_then(cursor_str) {
+        return Some(Some(c));
+    }
+    if let Some(last) = data.last().and_then(|e| e.get("sequence_num")).and_then(cursor_str) {
+        st.cursor = Some(last);
+    }
+    Some(None)
+}
+
+/// The cursor is a sequence number, which the endpoint sends as a string but
+/// is not obliged to.
+fn cursor_str(v: &Value) -> Option<String> {
+    match v {
+        Value::String(s) if !s.is_empty() => Some(s.clone()),
+        Value::Number(n) => Some(n.to_string()),
+        _ => None,
+    }
+}
+
+/// The tokens an `assistant` event reports, with the model that spent them.
+/// Every other event type carries no usage at all — `result` has a `usage`
+/// block but it is zeroed, so reading it would only add noise.
+fn event_usage(e: &Value) -> Option<(String, String, Usage)> {
+    if e.get("event_type").and_then(Value::as_str) != Some("assistant") {
+        return None;
+    }
+    let msg = e.get("payload")?.get("message")?;
+    let id = msg.get("id").and_then(Value::as_str)?.to_string();
+    let model = msg.get("model").and_then(Value::as_str)?.to_string();
+    let usage = msg.get("usage")?;
+    let total_write = u64_at(usage, "cache_creation_input_tokens");
+    let (mut c5, c1) = match usage.get("cache_creation") {
+        Some(cc) => (u64_at(cc, "ephemeral_5m_input_tokens"), u64_at(cc, "ephemeral_1h_input_tokens")),
+        None => (0, 0),
+    };
+    if c5 + c1 == 0 {
+        c5 = total_write;
+    }
+    Some((
+        id,
+        model,
+        Usage {
+            input: u64_at(usage, "input_tokens"),
+            output: u64_at(usage, "output_tokens"),
+            cache_5m: c5,
+            cache_1h: c1,
+            cache_read: u64_at(usage, "cache_read_input_tokens"),
+        },
+    ))
+}
+
+fn u64_at(v: &Value, k: &str) -> u64 {
+    v.get(k).and_then(Value::as_u64).unwrap_or(0)
 }
 
 /// Mark the rows a local transcript can vouch for. `bridge` maps an account
@@ -199,6 +387,26 @@ fn get(tok: &str, cursor: Option<&str>) -> Result<Value, FetchError> {
         .set("anthropic-version", API_VERSION)
         .set("User-Agent", UA)
         .timeout(std::time::Duration::from_secs(10));
+    if let Some(c) = cursor {
+        req = req.query("cursor", c);
+    }
+    match req.call() {
+        Ok(r) => r.into_json::<Value>().map_err(|_| FetchError::Shape),
+        Err(ureq::Error::Status(401 | 403, _)) => Err(FetchError::Unauthorized),
+        Err(ureq::Error::Status(c, _)) => Err(FetchError::Http(c)),
+        Err(ureq::Error::Transport(t)) => Err(FetchError::Transport(redact(&t.to_string(), tok))),
+    }
+}
+
+fn get_events(tok: &str, id: &str, cursor: Option<&str>) -> Result<Value, FetchError> {
+    let mut req = ureq::get(&format!("{ENDPOINT}/{id}/events"))
+        .query("limit", &EVENTS_PAGE.to_string())
+        // Forward, so the cursor kept between passes means "everything after".
+        .query("sort_order", "asc")
+        .set("Authorization", &format!("Bearer {tok}"))
+        .set("anthropic-version", API_VERSION)
+        .set("User-Agent", UA)
+        .timeout(std::time::Duration::from_secs(15));
     if let Some(c) = cursor {
         req = req.query("cursor", c);
     }
@@ -299,6 +507,103 @@ mod tests {
     fn an_unusable_token_never_reaches_the_wire() {
         assert_eq!(fetch_with("   "), Err(FetchError::Malformed));
         assert_eq!(fetch_with("sk-ant-oat01-\u{201c}aaa"), Err(FetchError::Malformed));
+    }
+
+    /// Two pages of one session's stream, trimmed from the live response. The
+    /// same message id appears three times with growing usage — which is how
+    /// the endpoint really writes it, and why summing events is wrong.
+    const EVENTS_P1: &str = r#"{
+      "data": [
+        {"event_type":"user","sequence_num":"1","payload":{"type":"user"}},
+        {"event_type":"assistant","sequence_num":"2","payload":{"message":{"id":"msg_a",
+          "model":"claude-opus-5","usage":{"input_tokens":2,"output_tokens":1,
+          "cache_creation_input_tokens":1214,"cache_read_input_tokens":106580,
+          "cache_creation":{"ephemeral_1h_input_tokens":1214,"ephemeral_5m_input_tokens":0}}}}},
+        {"event_type":"assistant","sequence_num":"3","payload":{"message":{"id":"msg_a",
+          "model":"claude-opus-5","usage":{"input_tokens":2,"output_tokens":3,
+          "cache_creation_input_tokens":1214,"cache_read_input_tokens":106580,
+          "cache_creation":{"ephemeral_1h_input_tokens":1214,"ephemeral_5m_input_tokens":0}}}}},
+        {"event_type":"rate_limit_event","sequence_num":"4","payload":{"rate_limit_info":{}}}
+      ],
+      "next_cursor": "4",
+      "resume_cursor": "4"
+    }"#;
+
+    const EVENTS_P2: &str = r#"{
+      "data": [
+        {"event_type":"assistant","sequence_num":"5","payload":{"message":{"id":"msg_a",
+          "model":"claude-opus-5","usage":{"input_tokens":2,"output_tokens":2,
+          "cache_creation_input_tokens":1214,"cache_read_input_tokens":106580}}}},
+        {"event_type":"assistant","sequence_num":"6","payload":{"message":{"id":"msg_b",
+          "model":"claude-fable-5-1","usage":{"input_tokens":10,"output_tokens":5,
+          "cache_creation_input_tokens":40,"cache_read_input_tokens":900,
+          "cache_creation":{"ephemeral_1h_input_tokens":0,"ephemeral_5m_input_tokens":40}}}}},
+        {"event_type":"result","sequence_num":"7","payload":{"usage":{"input_tokens":0},
+          "total_cost_usd":0}}
+      ],
+      "resume_cursor": "7"
+    }"#;
+
+    fn absorb(body: &str, st: &mut SessionEvents) -> Option<String> {
+        let v: Value = serde_json::from_str(body).unwrap();
+        absorb_events_page(&v, st).unwrap()
+    }
+
+    #[test]
+    fn a_repeated_message_is_counted_once_at_its_largest() {
+        let mut st = SessionEvents::default();
+        let next = absorb(EVENTS_P1, &mut st);
+        assert_eq!(next.as_deref(), Some("4"));
+        assert_eq!(st.messages(), 1, "three events, one message");
+
+        let u = st.usage();
+        assert_eq!(u.input, 2, "not 4 — the copies are the same message");
+        assert_eq!(u.cache_read, 106_580);
+        assert_eq!(u.cache_1h, 1214);
+        assert_eq!(u.output, 3, "the largest copy seen, not the sum and not the first");
+    }
+
+    #[test]
+    fn the_walk_resumes_where_it_stopped_and_stops_on_the_last_page() {
+        let mut st = SessionEvents::default();
+        st.cursor = absorb(EVENTS_P1, &mut st);
+        let next = absorb(EVENTS_P2, &mut st);
+        assert!(next.is_none(), "no next_cursor means the stream is caught up");
+        assert_eq!(
+            st.cursor.as_deref(),
+            Some("7"),
+            "the mark still advances past the last page, or it would be re-read"
+        );
+
+        // Still one `msg_a`, even though it spanned the page boundary.
+        assert_eq!(st.messages(), 2);
+        let by = st.by_model();
+        assert_eq!(by.len(), 2);
+        assert_eq!(by[0].0, "claude-fable-5-1");
+        assert_eq!(by[0].1.cache_5m, 40);
+        assert_eq!(by[1].0, "claude-opus-5");
+        assert_eq!(by[1].1.output, 3);
+    }
+
+    #[test]
+    fn only_assistant_events_carry_usage() {
+        let v: Value = serde_json::from_str(EVENTS_P2).unwrap();
+        let rows = v["data"].as_array().unwrap();
+        // The `result` event has a `usage` block, but it is zeroed on every
+        // session — reading it would add noise, so it is skipped by type.
+        assert!(event_usage(&rows[2]).is_none());
+        assert!(event_usage(&rows[1]).is_some());
+    }
+
+    #[test]
+    fn a_session_id_that_is_not_one_is_refused_before_the_wire() {
+        let mut st = SessionEvents::default();
+        assert!(matches!(
+            fetch_events("tok", "cse_abc/../../v1", &mut st),
+            Err(FetchError::Malformed)
+        ));
+        assert!(matches!(fetch_events("", "cse_abc", &mut st), Err(FetchError::Malformed)));
+        assert!(matches!(fetch_events("tok", "nonsense", &mut st), Err(FetchError::Malformed)));
     }
 
     #[test]

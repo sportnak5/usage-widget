@@ -33,7 +33,8 @@ export interface Entry {
 /** One conversation the account knows about, on any machine signed into it.
     Mirrors `RemoteSession` in src-tauri/src/ledger/sessions.rs. No usage of any
     kind — the list carries state, not tokens — and no device name, because the
-    endpoint has none to give. */
+    endpoint has none to give. Tokens arrive separately, from the session's own
+    event stream; see `models`. */
 export interface RemoteThread {
   /** `cse_…`, the account-wide id. */
   id: string;
@@ -47,9 +48,25 @@ export interface RemoteThread {
   unread: boolean;
   /** `owner/repo`, when the session reported one. The only hint at where. */
   repo: string | null;
+  /** Tokens the session's own event stream reports, per model. Empty until the
+      stream has been walked — which is not the same as having spent nothing. */
+  models: RemoteModel[];
+  /** Weighted dollars across `models`. A floor, not a total: the event stream's
+      output counts are a streaming placeholder, so the real figure is higher. */
+  cost: number;
+  raw: number;
   /** A local transcript vouched for it, so it ran on this machine. */
   this_device: boolean;
   local_session: string | null;
+}
+
+/** One model's share of a remote conversation. The local `ModelPart` with the
+    fields a row actually draws — there is no per-kind breakdown in the stream
+    worth carrying. */
+export interface RemoteModel {
+  model: string;
+  cost: number;
+  raw: number;
 }
 
 export interface Kinds {

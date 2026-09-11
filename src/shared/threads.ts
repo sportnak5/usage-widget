@@ -2,7 +2,7 @@
 // and what a row says about itself. The ranking is one setting held by the
 // backend — the snapshot carries it — so the widget and the ledger show the
 // same list and the same toggle state without talking to each other.
-import { basename, esc } from "./format";
+import { esc } from "./format";
 import type { Entry, RemoteThread, Snapshot, ThreadSort, WindowOut } from "./types";
 
 export const SORTS: { id: ThreadSort; label: string; note: string }[] = [
@@ -34,6 +34,15 @@ export const localRows = (es: Entry[]): ThreadRow[] => es.map((e): ThreadRow => 
 
 const lastOf = (row: ThreadRow): number => Date.parse(row.remote ? row.r.last : row.e.last);
 
+/** A remote row is priced once its event stream has been walked; before that
+ *  there is nothing to rank it by. */
+export const priced = (row: ThreadRow): boolean => !row.remote || row.r.models.length > 0;
+
+/** Weighted dollars, or -1 for a row we have no number for yet, which sorts it
+ *  to the bottom rather than to the top. */
+const weightOf = (row: ThreadRow): number =>
+  row.remote ? (row.r.models.length ? row.r.cost : -1) : row.e.cost;
+
 /** The conversation list for one window: what this machine recorded, plus what
  *  the account says is running elsewhere.
  *
@@ -51,12 +60,15 @@ export function mergeThreads(snap: Snapshot | null, w: WindowOut): ThreadRow[] {
     .map((r): ThreadRow => ({ remote: true, r }))
     .sort((a, b) => lastOf(b) - lastOf(a));
   if (remote.length === 0) return locals;
-  // Under the weighted ranking there is nothing to weigh a remote row by, so
-  // they follow the locals rather than landing somewhere arbitrary inside a
-  // ranking they can't take part in. Recency they can be ranked by, so they are.
+  const all = [...locals, ...remote];
+  // Both rankings now take remote rows: their tokens come from the session's
+  // own event stream. A row whose stream has not been walked yet has no weight,
+  // so under Top it waits at the bottom until it has one. Its cost is a floor
+  // (no output tokens in the stream), so it ranks a little low against a local
+  // row — better than the arbitrary place it used to be given.
   return sortOf(snap) === "recent"
-    ? [...locals, ...remote].sort((a, b) => lastOf(b) - lastOf(a))
-    : [...locals, ...remote];
+    ? all.sort((a, b) => lastOf(b) - lastOf(a))
+    : all.sort((a, b) => weightOf(b) - weightOf(a));
 }
 
 /** A row's status in the local vocabulary. Anthropic's `requires_action` is a
@@ -70,19 +82,18 @@ export const statusOf = (row: ThreadRow): Pick<Entry, "working" | "unread"> =>
 export const threadName = (row: ThreadRow): string =>
   row.remote ? row.r.title || row.r.repo || "untitled session" : row.e.title || "untitled session";
 
-/** Which machine a row is on, as far as anything can tell.
+/** Marks a row as running somewhere that isn't this machine.
  *
- *  Local rows get this machine's name. Remote ones can't be named at all — no
- *  field in the session list identifies a device — so the tag says "elsewhere",
- *  or names the repo it reported working in, which is the only hint there is. */
-export function deviceTag(row: ThreadRow, snap: Snapshot | null): string {
-  if (!row.remote) {
-    const label = snap?.device_label ?? "";
-    return label ? `<span class="dtag" title="Running on this machine">${esc(label)}</span>` : "";
-  }
+ *  Nothing identifies *which* machine — no field in the session list names one
+ *  — so the tag says only that, and local rows carry no tag at all: a label on
+ *  every row but the odd one out is noise, and "not here" is the whole signal.
+ *  The repo it reported working in is the nearest thing to a place, so it rides
+ *  the tooltip rather than the tag, where it used to read as a device name. */
+export function remoteTag(row: ThreadRow): string {
+  if (!row.remote) return "";
   const repo = row.r.repo;
-  const tip = repo ? `Running on another device · ${repo}` : "Running on another device";
-  return `<span class="dtag away" title="${esc(tip)}">${esc(repo ? basename(repo) : "elsewhere")}</span>`;
+  const tip = repo ? `Running on another device \u00b7 ${repo}` : "Running on another device";
+  return `<span class="dtag" title="${esc(tip)}">Remote</span>`;
 }
 
 /** The dot in front of a conversation: still working, or waiting to be read.

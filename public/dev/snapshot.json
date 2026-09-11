@@ -1,3773 +1,3838 @@
 {
-  "generated_at": "2026-09-10T17:57:51.463349Z",
-  "plan": "Max (20x)",
-  "boost": null,
-  "calibrated": true,
-  "windows": [
+ "generated_at": "2026-09-10T17:57:51.463349Z",
+ "plan": "Max (20x)",
+ "boost": null,
+ "calibrated": true,
+ "windows": [
+  {
+   "id": "session",
+   "label": "Current session",
+   "sub": "5-hour rolling window",
+   "start": "2026-09-10T16:40:17.468Z",
+   "reset": "2026-09-10T21:40:17.468Z",
+   "boundary_known": true,
+   "idle": false,
+   "calibrated": true,
+   "pct": 13.65,
+   "pace": 0.53,
+   "ramp": 0.0,
+   "elapsed_frac": 0.259,
+   "total_cost": 73.26,
+   "total_raw": 131217431,
+   "messages": 284,
+   "limit": 536.56,
+   "kinds": {
+    "input": 568,
+    "output": 153740,
+    "cache_write": 408429,
+    "cache_read": 130654694
+   },
+   "by_model": [
     {
-      "id": "session",
-      "label": "Current session",
-      "sub": "5-hour rolling window",
-      "start": "2026-09-10T16:40:17.468Z",
-      "reset": "2026-09-10T21:40:17.468Z",
-      "boundary_known": true,
-      "idle": false,
-      "calibrated": true,
-      "pct": 13.65,
-      "pace": 0.53,
-      "ramp": 0.0,
-      "elapsed_frac": 0.259,
-      "total_cost": 73.26,
-      "total_raw": 131217431,
-      "messages": 284,
-      "limit": 536.56,
-      "kinds": {
-        "input": 568,
-        "output": 153740,
-        "cache_write": 408429,
-        "cache_read": 130654694
-      },
-      "by_model": [
-        {
-          "key": "claude-opus-5",
-          "title": null,
-          "title_kind": null,
-          "cost": 73.26,
-          "raw": 131217431,
-          "n": 284,
-          "first": "2026-09-10T16:40:17.468Z",
-          "last": "2026-09-10T17:57:48.191Z",
-          "share": 100.0,
-          "pct": 13.65,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 73.26,
-              "input": 568,
-              "output": 153740,
-              "cache_write": 408429,
-              "cache_read": 130654694
-            }
-          ]
-        }
-      ],
-      "by_project": [
-        {
-          "key": "/Users/crawfordnakayama/DTCloudSource",
-          "title": null,
-          "title_kind": null,
-          "cost": 39.85,
-          "raw": 74838625,
-          "n": 103,
-          "first": "2026-09-10T16:41:16.852Z",
-          "last": "2026-09-10T17:47:49.169Z",
-          "share": 54.4,
-          "pct": 7.43,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 39.85,
-              "input": 206,
-              "output": 48483,
-              "cache_write": 130676,
-              "cache_read": 74659260
-            }
-          ]
-        },
-        {
-          "key": "/Users/crawfordnakayama/token-ledger",
-          "title": null,
-          "title_kind": null,
-          "cost": 18.79,
-          "raw": 29163053,
-          "n": 131,
-          "first": "2026-09-10T16:40:17.468Z",
-          "last": "2026-09-10T17:57:48.191Z",
-          "share": 25.64,
-          "pct": 3.5,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 18.79,
-              "input": 262,
-              "output": 83798,
-              "cache_write": 226342,
-              "cache_read": 28852651
-            }
-          ]
-        },
-        {
-          "key": "/Users/crawfordnakayama/DTCloudSource/WebApps/App",
-          "title": null,
-          "title_kind": null,
-          "cost": 8.01,
-          "raw": 15223965,
-          "n": 19,
-          "first": "2026-09-10T16:43:36.627Z",
-          "last": "2026-09-10T17:47:07.576Z",
-          "share": 10.93,
-          "pct": 1.49,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 8.01,
-              "input": 38,
-              "output": 7994,
-              "cache_write": 20896,
-              "cache_read": 15195037
-            }
-          ]
-        },
-        {
-          "key": "/Users/crawfordnakayama/DTCloudSource/Projects",
-          "title": null,
-          "title_kind": null,
-          "cost": 3.65,
-          "raw": 7015611,
-          "n": 10,
-          "first": "2026-09-10T16:45:54.521Z",
-          "last": "2026-09-10T16:54:48.086Z",
-          "share": 4.99,
-          "pct": 0.68,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 3.65,
-              "input": 20,
-              "output": 3288,
-              "cache_write": 6952,
-              "cache_read": 7005351
-            }
-          ]
-        },
-        {
-          "key": "/Users/crawfordnakayama/token-ledger/src-tauri",
-          "title": null,
-          "title_kind": null,
-          "cost": 2.96,
-          "raw": 4976177,
-          "n": 21,
-          "first": "2026-09-10T16:42:21.299Z",
-          "last": "2026-09-10T17:57:05.270Z",
-          "share": 4.04,
-          "pct": 0.55,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 2.96,
-              "input": 42,
-              "output": 10177,
-              "cache_write": 23563,
-              "cache_read": 4942395
-            }
-          ]
-        }
-      ],
-      "by_session": [
-        {
-          "key": [
-            "3118e229-814b-4219-987f-9a11a1e6c5f4",
-            "/Users/crawfordnakayama/DTCloudSource"
-          ],
-          "title": "Quote Assist local testing flow",
-          "title_kind": "custom",
-          "cost": 51.51,
-          "raw": 97078201,
-          "n": 132,
-          "first": "2026-09-10T16:41:16.852Z",
-          "last": "2026-09-10T17:47:49.169Z",
-          "share": 70.31,
-          "pct": 9.6,
-          "unread": true,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 51.51,
-              "input": 264,
-              "output": 59765,
-              "cache_write": 158524,
-              "cache_read": 96859648
-            }
-          ]
-        },
-        {
-          "key": [
-            "59b82c91-1b1a-4b2b-8550-737287cbb24e",
-            "/Users/crawfordnakayama/token-ledger"
-          ],
-          "title": "Thread sorting and unread indicators",
-          "title_kind": "custom",
-          "cost": 15.01,
-          "raw": 22633715,
-          "n": 113,
-          "first": "2026-09-10T16:42:57.365Z",
-          "last": "2026-09-10T17:57:48.191Z",
-          "share": 20.49,
-          "pct": 2.8,
-          "unread": false,
-          "working": true,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 15.01,
-              "input": 226,
-              "output": 68161,
-              "cache_write": 213119,
-              "cache_read": 22352209
-            }
-          ]
-        },
-        {
-          "key": [
-            "b87d4751-cef9-46ad-8ccc-a673f32625f4",
-            "/Users/crawfordnakayama/token-ledger"
-          ],
-          "title": "Ledger usage timeline view",
-          "title_kind": "custom",
-          "cost": 6.74,
-          "raw": 11505515,
-          "n": 39,
-          "first": "2026-09-10T16:40:17.468Z",
-          "last": "2026-09-10T17:55:43.283Z",
-          "share": 9.19,
-          "pct": 1.26,
-          "unread": false,
-          "working": true,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 6.74,
-              "input": 78,
-              "output": 25814,
-              "cache_write": 36786,
-              "cache_read": 11442837
-            }
-          ]
-        }
-      ],
-      "series": {
-        "bucket": "15m",
-        "start": "2026-09-10T16:40:17.468Z",
-        "end": "2026-09-10T21:40:17.468Z",
-        "buckets": [
-          {
-            "t": "2026-09-10T16:40:17.468Z",
-            "by_session": [
-              [
-                "3118e229-814b-4219-987f-9a11a1e6c5f4",
-                8.4479,
-                15587286
-              ],
-              [
-                "b87d4751-cef9-46ad-8ccc-a673f32625f4",
-                2.4952,
-                4216600
-              ],
-              [
-                "59b82c91-1b1a-4b2b-8550-737287cbb24e",
-                1.4879,
-                1198416
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-opus-5",
-                12.431,
-                21002302
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-10T16:45:00Z",
-            "by_session": [
-              [
-                "3118e229-814b-4219-987f-9a11a1e6c5f4",
-                10.8123,
-                20375959
-              ],
-              [
-                "59b82c91-1b1a-4b2b-8550-737287cbb24e",
-                10.5398,
-                16424094
-              ],
-              [
-                "b87d4751-cef9-46ad-8ccc-a673f32625f4",
-                1.6969,
-                2678915
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-opus-5",
-                23.049,
-                39478968
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-10T17:00:00Z",
-            "by_session": [
-              [
-                "3118e229-814b-4219-987f-9a11a1e6c5f4",
-                1.4984,
-                2866888
-              ],
-              [
-                "59b82c91-1b1a-4b2b-8550-737287cbb24e",
-                1.4232,
-                2458852
-              ],
-              [
-                "b87d4751-cef9-46ad-8ccc-a673f32625f4",
-                1.2264,
-                2128235
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-opus-5",
-                4.148,
-                7453975
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-10T17:15:00Z",
-            "by_session": [
-              [
-                "3118e229-814b-4219-987f-9a11a1e6c5f4",
-                11.8939,
-                22789940
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-opus-5",
-                11.8939,
-                22789940
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-10T17:30:00Z",
-            "by_session": [
-              [
-                "3118e229-814b-4219-987f-9a11a1e6c5f4",
-                15.4136,
-                28930849
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-opus-5",
-                15.4136,
-                28930849
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-10T17:45:00Z",
-            "by_session": [
-              [
-                "3118e229-814b-4219-987f-9a11a1e6c5f4",
-                3.4444,
-                6527279
-              ],
-              [
-                "59b82c91-1b1a-4b2b-8550-737287cbb24e",
-                1.5616,
-                2552353
-              ],
-              [
-                "b87d4751-cef9-46ad-8ccc-a673f32625f4",
-                1.3165,
-                2481765
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-opus-5",
-                6.3225,
-                11561397
-              ]
-            ]
-          }
-        ]
+     "key": "claude-opus-5",
+     "title": null,
+     "title_kind": null,
+     "cost": 73.26,
+     "raw": 131217431,
+     "n": 284,
+     "first": "2026-09-10T16:40:17.468Z",
+     "last": "2026-09-10T17:57:48.191Z",
+     "share": 100.0,
+     "pct": 13.65,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 73.26,
+       "input": 568,
+       "output": 153740,
+       "cache_write": 408429,
+       "cache_read": 130654694
       }
-    },
-    {
-      "id": "weekly",
-      "label": "Weekly \u00b7 all models",
-      "sub": "resets weekly",
-      "start": "2026-09-08T06:00:00Z",
-      "reset": "2026-09-15T06:00:00Z",
-      "boundary_known": true,
-      "idle": false,
-      "calibrated": true,
-      "pct": 44.02,
-      "pace": 1.23,
-      "ramp": 0.478,
-      "elapsed_frac": 0.357,
-      "total_cost": 711.51,
-      "total_raw": 1024484832,
-      "messages": 3089,
-      "limit": 1616.28,
-      "kinds": {
-        "input": 24094,
-        "output": 2336456,
-        "cache_write": 13776605,
-        "cache_read": 1008347677
-      },
-      "by_model": [
-        {
-          "key": "claude-opus-5",
-          "title": null,
-          "title_kind": null,
-          "cost": 514.4,
-          "raw": 796248913,
-          "n": 2368,
-          "first": "2026-09-08T13:11:56.418Z",
-          "last": "2026-09-10T17:57:48.191Z",
-          "share": 72.3,
-          "pct": 31.83,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 514.4,
-              "input": 4736,
-              "output": 1407720,
-              "cache_write": 8607106,
-              "cache_read": 786229351
-            }
-          ]
-        },
-        {
-          "key": "claude-fable-5-1",
-          "title": null,
-          "title_kind": null,
-          "cost": 195.22,
-          "raw": 227606732,
-          "n": 712,
-          "first": "2026-09-08T14:07:19.637Z",
-          "last": "2026-09-09T13:45:28.589Z",
-          "share": 27.44,
-          "pct": 12.08,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 195.22,
-              "input": 19276,
-              "output": 922081,
-              "cache_write": 4671065,
-              "cache_read": 221994310
-            }
-          ]
-        },
-        {
-          "key": "claude-sonnet-5",
-          "title": null,
-          "title_kind": null,
-          "cost": 1.7,
-          "raw": 460217,
-          "n": 1,
-          "first": "2026-09-08T18:56:28.709Z",
-          "last": "2026-09-08T18:56:28.709Z",
-          "share": 0.24,
-          "pct": 0.1,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-sonnet-5",
-              "cost": 1.7,
-              "input": 2,
-              "output": 616,
-              "cache_write": 420441,
-              "cache_read": 39158
-            }
-          ]
-        },
-        {
-          "key": "claude-haiku-4-5-20251001",
-          "title": null,
-          "title_kind": null,
-          "cost": 0.19,
-          "raw": 168970,
-          "n": 8,
-          "first": "2026-09-08T18:42:55.783Z",
-          "last": "2026-09-09T02:47:52.460Z",
-          "share": 0.03,
-          "pct": 0.01,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-haiku-4-5-20251001",
-              "cost": 0.19,
-              "input": 80,
-              "output": 6039,
-              "cache_write": 77993,
-              "cache_read": 84858
-            }
-          ]
-        }
-      ],
-      "by_project": [
-        {
-          "key": "/Users/crawfordnakayama/DTCloudSource",
-          "title": null,
-          "title_kind": null,
-          "cost": 339.44,
-          "raw": 524095762,
-          "n": 1270,
-          "first": "2026-09-08T14:10:29.988Z",
-          "last": "2026-09-10T17:47:49.169Z",
-          "share": 47.71,
-          "pct": 21.0,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 286.44,
-              "input": 2094,
-              "output": 527833,
-              "cache_write": 4933223,
-              "cache_read": 447805183
-            },
-            {
-              "model": "claude-fable-5-1",
-              "cost": 51.3,
-              "input": 6398,
-              "output": 222440,
-              "cache_write": 1143305,
-              "cache_read": 68995069
-            },
-            {
-              "model": "claude-sonnet-5",
-              "cost": 1.7,
-              "input": 2,
-              "output": 616,
-              "cache_write": 420441,
-              "cache_read": 39158
-            }
-          ]
-        },
-        {
-          "key": "/Users/crawfordnakayama/token-ledger",
-          "title": null,
-          "title_kind": null,
-          "cost": 80.69,
-          "raw": 112046112,
-          "n": 654,
-          "first": "2026-09-09T13:45:44.946Z",
-          "last": "2026-09-10T17:57:48.191Z",
-          "share": 11.34,
-          "pct": 4.99,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 80.69,
-              "input": 1308,
-              "output": 434665,
-              "cache_write": 1474994,
-              "cache_read": 110135145
-            }
-          ]
-        },
-        {
-          "key": "/Users/crawfordnakayama/\u65e5\u672c\u8a9e",
-          "title": null,
-          "title_kind": null,
-          "cost": 64.53,
-          "raw": 72333752,
-          "n": 273,
-          "first": "2026-09-08T14:07:19.637Z",
-          "last": "2026-09-10T15:26:07.954Z",
-          "share": 9.07,
-          "pct": 3.99,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 61.54,
-              "input": 6742,
-              "output": 377547,
-              "cache_write": 1295612,
-              "cache_read": 66720153
-            },
-            {
-              "model": "claude-opus-5",
-              "cost": 2.99,
-              "input": 42,
-              "output": 27780,
-              "cache_write": 36199,
-              "cache_read": 3869677
-            }
-          ]
-        },
-        {
-          "key": "/Users/crawfordnakayama/tasks",
-          "title": null,
-          "title_kind": null,
-          "cost": 61.06,
-          "raw": 80040068,
-          "n": 180,
-          "first": "2026-09-08T13:11:58.406Z",
-          "last": "2026-09-10T14:01:03.226Z",
-          "share": 8.58,
-          "pct": 3.78,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 42.93,
-              "input": 234,
-              "output": 72628,
-              "cache_write": 1110981,
-              "cache_read": 60014305
-            },
-            {
-              "model": "claude-fable-5-1",
-              "cost": 18.13,
-              "input": 1316,
-              "output": 87668,
-              "cache_write": 457869,
-              "cache_read": 18295067
-            }
-          ]
-        },
-        {
-          "key": "/Users/crawfordnakayama",
-          "title": null,
-          "title_kind": null,
-          "cost": 42.14,
-          "raw": 19886343,
-          "n": 102,
-          "first": "2026-09-08T13:11:56.418Z",
-          "last": "2026-09-10T14:00:59.514Z",
-          "share": 5.92,
-          "pct": 2.61,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 29.97,
-              "input": 368,
-              "output": 24857,
-              "cache_write": 1362937,
-              "cache_read": 5852197
-            },
-            {
-              "model": "claude-opus-5",
-              "cost": 12.17,
-              "input": 166,
-              "output": 94929,
-              "cache_write": 370929,
-              "cache_read": 12179960
-            }
-          ]
-        },
-        {
-          "key": "/Users/crawfordnakayama/DTCloudSource/Projects",
-          "title": null,
-          "title_kind": null,
-          "cost": 35.0,
-          "raw": 70212490,
-          "n": 114,
-          "first": "2026-09-08T16:25:20.894Z",
-          "last": "2026-09-10T16:54:48.086Z",
-          "share": 4.92,
-          "pct": 2.17,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 30.88,
-              "input": 176,
-              "output": 31137,
-              "cache_write": 79492,
-              "cache_read": 58617542
-            },
-            {
-              "model": "claude-fable-5-1",
-              "cost": 4.12,
-              "input": 802,
-              "output": 15061,
-              "cache_write": 24786,
-              "cache_read": 11443494
-            }
-          ]
-        },
-        {
-          "key": "/Users/crawfordnakayama/DTCloudSource/WebApps/App",
-          "title": null,
-          "title_kind": null,
-          "cost": 29.45,
-          "raw": 57602913,
-          "n": 114,
-          "first": "2026-09-08T16:35:31.357Z",
-          "last": "2026-09-10T17:47:07.576Z",
-          "share": 4.14,
-          "pct": 1.82,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 24.96,
-              "input": 180,
-              "output": 39129,
-              "cache_write": 127106,
-              "cache_read": 45410410
-            },
-            {
-              "model": "claude-fable-5-1",
-              "cost": 4.49,
-              "input": 618,
-              "output": 12107,
-              "cache_write": 44401,
-              "cache_read": 11968962
-            }
-          ]
-        },
-        {
-          "key": "/Users/crawfordnakayama/usage_app",
-          "title": null,
-          "title_kind": null,
-          "cost": 17.41,
-          "raw": 27209816,
-          "n": 127,
-          "first": "2026-09-08T21:52:13.190Z",
-          "last": "2026-09-09T13:45:20.297Z",
-          "share": 2.45,
-          "pct": 1.08,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 11.68,
-              "input": 1652,
-              "output": 84278,
-              "cache_write": 117949,
-              "cache_read": 20347558
-            },
-            {
-              "model": "claude-opus-5",
-              "cost": 5.74,
-              "input": 132,
-              "output": 31807,
-              "cache_write": 171403,
-              "cache_read": 6455037
-            }
-          ]
-        },
-        {
-          "key": "/Users/crawfordnakayama/token-ledger/src-tauri",
-          "title": null,
-          "title_kind": null,
-          "cost": 10.91,
-          "raw": 16452350,
-          "n": 84,
-          "first": "2026-09-09T15:42:48.606Z",
-          "last": "2026-09-10T17:57:05.270Z",
-          "share": 1.53,
-          "pct": 0.67,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 10.91,
-              "input": 168,
-              "output": 66134,
-              "cache_write": 111795,
-              "cache_read": 16274253
-            }
-          ]
-        },
-        {
-          "key": "/Users/crawfordnakayama/DTCloudSource/WebApps/App/src/app",
-          "title": null,
-          "title_kind": null,
-          "cost": 9.7,
-          "raw": 18281763,
-          "n": 34,
-          "first": "2026-09-08T16:10:39.088Z",
-          "last": "2026-09-08T21:48:33.100Z",
-          "share": 1.36,
-          "pct": 0.6,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 6.59,
-              "input": 802,
-              "output": 38916,
-              "cache_write": 78556,
-              "cache_read": 12252446
-            },
-            {
-              "model": "claude-opus-5",
-              "cost": 3.11,
-              "input": 16,
-              "output": 3002,
-              "cache_write": 8500,
-              "cache_read": 5899525
-            }
-          ]
-        },
-        {
-          "key": "/Users/crawfordnakayama/DTCloudSource/personal/proposal-ai-loop-harness/scorer",
-          "title": null,
-          "title_kind": null,
-          "cost": 7.68,
-          "raw": 12452942,
-          "n": 61,
-          "first": "2026-09-09T16:29:18.153Z",
-          "last": "2026-09-09T19:28:55.569Z",
-          "share": 1.08,
-          "pct": 0.48,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 7.68,
-              "input": 122,
-              "output": 33830,
-              "cache_write": 65421,
-              "cache_read": 12353569
-            }
-          ]
-        },
-        {
-          "key": "/Users/crawfordnakayama/usage_app/src-tauri",
-          "title": null,
-          "title_kind": null,
-          "cost": 2.42,
-          "raw": 3645594,
-          "n": 10,
-          "first": "2026-09-08T22:02:53.237Z",
-          "last": "2026-09-08T23:27:39.716Z",
-          "share": 0.34,
-          "pct": 0.15,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 2.42,
-              "input": 320,
-              "output": 19656,
-              "cache_write": 26835,
-              "cache_read": 3598783
-            }
-          ]
-        }
-      ],
-      "by_session": [
-        {
-          "key": [
-            "7e80391a-3209-4450-b70e-cccfe2aa3dce",
-            "/Users/crawfordnakayama/DTCloudSource"
-          ],
-          "title": "Packages and allowances in catalog",
-          "title_kind": "custom",
-          "cost": 205.8,
-          "raw": 346798745,
-          "n": 566,
-          "first": "2026-09-08T15:16:01.292Z",
-          "last": "2026-09-09T02:27:12.436Z",
-          "share": 28.92,
-          "pct": 12.73,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 157.3,
-              "input": 638,
-              "output": 212693,
-              "cache_write": 3041804,
-              "cache_read": 243127399
-            },
-            {
-              "model": "claude-fable-5-1",
-              "cost": 48.49,
-              "input": 7164,
-              "output": 239912,
-              "cache_write": 576473,
-              "cache_read": 99592662
-            }
-          ]
-        },
-        {
-          "key": [
-            "3118e229-814b-4219-987f-9a11a1e6c5f4",
-            "/Users/crawfordnakayama/DTCloudSource"
-          ],
-          "title": "Quote Assist local testing flow",
-          "title_kind": "custom",
-          "cost": 133.87,
-          "raw": 242910412,
-          "n": 524,
-          "first": "2026-09-10T13:45:35.905Z",
-          "last": "2026-09-10T17:47:49.169Z",
-          "share": 18.81,
-          "pct": 8.28,
-          "unread": true,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 133.87,
-              "input": 1048,
-              "output": 207869,
-              "cache_write": 770105,
-              "cache_read": 241931390
-            }
-          ]
-        },
-        {
-          "key": [
-            "f073766f-8caa-4861-8dd9-e613edfeacf3",
-            "/Users/crawfordnakayama/tasks"
-          ],
-          "title": "Board task sequencing and performance",
-          "title_kind": "custom",
-          "cost": 60.95,
-          "raw": 79834253,
-          "n": 176,
-          "first": "2026-09-08T18:34:53.428Z",
-          "last": "2026-09-09T15:44:11.311Z",
-          "share": 8.57,
-          "pct": 3.77,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 42.82,
-              "input": 226,
-              "output": 72532,
-              "cache_write": 1110210,
-              "cache_read": 59809365
-            },
-            {
-              "model": "claude-fable-5-1",
-              "cost": 18.13,
-              "input": 1316,
-              "output": 87668,
-              "cache_write": 457869,
-              "cache_read": 18295067
-            }
-          ]
-        },
-        {
-          "key": [
-            "f61278b4-7287-4e15-9ed7-ed9b4ce75075",
-            "/Users/crawfordnakayama"
-          ],
-          "title": "Usage widget implementation",
-          "title_kind": "custom",
-          "cost": 58.31,
-          "raw": 45388596,
-          "n": 177,
-          "first": "2026-09-08T19:19:05.900Z",
-          "last": "2026-09-09T13:45:28.589Z",
-          "share": 8.2,
-          "pct": 3.61,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 46.2,
-              "input": 2468,
-              "output": 153641,
-              "cache_write": 1539555,
-              "cache_read": 30815519
-            },
-            {
-              "model": "claude-opus-5",
-              "cost": 12.11,
-              "input": 166,
-              "output": 101928,
-              "cache_write": 334367,
-              "cache_read": 12440952
-            }
-          ]
-        },
-        {
-          "key": [
-            "cc67c85a-ffa6-4139-ab30-7466d34b96af",
-            "/Users/crawfordnakayama/token-ledger"
-          ],
-          "title": "Tool usage counting for design/chat sessions",
-          "title_kind": "custom",
-          "cost": 27.95,
-          "raw": 38215224,
-          "n": 200,
-          "first": "2026-09-09T16:29:34.937Z",
-          "last": "2026-09-09T23:14:08.163Z",
-          "share": 3.93,
-          "pct": 1.73,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 27.95,
-              "input": 400,
-              "output": 133197,
-              "cache_write": 587079,
-              "cache_read": 37494548
-            }
-          ]
-        },
-        {
-          "key": [
-            "6e16d3e6-ffeb-4016-8219-06e3c70a7362",
-            "/Users/crawfordnakayama/\u65e5\u672c\u8a9e"
-          ],
-          "title": "Reader and vocab app bugs",
-          "title_kind": "custom",
-          "cost": 27.71,
-          "raw": 36544976,
-          "n": 97,
-          "first": "2026-09-08T14:07:19.637Z",
-          "last": "2026-09-08T16:39:31.154Z",
-          "share": 3.89,
-          "pct": 1.71,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 27.71,
-              "input": 2716,
-              "output": 187232,
-              "cache_write": 467242,
-              "cache_read": 35887786
-            }
-          ]
-        },
-        {
-          "key": [
-            "4b775ab2-6ebe-4e50-9ffa-028da45c997d",
-            "/Users/crawfordnakayama/DTCloudSource"
-          ],
-          "title": "Proposal agent and page SDK tools",
-          "title_kind": "custom",
-          "cost": 27.35,
-          "raw": 36133340,
-          "n": 190,
-          "first": "2026-09-09T15:07:03.105Z",
-          "last": "2026-09-10T13:53:11.648Z",
-          "share": 3.84,
-          "pct": 1.69,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 27.35,
-              "input": 380,
-              "output": 99830,
-              "cache_write": 719483,
-              "cache_read": 35313647
-            }
-          ]
-        },
-        {
-          "key": [
-            "370a65c3-6e4e-438e-b29b-ce1cc26749fc",
-            "/Users/crawfordnakayama/DTCloudSource"
-          ],
-          "title": "Merge readiness review",
-          "title_kind": "custom",
-          "cost": 24.76,
-          "raw": 40403698,
-          "n": 171,
-          "first": "2026-09-09T02:25:22.642Z",
-          "last": "2026-09-09T02:49:31.667Z",
-          "share": 3.48,
-          "pct": 1.53,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 24.76,
-              "input": 342,
-              "output": 72760,
-              "cache_write": 291747,
-              "cache_read": 40038849
-            }
-          ]
-        },
-        {
-          "key": [
-            "7d8c0284-ea69-43a9-a840-ba69fcc617f7",
-            "/Users/crawfordnakayama/\u65e5\u672c\u8a9e"
-          ],
-          "title": "Local translation model",
-          "title_kind": "custom",
-          "cost": 18.87,
-          "raw": 17592879,
-          "n": 82,
-          "first": "2026-09-08T14:08:34.207Z",
-          "last": "2026-09-08T17:00:13.815Z",
-          "share": 2.65,
-          "pct": 1.17,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 18.87,
-              "input": 2240,
-              "output": 115888,
-              "cache_write": 439618,
-              "cache_read": 17035133
-            }
-          ]
-        },
-        {
-          "key": [
-            "b87d4751-cef9-46ad-8ccc-a673f32625f4",
-            "/Users/crawfordnakayama/token-ledger"
-          ],
-          "title": "Ledger usage timeline view",
-          "title_kind": "custom",
-          "cost": 18.86,
-          "raw": 26311193,
-          "n": 117,
-          "first": "2026-09-10T16:05:24.676Z",
-          "last": "2026-09-10T17:55:43.283Z",
-          "share": 2.65,
-          "pct": 1.17,
-          "unread": false,
-          "working": true,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 18.86,
-              "input": 234,
-              "output": 130870,
-              "cache_write": 262796,
-              "cache_read": 25917293
-            }
-          ]
-        },
-        {
-          "key": [
-            "3478f7e5-ffaa-48d5-b18e-a9aab1144dca",
-            "/Users/crawfordnakayama/\u65e5\u672c\u8a9e"
-          ],
-          "title": "Uncommitted changes review",
-          "title_kind": "custom",
-          "cost": 17.03,
-          "raw": 14620206,
-          "n": 75,
-          "first": "2026-09-08T17:00:46.951Z",
-          "last": "2026-09-08T20:12:57.971Z",
-          "share": 2.39,
-          "pct": 1.05,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 17.03,
-              "input": 1850,
-              "output": 86589,
-              "cache_write": 458392,
-              "cache_read": 14073375
-            }
-          ]
-        },
-        {
-          "key": [
-            "59b82c91-1b1a-4b2b-8550-737287cbb24e",
-            "/Users/crawfordnakayama/token-ledger"
-          ],
-          "title": "Thread sorting and unread indicators",
-          "title_kind": "custom",
-          "cost": 15.01,
-          "raw": 22633715,
-          "n": 113,
-          "first": "2026-09-10T16:42:57.365Z",
-          "last": "2026-09-10T17:57:48.191Z",
-          "share": 2.11,
-          "pct": 0.93,
-          "unread": false,
-          "working": true,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 15.01,
-              "input": 226,
-              "output": 68161,
-              "cache_write": 213119,
-              "cache_read": 22352209
-            }
-          ]
-        },
-        {
-          "key": [
-            "4457f61c-4759-43fe-bc0b-e0c1df30fb12",
-            "/Users/crawfordnakayama/token-ledger"
-          ],
-          "title": "Widget gauge rerender on token update (fork)",
-          "title_kind": "custom",
-          "cost": 14.82,
-          "raw": 21874251,
-          "n": 117,
-          "first": "2026-09-09T13:47:04.930Z",
-          "last": "2026-09-09T16:49:43.802Z",
-          "share": 2.08,
-          "pct": 0.92,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 14.82,
-              "input": 234,
-              "output": 76991,
-              "cache_write": 209865,
-              "cache_read": 21587161
-            }
-          ]
-        },
-        {
-          "key": [
-            "6b2af53a-213a-482d-96cb-5da80a3cec17",
-            "/Users/crawfordnakayama/DTCloudSource"
-          ],
-          "title": "Packages and allowances in catalog (fork)",
-          "title_kind": "custom",
-          "cost": 10.99,
-          "raw": 967189,
-          "n": 2,
-          "first": "2026-09-08T18:51:00.743Z",
-          "last": "2026-09-08T18:56:28.709Z",
-          "share": 1.54,
-          "pct": 0.68,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 9.29,
-              "input": 2,
-              "output": 1188,
-              "cache_write": 460982,
-              "cache_read": 44800
-            },
-            {
-              "model": "claude-sonnet-5",
-              "cost": 1.7,
-              "input": 2,
-              "output": 616,
-              "cache_write": 420441,
-              "cache_read": 39158
-            }
-          ]
-        },
-        {
-          "key": [
-            "bfc318da-c8d6-45dc-bf3c-d7abf12b36ed",
-            "/Users/crawfordnakayama/token-ledger"
-          ],
-          "title": "Widget manual usage entry on PC",
-          "title_kind": "custom",
-          "cost": 6.7,
-          "raw": 8892427,
-          "n": 74,
-          "first": "2026-09-09T15:58:43.184Z",
-          "last": "2026-09-09T16:15:21.893Z",
-          "share": 0.94,
-          "pct": 0.41,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 6.7,
-              "input": 148,
-              "output": 44449,
-              "cache_write": 122949,
-              "cache_read": 8724881
-            }
-          ]
-        },
-        {
-          "key": [
-            "81b23a86-5cf6-4c78-a0d3-495a7ba79519",
-            "/Users/crawfordnakayama/usage_app"
-          ],
-          "title": "Widget gauge rerender on token update",
-          "title_kind": "custom",
-          "cost": 6.11,
-          "raw": 7306698,
-          "n": 71,
-          "first": "2026-09-09T02:15:18.800Z",
-          "last": "2026-09-09T13:45:44.946Z",
-          "share": 0.86,
-          "pct": 0.38,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 6.11,
-              "input": 142,
-              "output": 32740,
-              "cache_write": 173682,
-              "cache_read": 7100134
-            }
-          ]
-        },
-        {
-          "key": [
-            "a4c2fc16-fd32-4db3-9879-36c08f03b535",
-            "/Users/crawfordnakayama/DTCloudSource"
-          ],
-          "title": "PR review: agent PDF handling",
-          "title_kind": "custom",
-          "cost": 5.59,
-          "raw": 7629610,
-          "n": 66,
-          "first": "2026-09-09T02:33:44.255Z",
-          "last": "2026-09-09T02:49:58.003Z",
-          "share": 0.79,
-          "pct": 0.35,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 5.59,
-              "input": 132,
-              "output": 29741,
-              "cache_write": 110257,
-              "cache_read": 7489480
-            }
-          ]
-        },
-        {
-          "key": [
-            "d3976c54-e579-4c29-8621-2fe5ee4096aa",
-            "/Users/crawfordnakayama/token-ledger"
-          ],
-          "title": "GitHub releases and app distribution",
-          "title_kind": "custom",
-          "cost": 5.55,
-          "raw": 7725361,
-          "n": 78,
-          "first": "2026-09-10T14:25:50.580Z",
-          "last": "2026-09-10T16:09:39.822Z",
-          "share": 0.78,
-          "pct": 0.34,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 5.55,
-              "input": 156,
-              "output": 32683,
-              "cache_write": 93291,
-              "cache_read": 7599231
-            }
-          ]
-        },
-        {
-          "key": [
-            "b8046658-19f3-4786-b1e2-1c7ed79aa2da",
-            "/Users/crawfordnakayama/\u65e5\u672c\u8a9e"
-          ],
-          "title": "Testing strategies and kanji ordering",
-          "title_kind": "custom",
-          "cost": 5.03,
-          "raw": 6184224,
-          "n": 35,
-          "first": "2026-09-10T14:39:48.049Z",
-          "last": "2026-09-10T15:26:07.954Z",
-          "share": 0.71,
-          "pct": 0.31,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 5.03,
-              "input": 70,
-              "output": 47565,
-              "cache_write": 80850,
-              "cache_read": 6055739
-            }
-          ]
-        },
-        {
-          "key": [
-            "8cfd75ec-69ff-4a28-9a90-413aeb0572e4",
-            "/Users/crawfordnakayama/DTCloudSource"
-          ],
-          "title": "Proposals tool component usability",
-          "title_kind": "custom",
-          "cost": 4.98,
-          "raw": 2917421,
-          "n": 21,
-          "first": "2026-09-08T14:10:29.988Z",
-          "last": "2026-09-08T14:18:40.830Z",
-          "share": 0.7,
-          "pct": 0.31,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 4.98,
-              "input": 586,
-              "output": 26016,
-              "cache_write": 149258,
-              "cache_read": 2741561
-            }
-          ]
-        },
-        {
-          "key": [
-            "358b6ed6-ded9-4a76-9e30-8156809700a1",
-            "/Users/crawfordnakayama/DTCloudSource"
-          ],
-          "title": "PR deployment status across environments",
-          "title_kind": "custom",
-          "cost": 4.2,
-          "raw": 3600950,
-          "n": 31,
-          "first": "2026-09-08T15:14:55.986Z",
-          "last": "2026-09-08T15:30:05.340Z",
-          "share": 0.59,
-          "pct": 0.26,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 4.2,
-              "input": 932,
-              "output": 23499,
-              "cache_write": 107202,
-              "cache_read": 3469317
-            }
-          ]
-        },
-        {
-          "key": [
-            "66b4ff4a-fb39-4215-985e-45407b6bcdbf",
-            "/Users/crawfordnakayama/DTCloudSource/personal/proposal-ai-loop-harness/scorer"
-          ],
-          "title": "Proposal agent and page SDK tools (fork)",
-          "title_kind": "custom",
-          "cost": 3.61,
-          "raw": 3336364,
-          "n": 15,
-          "first": "2026-09-09T18:55:46.533Z",
-          "last": "2026-09-09T19:00:00.131Z",
-          "share": 0.51,
-          "pct": 0.22,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 3.61,
-              "input": 30,
-              "output": 7637,
-              "cache_write": 184839,
-              "cache_read": 3143858
-            }
-          ]
-        },
-        {
-          "key": [
-            "8c784f60-c08d-4acd-b094-31a6604eae4c",
-            "/Users/crawfordnakayama/DTCloudSource"
-          ],
-          "title": "Database changes review",
-          "title_kind": "custom",
-          "cost": 2.08,
-          "raw": 2212103,
-          "n": 22,
-          "first": "2026-09-08T20:02:42.539Z",
-          "last": "2026-09-08T20:53:34.451Z",
-          "share": 0.29,
-          "pct": 0.13,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 2.08,
-              "input": 44,
-              "output": 9420,
-              "cache_write": 78312,
-              "cache_read": 2124327
-            }
-          ]
-        },
-        {
-          "key": [
-            "ff5dc17e-0203-43a6-934a-ad9ff01c01ce",
-            "/Users/crawfordnakayama/token-ledger"
-          ],
-          "title": "Widget relocation on KVM switch",
-          "title_kind": "custom",
-          "cost": 1.95,
-          "raw": 2200114,
-          "n": 29,
-          "first": "2026-09-10T14:29:49.993Z",
-          "last": "2026-09-10T14:38:52.596Z",
-          "share": 0.27,
-          "pct": 0.12,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 1.95,
-              "input": 58,
-              "output": 17943,
-              "cache_write": 42709,
-              "cache_read": 2139404
-            }
-          ]
-        },
-        {
-          "key": [
-            "0dddf0a7-6217-4392-a0bc-79f81a3dbea0",
-            "/Users/crawfordnakayama/token-ledger"
-          ],
-          "title": "Widget drag/double-click issues with gauge buttons",
-          "title_kind": "custom",
-          "cost": 1.34,
-          "raw": 1007617,
-          "n": 16,
-          "first": "2026-09-09T23:14:11.218Z",
-          "last": "2026-09-10T12:35:41.561Z",
-          "share": 0.19,
-          "pct": 0.08,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-opus-5",
-              "cost": 1.34,
-              "input": 32,
-              "output": 4757,
-              "cache_write": 76126,
-              "cache_read": 926702
-            }
-          ]
-        }
-      ],
-      "series": {
-        "bucket": "hour",
-        "start": "2026-09-08T06:00:00Z",
-        "end": "2026-09-15T06:00:00Z",
-        "buckets": [
-          {
-            "t": "2026-09-08T06:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-08T07:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-08T08:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-08T09:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-08T10:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-08T11:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-08T12:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-08T13:00:00Z",
-            "by_session": [
-              [
-                "__rest",
-                0.1896,
-                102802
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-opus-5",
-                0.1896,
-                102802
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-08T14:00:00Z",
-            "by_session": [
-              [
-                "6e16d3e6-ffeb-4016-8219-06e3c70a7362",
-                21.7391,
-                23837944
-              ],
-              [
-                "7d8c0284-ea69-43a9-a840-ba69fcc617f7",
-                9.6949,
-                6873507
-              ],
-              [
-                "8cfd75ec-69ff-4a28-9a90-413aeb0572e4",
-                4.9772,
-                2917421
-              ],
-              [
-                "__rest",
-                0.1438,
-                102798
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-fable-5-1",
-                36.4112,
-                33628872
-              ],
-              [
-                "claude-opus-5",
-                0.1438,
-                102798
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-08T15:00:00Z",
-            "by_session": [
-              [
-                "7e80391a-3209-4450-b70e-cccfe2aa3dce",
-                6.6706,
-                4959621
-              ],
-              [
-                "6e16d3e6-ffeb-4016-8219-06e3c70a7362",
-                4.2767,
-                7652981
-              ],
-              [
-                "358b6ed6-ded9-4a76-9e30-8156809700a1",
-                4.1956,
-                3600950
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-fable-5-1",
-                15.143,
-                16213552
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-08T16:00:00Z",
-            "by_session": [
-              [
-                "7e80391a-3209-4450-b70e-cccfe2aa3dce",
-                26.5308,
-                55818501
-              ],
-              [
-                "7d8c0284-ea69-43a9-a840-ba69fcc617f7",
-                9.0914,
-                10421983
-              ],
-              [
-                "6e16d3e6-ffeb-4016-8219-06e3c70a7362",
-                1.6897,
-                5054051
-              ],
-              [
-                "__rest",
-                0.3217,
-                54014
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-fable-5-1",
-                37.6337,
-                71348549
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-08T17:00:00Z",
-            "by_session": [
-              [
-                "3478f7e5-ffaa-48d5-b18e-a9aab1144dca",
-                10.622,
-                9790459
-              ],
-              [
-                "7e80391a-3209-4450-b70e-cccfe2aa3dce",
-                6.0818,
-                14988290
-              ],
-              [
-                "7d8c0284-ea69-43a9-a840-ba69fcc617f7",
-                0.0816,
-                297389
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-fable-5-1",
-                16.7854,
-                25076138
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-08T18:00:00Z",
-            "by_session": [
-              [
-                "7e80391a-3209-4450-b70e-cccfe2aa3dce",
-                20.9287,
-                28013798
-              ],
-              [
-                "f073766f-8caa-4861-8dd9-e613edfeacf3",
-                16.18,
-                14384634
-              ],
-              [
-                "6b2af53a-213a-482d-96cb-5da80a3cec17",
-                10.986,
-                967189
-              ],
-              [
-                "3478f7e5-ffaa-48d5-b18e-a9aab1144dca",
-                1.4147,
-                3735700
-              ],
-              [
-                "__rest",
-                0.0631,
-                42417
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-fable-5-1",
-                36.0966,
-                43277105
-              ],
-              [
-                "claude-opus-5",
-                11.7171,
-                3363999
-              ],
-              [
-                "claude-sonnet-5",
-                1.6958,
-                460217
-              ],
-              [
-                "claude-haiku-4-5-20251001",
-                0.0631,
-                42417
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-08T19:00:00Z",
-            "by_session": [
-              [
-                "7e80391a-3209-4450-b70e-cccfe2aa3dce",
-                25.6352,
-                46345802
-              ],
-              [
-                "f61278b4-7287-4e15-9ed7-ed9b4ce75075",
-                5.9166,
-                6432527
-              ],
-              [
-                "f073766f-8caa-4861-8dd9-e613edfeacf3",
-                1.9477,
-                4457286
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-opus-5",
-                31.5518,
-                52778329
-              ],
-              [
-                "claude-fable-5-1",
-                1.9477,
-                4457286
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-08T20:00:00Z",
-            "by_session": [
-              [
-                "3478f7e5-ffaa-48d5-b18e-a9aab1144dca",
-                4.9975,
-                1094047
-              ],
-              [
-                "7e80391a-3209-4450-b70e-cccfe2aa3dce",
-                2.9959,
-                5510429
-              ],
-              [
-                "8c784f60-c08d-4acd-b094-31a6604eae4c",
-                2.081,
-                2212103
-              ],
-              [
-                "f61278b4-7287-4e15-9ed7-ed9b4ce75075",
-                1.0635,
-                1623560
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-opus-5",
-                6.1403,
-                9346092
-              ],
-              [
-                "claude-fable-5-1",
-                4.9975,
-                1094047
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-08T21:00:00Z",
-            "by_session": [
-              [
-                "7e80391a-3209-4450-b70e-cccfe2aa3dce",
-                39.8339,
-                62302304
-              ],
-              [
-                "f61278b4-7287-4e15-9ed7-ed9b4ce75075",
-                12.699,
-                8056698
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-opus-5",
-                44.9669,
-                67123630
-              ],
-              [
-                "claude-fable-5-1",
-                7.5659,
-                3235372
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-08T22:00:00Z",
-            "by_session": [
-              [
-                "7e80391a-3209-4450-b70e-cccfe2aa3dce",
-                19.3626,
-                36421386
-              ],
-              [
-                "f61278b4-7287-4e15-9ed7-ed9b4ce75075",
-                13.5666,
-                24174283
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-opus-5",
-                19.3626,
-                36421386
-              ],
-              [
-                "claude-fable-5-1",
-                13.5666,
-                24174283
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-08T23:00:00Z",
-            "by_session": [
-              [
-                "7e80391a-3209-4450-b70e-cccfe2aa3dce",
-                20.5365,
-                39063456
-              ],
-              [
-                "f61278b4-7287-4e15-9ed7-ed9b4ce75075",
-                9.0149,
-                2956262
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-opus-5",
-                20.5365,
-                39063456
-              ],
-              [
-                "claude-fable-5-1",
-                9.0149,
-                2956262
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-09T00:00:00Z",
-            "by_session": [
-              [
-                "7e80391a-3209-4450-b70e-cccfe2aa3dce",
-                5.4118,
-                10148833
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-opus-5",
-                5.4118,
-                10148833
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-09T01:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-09T02:00:00Z",
-            "by_session": [
-              [
-                "f073766f-8caa-4861-8dd9-e613edfeacf3",
-                37.2317,
-                60396926
-              ],
-              [
-                "7e80391a-3209-4450-b70e-cccfe2aa3dce",
-                31.8093,
-                43226325
-              ],
-              [
-                "370a65c3-6e4e-438e-b29b-ce1cc26749fc",
-                24.7576,
-                40403698
-              ],
-              [
-                "f61278b4-7287-4e15-9ed7-ed9b4ce75075",
-                8.0916,
-                1284997
-              ],
-              [
-                "a4c2fc16-fd32-4db3-9879-36c08f03b535",
-                5.5915,
-                7629610
-              ],
-              [
-                "81b23a86-5cf6-4c78-a0d3-495a7ba79519",
-                4.0196,
-                5029392
-              ],
-              [
-                "__rest",
-                0.1316,
-                126553
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-opus-5",
-                103.4097,
-                156685951
-              ],
-              [
-                "claude-fable-5-1",
-                8.0916,
-                1284997
-              ],
-              [
-                "claude-haiku-4-5-20251001",
-                0.1316,
-                126553
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-09T03:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-09T04:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-09T05:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-09T06:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-09T07:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-09T08:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-09T09:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-09T10:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-09T11:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-09T12:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-09T13:00:00Z",
-            "by_session": [
-              [
-                "f61278b4-7287-4e15-9ed7-ed9b4ce75075",
-                7.9627,
-                860269
-              ],
-              [
-                "81b23a86-5cf6-4c78-a0d3-495a7ba79519",
-                2.0865,
-                2277306
-              ],
-              [
-                "4457f61c-4759-43fe-bc0b-e0c1df30fb12",
-                0.4768,
-                797578
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-fable-5-1",
-                7.9627,
-                860269
-              ],
-              [
-                "claude-opus-5",
-                2.5633,
-                3074884
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-09T14:00:00Z",
-            "by_session": [
-              [
-                "__rest",
-                0.1894,
-                102792
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-opus-5",
-                0.1894,
-                102792
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-09T15:00:00Z",
-            "by_session": [
-              [
-                "f073766f-8caa-4861-8dd9-e613edfeacf3",
-                5.5895,
-                595407
-              ],
-              [
-                "4457f61c-4759-43fe-bc0b-e0c1df30fb12",
-                3.4082,
-                3690603
-              ],
-              [
-                "4b775ab2-6ebe-4e50-9ffa-028da45c997d",
-                1.3479,
-                1213535
-              ],
-              [
-                "bfc318da-c8d6-45dc-bf3c-d7abf12b36ed",
-                0.5835,
-                481489
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-opus-5",
-                10.9291,
-                5981034
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-09T16:00:00Z",
-            "by_session": [
-              [
-                "4457f61c-4759-43fe-bc0b-e0c1df30fb12",
-                10.9332,
-                17386070
-              ],
-              [
-                "4b775ab2-6ebe-4e50-9ffa-028da45c997d",
-                7.6826,
-                11351843
-              ],
-              [
-                "bfc318da-c8d6-45dc-bf3c-d7abf12b36ed",
-                6.1204,
-                8410938
-              ],
-              [
-                "cc67c85a-ffa6-4139-ab30-7466d34b96af",
-                3.2682,
-                3680706
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-opus-5",
-                28.0044,
-                40829557
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-09T17:00:00Z",
-            "by_session": [
-              [
-                "4b775ab2-6ebe-4e50-9ffa-028da45c997d",
-                2.7923,
-                4918892
-              ],
-              [
-                "cc67c85a-ffa6-4139-ab30-7466d34b96af",
-                1.8487,
-                2428860
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-opus-5",
-                4.641,
-                7347752
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-09T18:00:00Z",
-            "by_session": [
-              [
-                "4b775ab2-6ebe-4e50-9ffa-028da45c997d",
-                6.6511,
-                11186543
-              ],
-              [
-                "66b4ff4a-fb39-4215-985e-45407b6bcdbf",
-                3.4689,
-                3105642
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-opus-5",
-                10.12,
-                14292185
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-09T19:00:00Z",
-            "by_session": [
-              [
-                "cc67c85a-ffa6-4139-ab30-7466d34b96af",
-                4.0057,
-                3878268
-              ],
-              [
-                "4b775ab2-6ebe-4e50-9ffa-028da45c997d",
-                2.2418,
-                4061546
-              ],
-              [
-                "66b4ff4a-fb39-4215-985e-45407b6bcdbf",
-                0.1425,
-                230722
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-opus-5",
-                6.3899,
-                8170536
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-09T20:00:00Z",
-            "by_session": [
-              [
-                "cc67c85a-ffa6-4139-ab30-7466d34b96af",
-                6.8604,
-                11612314
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-opus-5",
-                6.8604,
-                11612314
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-09T21:00:00Z",
-            "by_session": [
-              [
-                "cc67c85a-ffa6-4139-ab30-7466d34b96af",
-                8.6135,
-                14862697
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-opus-5",
-                8.6135,
-                14862697
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-09T22:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-09T23:00:00Z",
-            "by_session": [
-              [
-                "cc67c85a-ffa6-4139-ab30-7466d34b96af",
-                3.3535,
-                1752379
-              ],
-              [
-                "0dddf0a7-6217-4392-a0bc-79f81a3dbea0",
-                0.4798,
-                408440
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-opus-5",
-                3.8333,
-                2160819
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-10T00:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-10T01:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-10T02:00:00Z",
-            "by_session": [
-              [
-                "0dddf0a7-6217-4392-a0bc-79f81a3dbea0",
-                0.3567,
-                195177
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-opus-5",
-                0.3567,
-                195177
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-10T03:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-10T04:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-10T05:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-10T06:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-10T07:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-10T08:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-10T09:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-10T10:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-10T11:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-10T12:00:00Z",
-            "by_session": [
-              [
-                "4b775ab2-6ebe-4e50-9ffa-028da45c997d",
-                3.8421,
-                2534005
-              ],
-              [
-                "0dddf0a7-6217-4392-a0bc-79f81a3dbea0",
-                0.5072,
-                404000
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-opus-5",
-                4.3493,
-                2938005
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-10T13:00:00Z",
-            "by_session": [
-              [
-                "3118e229-814b-4219-987f-9a11a1e6c5f4",
-                6.8761,
-                9860339
-              ],
-              [
-                "4b775ab2-6ebe-4e50-9ffa-028da45c997d",
-                2.7916,
-                866976
-              ],
-              [
-                "__rest",
-                0.8773,
-                609060
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-opus-5",
-                10.545,
-                11336375
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-10T14:00:00Z",
-            "by_session": [
-              [
-                "3118e229-814b-4219-987f-9a11a1e6c5f4",
-                37.3686,
-                65065652
-              ],
-              [
-                "ff5dc17e-0203-43a6-934a-ad9ff01c01ce",
-                1.9457,
-                2200114
-              ],
-              [
-                "d3976c54-e579-4c29-8621-2fe5ee4096aa",
-                0.4933,
-                503044
-              ],
-              [
-                "b8046658-19f3-4786-b1e2-1c7ed79aa2da",
-                0.1236,
-                123381
-              ],
-              [
-                "__rest",
-                0.1904,
-                102830
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-opus-5",
-                40.1215,
-                67995021
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-10T15:00:00Z",
-            "by_session": [
-              [
-                "3118e229-814b-4219-987f-9a11a1e6c5f4",
-                26.7726,
-                49754989
-              ],
-              [
-                "b8046658-19f3-4786-b1e2-1c7ed79aa2da",
-                4.9022,
-                6060843
-              ],
-              [
-                "d3976c54-e579-4c29-8621-2fe5ee4096aa",
-                4.8114,
-                6810916
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-opus-5",
-                36.4863,
-                62626748
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-10T16:00:00Z",
-            "by_session": [
-              [
-                "3118e229-814b-4219-987f-9a11a1e6c5f4",
-                30.601,
-                57114476
-              ],
-              [
-                "b87d4751-cef9-46ad-8ccc-a673f32625f4",
-                16.3167,
-                21701193
-              ],
-              [
-                "59b82c91-1b1a-4b2b-8550-737287cbb24e",
-                12.0277,
-                17622510
-              ],
-              [
-                "d3976c54-e579-4c29-8621-2fe5ee4096aa",
-                0.2457,
-                411401
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-opus-5",
-                59.1911,
-                96849580
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-10T17:00:00Z",
-            "by_session": [
-              [
-                "3118e229-814b-4219-987f-9a11a1e6c5f4",
-                32.2503,
-                61114956
-              ],
-              [
-                "59b82c91-1b1a-4b2b-8550-737287cbb24e",
-                2.9848,
-                5011205
-              ],
-              [
-                "b87d4751-cef9-46ad-8ccc-a673f32625f4",
-                2.5429,
-                4610000
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-opus-5",
-                37.7779,
-                70736161
-              ]
-            ]
-          }
-        ]
-      }
-    },
-    {
-      "id": "fable",
-      "label": "Weekly \u00b7 Fable",
-      "sub": "resets weekly",
-      "start": "2026-09-08T06:00:00Z",
-      "reset": "2026-09-15T06:00:00Z",
-      "boundary_known": true,
-      "idle": false,
-      "calibrated": true,
-      "pct": 59.0,
-      "pace": 1.65,
-      "ramp": 0.587,
-      "elapsed_frac": 0.357,
-      "total_cost": 195.22,
-      "total_raw": 227606732,
-      "messages": 712,
-      "limit": 330.88,
-      "kinds": {
-        "input": 19276,
-        "output": 922081,
-        "cache_write": 4671065,
-        "cache_read": 221994310
-      },
-      "by_model": [
-        {
-          "key": "claude-fable-5-1",
-          "title": null,
-          "title_kind": null,
-          "cost": 195.22,
-          "raw": 227606732,
-          "n": 712,
-          "first": "2026-09-08T14:07:19.637Z",
-          "last": "2026-09-09T13:45:28.589Z",
-          "share": 100.0,
-          "pct": 59.0,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 195.22,
-              "input": 19276,
-              "output": 922081,
-              "cache_write": 4671065,
-              "cache_read": 221994310
-            }
-          ]
-        }
-      ],
-      "by_project": [
-        {
-          "key": "/Users/crawfordnakayama/\u65e5\u672c\u8a9e",
-          "title": null,
-          "title_kind": null,
-          "cost": 61.54,
-          "raw": 68400054,
-          "n": 252,
-          "first": "2026-09-08T14:07:19.637Z",
-          "last": "2026-09-08T20:12:57.971Z",
-          "share": 31.52,
-          "pct": 18.6,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 61.54,
-              "input": 6742,
-              "output": 377547,
-              "cache_write": 1295612,
-              "cache_read": 66720153
-            }
-          ]
-        },
-        {
-          "key": "/Users/crawfordnakayama/DTCloudSource",
-          "title": null,
-          "title_kind": null,
-          "cost": 51.3,
-          "raw": 70367212,
-          "n": 222,
-          "first": "2026-09-08T14:10:29.988Z",
-          "last": "2026-09-08T18:54:35.160Z",
-          "share": 26.28,
-          "pct": 15.5,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 51.3,
-              "input": 6398,
-              "output": 222440,
-              "cache_write": 1143305,
-              "cache_read": 68995069
-            }
-          ]
-        },
-        {
-          "key": "/Users/crawfordnakayama",
-          "title": null,
-          "title_kind": null,
-          "cost": 29.97,
-          "raw": 7240359,
-          "n": 19,
-          "first": "2026-09-08T21:51:54.527Z",
-          "last": "2026-09-09T13:45:28.589Z",
-          "share": 15.35,
-          "pct": 9.06,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 29.97,
-              "input": 368,
-              "output": 24857,
-              "cache_write": 1362937,
-              "cache_read": 5852197
-            }
-          ]
-        },
-        {
-          "key": "/Users/crawfordnakayama/tasks",
-          "title": null,
-          "title_kind": null,
-          "cost": 18.13,
-          "raw": 18841920,
-          "n": 63,
-          "first": "2026-09-08T18:34:53.428Z",
-          "last": "2026-09-08T19:04:33.758Z",
-          "share": 9.29,
-          "pct": 5.48,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 18.13,
-              "input": 1316,
-              "output": 87668,
-              "cache_write": 457869,
-              "cache_read": 18295067
-            }
-          ]
-        },
-        {
-          "key": "/Users/crawfordnakayama/usage_app",
-          "title": null,
-          "title_kind": null,
-          "cost": 11.68,
-          "raw": 20551437,
-          "n": 61,
-          "first": "2026-09-08T21:52:13.190Z",
-          "last": "2026-09-09T02:08:53.382Z",
-          "share": 5.98,
-          "pct": 3.53,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 11.68,
-              "input": 1652,
-              "output": 84278,
-              "cache_write": 117949,
-              "cache_read": 20347558
-            }
-          ]
-        },
-        {
-          "key": "/Users/crawfordnakayama/DTCloudSource/WebApps/App/src/app",
-          "title": null,
-          "title_kind": null,
-          "cost": 6.59,
-          "raw": 12370720,
-          "n": 26,
-          "first": "2026-09-08T16:10:39.088Z",
-          "last": "2026-09-08T18:53:45.048Z",
-          "share": 3.37,
-          "pct": 1.99,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 6.59,
-              "input": 802,
-              "output": 38916,
-              "cache_write": 78556,
-              "cache_read": 12252446
-            }
-          ]
-        },
-        {
-          "key": "/Users/crawfordnakayama/DTCloudSource/WebApps/App",
-          "title": null,
-          "title_kind": null,
-          "cost": 4.49,
-          "raw": 12026088,
-          "n": 24,
-          "first": "2026-09-08T16:35:31.357Z",
-          "last": "2026-09-08T18:54:02.545Z",
-          "share": 2.3,
-          "pct": 1.36,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 4.49,
-              "input": 618,
-              "output": 12107,
-              "cache_write": 44401,
-              "cache_read": 11968962
-            }
-          ]
-        },
-        {
-          "key": "/Users/crawfordnakayama/DTCloudSource/Projects",
-          "title": null,
-          "title_kind": null,
-          "cost": 4.12,
-          "raw": 11484143,
-          "n": 26,
-          "first": "2026-09-08T16:25:20.894Z",
-          "last": "2026-09-08T16:35:25.289Z",
-          "share": 2.11,
-          "pct": 1.24,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 4.12,
-              "input": 802,
-              "output": 15061,
-              "cache_write": 24786,
-              "cache_read": 11443494
-            }
-          ]
-        },
-        {
-          "key": "/Users/crawfordnakayama/usage_app/src-tauri",
-          "title": null,
-          "title_kind": null,
-          "cost": 2.42,
-          "raw": 3645594,
-          "n": 10,
-          "first": "2026-09-08T22:02:53.237Z",
-          "last": "2026-09-08T23:27:39.716Z",
-          "share": 1.24,
-          "pct": 0.73,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 2.42,
-              "input": 320,
-              "output": 19656,
-              "cache_write": 26835,
-              "cache_read": 3598783
-            }
-          ]
-        },
-        {
-          "key": "/Users/crawfordnakayama/\u65e5\u672c\u8a9e/Design",
-          "title": null,
-          "title_kind": null,
-          "cost": 2.07,
-          "raw": 358007,
-          "n": 2,
-          "first": "2026-09-08T14:09:42.366Z",
-          "last": "2026-09-08T14:10:34.066Z",
-          "share": 1.06,
-          "pct": 0.63,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 2.07,
-              "input": 64,
-              "output": 12162,
-              "cache_write": 69640,
-              "cache_read": 276141
-            }
-          ]
-        },
-        {
-          "key": "/Users/crawfordnakayama/usage_app/src-tauri/src/ledger",
-          "title": null,
-          "title_kind": null,
-          "cost": 1.38,
-          "raw": 526529,
-          "n": 2,
-          "first": "2026-09-08T21:55:45.279Z",
-          "last": "2026-09-08T21:57:36.480Z",
-          "share": 0.71,
-          "pct": 0.42,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 1.38,
-              "input": 64,
-              "output": 17922,
-              "cache_write": 18162,
-              "cache_read": 490381
-            }
-          ]
-        },
-        {
-          "key": "/Users/crawfordnakayama/usage_app/src-tauri/src",
-          "title": null,
-          "title_kind": null,
-          "cost": 0.53,
-          "raw": 273348,
-          "n": 1,
-          "first": "2026-09-08T21:58:50.416Z",
-          "last": "2026-09-08T21:58:50.416Z",
-          "share": 0.27,
-          "pct": 0.16,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 0.53,
-              "input": 32,
-              "output": 6705,
-              "cache_write": 6622,
-              "cache_read": 259989
-            }
-          ]
-        }
-      ],
-      "by_session": [
-        {
-          "key": [
-            "7e80391a-3209-4450-b70e-cccfe2aa3dce",
-            "/Users/crawfordnakayama/DTCloudSource"
-          ],
-          "title": "Packages and allowances in catalog",
-          "title_kind": "custom",
-          "cost": 48.49,
-          "raw": 100416211,
-          "n": 247,
-          "first": "2026-09-08T15:16:01.292Z",
-          "last": "2026-09-08T18:54:35.160Z",
-          "share": 24.84,
-          "pct": 14.66,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 48.49,
-              "input": 7164,
-              "output": 239912,
-              "cache_write": 576473,
-              "cache_read": 99592662
-            }
-          ]
-        },
-        {
-          "key": [
-            "f61278b4-7287-4e15-9ed7-ed9b4ce75075",
-            "/Users/crawfordnakayama/usage_app"
-          ],
-          "title": "Usage widget implementation",
-          "title_kind": "custom",
-          "cost": 46.2,
-          "raw": 32511183,
-          "n": 94,
-          "first": "2026-09-08T21:51:54.527Z",
-          "last": "2026-09-09T13:45:28.589Z",
-          "share": 23.67,
-          "pct": 13.96,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 46.2,
-              "input": 2468,
-              "output": 153641,
-              "cache_write": 1539555,
-              "cache_read": 30815519
-            }
-          ]
-        },
-        {
-          "key": [
-            "6e16d3e6-ffeb-4016-8219-06e3c70a7362",
-            "/Users/crawfordnakayama/\u65e5\u672c\u8a9e"
-          ],
-          "title": "Reader and vocab app bugs",
-          "title_kind": "custom",
-          "cost": 27.71,
-          "raw": 36544976,
-          "n": 97,
-          "first": "2026-09-08T14:07:19.637Z",
-          "last": "2026-09-08T16:39:31.154Z",
-          "share": 14.19,
-          "pct": 8.37,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 27.71,
-              "input": 2716,
-              "output": 187232,
-              "cache_write": 467242,
-              "cache_read": 35887786
-            }
-          ]
-        },
-        {
-          "key": [
-            "7d8c0284-ea69-43a9-a840-ba69fcc617f7",
-            "/Users/crawfordnakayama/\u65e5\u672c\u8a9e"
-          ],
-          "title": "Local translation model",
-          "title_kind": "custom",
-          "cost": 18.87,
-          "raw": 17592879,
-          "n": 82,
-          "first": "2026-09-08T14:08:34.207Z",
-          "last": "2026-09-08T17:00:13.815Z",
-          "share": 9.67,
-          "pct": 5.7,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 18.87,
-              "input": 2240,
-              "output": 115888,
-              "cache_write": 439618,
-              "cache_read": 17035133
-            }
-          ]
-        },
-        {
-          "key": [
-            "f073766f-8caa-4861-8dd9-e613edfeacf3",
-            "/Users/crawfordnakayama/tasks"
-          ],
-          "title": "Board task sequencing and performance",
-          "title_kind": "custom",
-          "cost": 18.13,
-          "raw": 18841920,
-          "n": 63,
-          "first": "2026-09-08T18:34:53.428Z",
-          "last": "2026-09-08T19:04:33.758Z",
-          "share": 9.29,
-          "pct": 5.48,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 18.13,
-              "input": 1316,
-              "output": 87668,
-              "cache_write": 457869,
-              "cache_read": 18295067
-            }
-          ]
-        },
-        {
-          "key": [
-            "3478f7e5-ffaa-48d5-b18e-a9aab1144dca",
-            "/Users/crawfordnakayama/\u65e5\u672c\u8a9e"
-          ],
-          "title": "Uncommitted changes review",
-          "title_kind": "custom",
-          "cost": 17.03,
-          "raw": 14620206,
-          "n": 75,
-          "first": "2026-09-08T17:00:46.951Z",
-          "last": "2026-09-08T20:12:57.971Z",
-          "share": 8.73,
-          "pct": 5.15,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 17.03,
-              "input": 1850,
-              "output": 86589,
-              "cache_write": 458392,
-              "cache_read": 14073375
-            }
-          ]
-        },
-        {
-          "key": [
-            "6b2af53a-213a-482d-96cb-5da80a3cec17",
-            "/Users/crawfordnakayama/DTCloudSource"
-          ],
-          "title": "Packages and allowances in catalog (fork)",
-          "title_kind": "custom",
-          "cost": 9.29,
-          "raw": 506972,
-          "n": 1,
-          "first": "2026-09-08T18:51:00.743Z",
-          "last": "2026-09-08T18:51:00.743Z",
-          "share": 4.76,
-          "pct": 2.81,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 9.29,
-              "input": 2,
-              "output": 1188,
-              "cache_write": 460982,
-              "cache_read": 44800
-            }
-          ]
-        },
-        {
-          "key": [
-            "8cfd75ec-69ff-4a28-9a90-413aeb0572e4",
-            "/Users/crawfordnakayama/DTCloudSource"
-          ],
-          "title": "Proposals tool component usability",
-          "title_kind": "custom",
-          "cost": 4.98,
-          "raw": 2917421,
-          "n": 21,
-          "first": "2026-09-08T14:10:29.988Z",
-          "last": "2026-09-08T14:18:40.830Z",
-          "share": 2.55,
-          "pct": 1.5,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 4.98,
-              "input": 586,
-              "output": 26016,
-              "cache_write": 149258,
-              "cache_read": 2741561
-            }
-          ]
-        },
-        {
-          "key": [
-            "358b6ed6-ded9-4a76-9e30-8156809700a1",
-            "/Users/crawfordnakayama/DTCloudSource"
-          ],
-          "title": "PR deployment status across environments",
-          "title_kind": "custom",
-          "cost": 4.2,
-          "raw": 3600950,
-          "n": 31,
-          "first": "2026-09-08T15:14:55.986Z",
-          "last": "2026-09-08T15:30:05.340Z",
-          "share": 2.15,
-          "pct": 1.27,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 4.2,
-              "input": 932,
-              "output": 23499,
-              "cache_write": 107202,
-              "cache_read": 3469317
-            }
-          ]
-        },
-        {
-          "key": [
-            "19a9de17-5114-492a-b6c4-ff8f186aab0d",
-            "/Users/crawfordnakayama/Library/Application Support/Claude/scratch-workspaces/cc90827f-08e3-45de-b52e-6e5bd25efb07/e6fbf55b-1e7f-4429-bdbc-6783f6bc6914/scratch-2026-09-08-f4c0ea"
-          ],
-          "title": "Coaching changes detection via unsupervised learning",
-          "title_kind": "custom",
-          "cost": 0.32,
-          "raw": 54014,
-          "n": 1,
-          "first": "2026-09-08T16:35:27Z",
-          "last": "2026-09-08T16:35:27Z",
-          "share": 0.16,
-          "pct": 0.1,
-          "unread": false,
-          "working": false,
-          "models": [
-            {
-              "model": "claude-fable-5-1",
-              "cost": 0.32,
-              "input": 2,
-              "output": 448,
-              "cache_write": 14474,
-              "cache_read": 39090
-            }
-          ]
-        }
-      ],
-      "series": {
-        "bucket": "hour",
-        "start": "2026-09-08T06:00:00Z",
-        "end": "2026-09-15T06:00:00Z",
-        "buckets": [
-          {
-            "t": "2026-09-08T06:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-08T07:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-08T08:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-08T09:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-08T10:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-08T11:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-08T12:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-08T13:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-08T14:00:00Z",
-            "by_session": [
-              [
-                "6e16d3e6-ffeb-4016-8219-06e3c70a7362",
-                21.7391,
-                23837944
-              ],
-              [
-                "7d8c0284-ea69-43a9-a840-ba69fcc617f7",
-                9.6949,
-                6873507
-              ],
-              [
-                "8cfd75ec-69ff-4a28-9a90-413aeb0572e4",
-                4.9772,
-                2917421
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-fable-5-1",
-                36.4112,
-                33628872
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-08T15:00:00Z",
-            "by_session": [
-              [
-                "7e80391a-3209-4450-b70e-cccfe2aa3dce",
-                6.6706,
-                4959621
-              ],
-              [
-                "6e16d3e6-ffeb-4016-8219-06e3c70a7362",
-                4.2767,
-                7652981
-              ],
-              [
-                "358b6ed6-ded9-4a76-9e30-8156809700a1",
-                4.1956,
-                3600950
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-fable-5-1",
-                15.143,
-                16213552
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-08T16:00:00Z",
-            "by_session": [
-              [
-                "7e80391a-3209-4450-b70e-cccfe2aa3dce",
-                26.5308,
-                55818501
-              ],
-              [
-                "7d8c0284-ea69-43a9-a840-ba69fcc617f7",
-                9.0914,
-                10421983
-              ],
-              [
-                "6e16d3e6-ffeb-4016-8219-06e3c70a7362",
-                1.6897,
-                5054051
-              ],
-              [
-                "19a9de17-5114-492a-b6c4-ff8f186aab0d",
-                0.3217,
-                54014
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-fable-5-1",
-                37.6337,
-                71348549
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-08T17:00:00Z",
-            "by_session": [
-              [
-                "3478f7e5-ffaa-48d5-b18e-a9aab1144dca",
-                10.622,
-                9790459
-              ],
-              [
-                "7e80391a-3209-4450-b70e-cccfe2aa3dce",
-                6.0818,
-                14988290
-              ],
-              [
-                "7d8c0284-ea69-43a9-a840-ba69fcc617f7",
-                0.0816,
-                297389
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-fable-5-1",
-                16.7854,
-                25076138
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-08T18:00:00Z",
-            "by_session": [
-              [
-                "f073766f-8caa-4861-8dd9-e613edfeacf3",
-                16.18,
-                14384634
-              ],
-              [
-                "6b2af53a-213a-482d-96cb-5da80a3cec17",
-                9.2903,
-                506972
-              ],
-              [
-                "7e80391a-3209-4450-b70e-cccfe2aa3dce",
-                9.2116,
-                24649799
-              ],
-              [
-                "3478f7e5-ffaa-48d5-b18e-a9aab1144dca",
-                1.4147,
-                3735700
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-fable-5-1",
-                36.0966,
-                43277105
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-08T19:00:00Z",
-            "by_session": [
-              [
-                "f073766f-8caa-4861-8dd9-e613edfeacf3",
-                1.9477,
-                4457286
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-fable-5-1",
-                1.9477,
-                4457286
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-08T20:00:00Z",
-            "by_session": [
-              [
-                "3478f7e5-ffaa-48d5-b18e-a9aab1144dca",
-                4.9975,
-                1094047
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-fable-5-1",
-                4.9975,
-                1094047
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-08T21:00:00Z",
-            "by_session": [
-              [
-                "f61278b4-7287-4e15-9ed7-ed9b4ce75075",
-                7.5659,
-                3235372
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-fable-5-1",
-                7.5659,
-                3235372
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-08T22:00:00Z",
-            "by_session": [
-              [
-                "f61278b4-7287-4e15-9ed7-ed9b4ce75075",
-                13.5666,
-                24174283
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-fable-5-1",
-                13.5666,
-                24174283
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-08T23:00:00Z",
-            "by_session": [
-              [
-                "f61278b4-7287-4e15-9ed7-ed9b4ce75075",
-                9.0149,
-                2956262
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-fable-5-1",
-                9.0149,
-                2956262
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-09T00:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-09T01:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-09T02:00:00Z",
-            "by_session": [
-              [
-                "f61278b4-7287-4e15-9ed7-ed9b4ce75075",
-                8.0916,
-                1284997
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-fable-5-1",
-                8.0916,
-                1284997
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-09T03:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-09T04:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-09T05:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-09T06:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-09T07:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-09T08:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-09T09:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-09T10:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-09T11:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-09T12:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-09T13:00:00Z",
-            "by_session": [
-              [
-                "f61278b4-7287-4e15-9ed7-ed9b4ce75075",
-                7.9627,
-                860269
-              ]
-            ],
-            "by_model": [
-              [
-                "claude-fable-5-1",
-                7.9627,
-                860269
-              ]
-            ]
-          },
-          {
-            "t": "2026-09-09T14:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-09T15:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-09T16:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-09T17:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-09T18:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-09T19:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-09T20:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-09T21:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-09T22:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-09T23:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-10T00:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-10T01:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-10T02:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-10T03:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-10T04:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-10T05:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-10T06:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-10T07:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-10T08:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-10T09:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-10T10:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-10T11:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-10T12:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-10T13:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-10T14:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-10T15:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-10T16:00:00Z",
-            "by_session": [],
-            "by_model": []
-          },
-          {
-            "t": "2026-09-10T17:00:00Z",
-            "by_session": [],
-            "by_model": []
-          }
-        ]
-      }
+     ]
     }
-  ],
-  "scan": {
-    "files_total": 7047,
-    "files_in_window": 982,
-    "files_read": 3,
-    "bytes_read": 5363905,
-    "lines_seen": 738,
-    "records_added": 150,
-    "duplicates_skipped": 73,
-    "records_retained": 19140,
-    "duration_ms": 334
-  },
-  "index_records": 19140,
-  "usage_cache": {
-    "fetched_at": "2026-09-09T16:36:23.340Z",
-    "session": {
-      "percent": 8.0,
-      "resets_at": "2026-09-09T18:40:00.303957Z"
+   ],
+   "by_project": [
+    {
+     "key": "/Users/crawfordnakayama/DTCloudSource",
+     "title": null,
+     "title_kind": null,
+     "cost": 39.85,
+     "raw": 74838625,
+     "n": 103,
+     "first": "2026-09-10T16:41:16.852Z",
+     "last": "2026-09-10T17:47:49.169Z",
+     "share": 54.4,
+     "pct": 7.43,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 39.85,
+       "input": 206,
+       "output": 48483,
+       "cache_write": 130676,
+       "cache_read": 74659260
+      }
+     ]
     },
-    "weekly": {
-      "percent": 34.0,
-      "resets_at": "2026-09-15T06:00:00.303983Z"
+    {
+     "key": "/Users/crawfordnakayama/token-ledger",
+     "title": null,
+     "title_kind": null,
+     "cost": 18.79,
+     "raw": 29163053,
+     "n": 131,
+     "first": "2026-09-10T16:40:17.468Z",
+     "last": "2026-09-10T17:57:48.191Z",
+     "share": 25.64,
+     "pct": 3.5,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 18.79,
+       "input": 262,
+       "output": 83798,
+       "cache_write": 226342,
+       "cache_read": 28852651
+      }
+     ]
     },
-    "fable": {
-      "percent": 59.0,
-      "resets_at": "2026-09-15T06:00:00.304391Z"
+    {
+     "key": "/Users/crawfordnakayama/DTCloudSource/WebApps/App",
+     "title": null,
+     "title_kind": null,
+     "cost": 8.01,
+     "raw": 15223965,
+     "n": 19,
+     "first": "2026-09-10T16:43:36.627Z",
+     "last": "2026-09-10T17:47:07.576Z",
+     "share": 10.93,
+     "pct": 1.49,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 8.01,
+       "input": 38,
+       "output": 7994,
+       "cache_write": 20896,
+       "cache_read": 15195037
+      }
+     ]
+    },
+    {
+     "key": "/Users/crawfordnakayama/DTCloudSource/Projects",
+     "title": null,
+     "title_kind": null,
+     "cost": 3.65,
+     "raw": 7015611,
+     "n": 10,
+     "first": "2026-09-10T16:45:54.521Z",
+     "last": "2026-09-10T16:54:48.086Z",
+     "share": 4.99,
+     "pct": 0.68,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 3.65,
+       "input": 20,
+       "output": 3288,
+       "cache_write": 6952,
+       "cache_read": 7005351
+      }
+     ]
+    },
+    {
+     "key": "/Users/crawfordnakayama/token-ledger/src-tauri",
+     "title": null,
+     "title_kind": null,
+     "cost": 2.96,
+     "raw": 4976177,
+     "n": 21,
+     "first": "2026-09-10T16:42:21.299Z",
+     "last": "2026-09-10T17:57:05.270Z",
+     "share": 4.04,
+     "pct": 0.55,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 2.96,
+       "input": 42,
+       "output": 10177,
+       "cache_write": 23563,
+       "cache_read": 4942395
+      }
+     ]
     }
+   ],
+   "by_session": [
+    {
+     "key": [
+      "3118e229-814b-4219-987f-9a11a1e6c5f4",
+      "/Users/crawfordnakayama/DTCloudSource"
+     ],
+     "title": "Quote Assist local testing flow",
+     "title_kind": "custom",
+     "cost": 51.51,
+     "raw": 97078201,
+     "n": 132,
+     "first": "2026-09-10T16:41:16.852Z",
+     "last": "2026-09-10T17:47:49.169Z",
+     "share": 70.31,
+     "pct": 9.6,
+     "unread": true,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 51.51,
+       "input": 264,
+       "output": 59765,
+       "cache_write": 158524,
+       "cache_read": 96859648
+      }
+     ]
+    },
+    {
+     "key": [
+      "59b82c91-1b1a-4b2b-8550-737287cbb24e",
+      "/Users/crawfordnakayama/token-ledger"
+     ],
+     "title": "Thread sorting and unread indicators",
+     "title_kind": "custom",
+     "cost": 15.01,
+     "raw": 22633715,
+     "n": 113,
+     "first": "2026-09-10T16:42:57.365Z",
+     "last": "2026-09-10T17:57:48.191Z",
+     "share": 20.49,
+     "pct": 2.8,
+     "unread": false,
+     "working": true,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 15.01,
+       "input": 226,
+       "output": 68161,
+       "cache_write": 213119,
+       "cache_read": 22352209
+      }
+     ]
+    },
+    {
+     "key": [
+      "b87d4751-cef9-46ad-8ccc-a673f32625f4",
+      "/Users/crawfordnakayama/token-ledger"
+     ],
+     "title": "Ledger usage timeline view",
+     "title_kind": "custom",
+     "cost": 6.74,
+     "raw": 11505515,
+     "n": 39,
+     "first": "2026-09-10T16:40:17.468Z",
+     "last": "2026-09-10T17:55:43.283Z",
+     "share": 9.19,
+     "pct": 1.26,
+     "unread": false,
+     "working": true,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 6.74,
+       "input": 78,
+       "output": 25814,
+       "cache_write": 36786,
+       "cache_read": 11442837
+      }
+     ]
+    }
+   ],
+   "series": {
+    "bucket": "15m",
+    "start": "2026-09-10T16:40:17.468Z",
+    "end": "2026-09-10T21:40:17.468Z",
+    "buckets": [
+     {
+      "t": "2026-09-10T16:40:17.468Z",
+      "by_session": [
+       [
+        "3118e229-814b-4219-987f-9a11a1e6c5f4",
+        8.4479,
+        15587286
+       ],
+       [
+        "b87d4751-cef9-46ad-8ccc-a673f32625f4",
+        2.4952,
+        4216600
+       ],
+       [
+        "59b82c91-1b1a-4b2b-8550-737287cbb24e",
+        1.4879,
+        1198416
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-opus-5",
+        12.431,
+        21002302
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-10T16:45:00Z",
+      "by_session": [
+       [
+        "3118e229-814b-4219-987f-9a11a1e6c5f4",
+        10.8123,
+        20375959
+       ],
+       [
+        "59b82c91-1b1a-4b2b-8550-737287cbb24e",
+        10.5398,
+        16424094
+       ],
+       [
+        "b87d4751-cef9-46ad-8ccc-a673f32625f4",
+        1.6969,
+        2678915
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-opus-5",
+        23.049,
+        39478968
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-10T17:00:00Z",
+      "by_session": [
+       [
+        "3118e229-814b-4219-987f-9a11a1e6c5f4",
+        1.4984,
+        2866888
+       ],
+       [
+        "59b82c91-1b1a-4b2b-8550-737287cbb24e",
+        1.4232,
+        2458852
+       ],
+       [
+        "b87d4751-cef9-46ad-8ccc-a673f32625f4",
+        1.2264,
+        2128235
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-opus-5",
+        4.148,
+        7453975
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-10T17:15:00Z",
+      "by_session": [
+       [
+        "3118e229-814b-4219-987f-9a11a1e6c5f4",
+        11.8939,
+        22789940
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-opus-5",
+        11.8939,
+        22789940
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-10T17:30:00Z",
+      "by_session": [
+       [
+        "3118e229-814b-4219-987f-9a11a1e6c5f4",
+        15.4136,
+        28930849
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-opus-5",
+        15.4136,
+        28930849
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-10T17:45:00Z",
+      "by_session": [
+       [
+        "3118e229-814b-4219-987f-9a11a1e6c5f4",
+        3.4444,
+        6527279
+       ],
+       [
+        "59b82c91-1b1a-4b2b-8550-737287cbb24e",
+        1.5616,
+        2552353
+       ],
+       [
+        "b87d4751-cef9-46ad-8ccc-a673f32625f4",
+        1.3165,
+        2481765
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-opus-5",
+        6.3225,
+        11561397
+       ]
+      ]
+     }
+    ]
+   }
   },
-  "calibration_source": "auto",
-  "thread_sort": "usage",
-  "list_rows": 25,
-  "widget_rows": 5,
-  "cache_diag": {
-    "path": "/Users/crawfordnakayama/.claude.json",
-    "projects_dir": "/Users/crawfordnakayama/.claude/projects",
-    "reason": "ok",
-    "detail": null,
-    "fetched_at": "2026-09-09T16:36:23.340Z",
-    "best_pct": 59.0,
-    "live": false,
-    "connected": false,
-    "live_error": null,
-    "live_auth_failed": false
+  {
+   "id": "weekly",
+   "label": "Weekly \u00b7 all models",
+   "sub": "resets weekly",
+   "start": "2026-09-08T06:00:00Z",
+   "reset": "2026-09-15T06:00:00Z",
+   "boundary_known": true,
+   "idle": false,
+   "calibrated": true,
+   "pct": 44.02,
+   "pace": 1.23,
+   "ramp": 0.478,
+   "elapsed_frac": 0.357,
+   "total_cost": 711.51,
+   "total_raw": 1024484832,
+   "messages": 3089,
+   "limit": 1616.28,
+   "kinds": {
+    "input": 24094,
+    "output": 2336456,
+    "cache_write": 13776605,
+    "cache_read": 1008347677
+   },
+   "by_model": [
+    {
+     "key": "claude-opus-5",
+     "title": null,
+     "title_kind": null,
+     "cost": 514.4,
+     "raw": 796248913,
+     "n": 2368,
+     "first": "2026-09-08T13:11:56.418Z",
+     "last": "2026-09-10T17:57:48.191Z",
+     "share": 72.3,
+     "pct": 31.83,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 514.4,
+       "input": 4736,
+       "output": 1407720,
+       "cache_write": 8607106,
+       "cache_read": 786229351
+      }
+     ]
+    },
+    {
+     "key": "claude-fable-5-1",
+     "title": null,
+     "title_kind": null,
+     "cost": 195.22,
+     "raw": 227606732,
+     "n": 712,
+     "first": "2026-09-08T14:07:19.637Z",
+     "last": "2026-09-09T13:45:28.589Z",
+     "share": 27.44,
+     "pct": 12.08,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 195.22,
+       "input": 19276,
+       "output": 922081,
+       "cache_write": 4671065,
+       "cache_read": 221994310
+      }
+     ]
+    },
+    {
+     "key": "claude-sonnet-5",
+     "title": null,
+     "title_kind": null,
+     "cost": 1.7,
+     "raw": 460217,
+     "n": 1,
+     "first": "2026-09-08T18:56:28.709Z",
+     "last": "2026-09-08T18:56:28.709Z",
+     "share": 0.24,
+     "pct": 0.1,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-sonnet-5",
+       "cost": 1.7,
+       "input": 2,
+       "output": 616,
+       "cache_write": 420441,
+       "cache_read": 39158
+      }
+     ]
+    },
+    {
+     "key": "claude-haiku-4-5-20251001",
+     "title": null,
+     "title_kind": null,
+     "cost": 0.19,
+     "raw": 168970,
+     "n": 8,
+     "first": "2026-09-08T18:42:55.783Z",
+     "last": "2026-09-09T02:47:52.460Z",
+     "share": 0.03,
+     "pct": 0.01,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-haiku-4-5-20251001",
+       "cost": 0.19,
+       "input": 80,
+       "output": 6039,
+       "cache_write": 77993,
+       "cache_read": 84858
+      }
+     ]
+    }
+   ],
+   "by_project": [
+    {
+     "key": "/Users/crawfordnakayama/DTCloudSource",
+     "title": null,
+     "title_kind": null,
+     "cost": 339.44,
+     "raw": 524095762,
+     "n": 1270,
+     "first": "2026-09-08T14:10:29.988Z",
+     "last": "2026-09-10T17:47:49.169Z",
+     "share": 47.71,
+     "pct": 21.0,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 286.44,
+       "input": 2094,
+       "output": 527833,
+       "cache_write": 4933223,
+       "cache_read": 447805183
+      },
+      {
+       "model": "claude-fable-5-1",
+       "cost": 51.3,
+       "input": 6398,
+       "output": 222440,
+       "cache_write": 1143305,
+       "cache_read": 68995069
+      },
+      {
+       "model": "claude-sonnet-5",
+       "cost": 1.7,
+       "input": 2,
+       "output": 616,
+       "cache_write": 420441,
+       "cache_read": 39158
+      }
+     ]
+    },
+    {
+     "key": "/Users/crawfordnakayama/token-ledger",
+     "title": null,
+     "title_kind": null,
+     "cost": 80.69,
+     "raw": 112046112,
+     "n": 654,
+     "first": "2026-09-09T13:45:44.946Z",
+     "last": "2026-09-10T17:57:48.191Z",
+     "share": 11.34,
+     "pct": 4.99,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 80.69,
+       "input": 1308,
+       "output": 434665,
+       "cache_write": 1474994,
+       "cache_read": 110135145
+      }
+     ]
+    },
+    {
+     "key": "/Users/crawfordnakayama/\u65e5\u672c\u8a9e",
+     "title": null,
+     "title_kind": null,
+     "cost": 64.53,
+     "raw": 72333752,
+     "n": 273,
+     "first": "2026-09-08T14:07:19.637Z",
+     "last": "2026-09-10T15:26:07.954Z",
+     "share": 9.07,
+     "pct": 3.99,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 61.54,
+       "input": 6742,
+       "output": 377547,
+       "cache_write": 1295612,
+       "cache_read": 66720153
+      },
+      {
+       "model": "claude-opus-5",
+       "cost": 2.99,
+       "input": 42,
+       "output": 27780,
+       "cache_write": 36199,
+       "cache_read": 3869677
+      }
+     ]
+    },
+    {
+     "key": "/Users/crawfordnakayama/tasks",
+     "title": null,
+     "title_kind": null,
+     "cost": 61.06,
+     "raw": 80040068,
+     "n": 180,
+     "first": "2026-09-08T13:11:58.406Z",
+     "last": "2026-09-10T14:01:03.226Z",
+     "share": 8.58,
+     "pct": 3.78,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 42.93,
+       "input": 234,
+       "output": 72628,
+       "cache_write": 1110981,
+       "cache_read": 60014305
+      },
+      {
+       "model": "claude-fable-5-1",
+       "cost": 18.13,
+       "input": 1316,
+       "output": 87668,
+       "cache_write": 457869,
+       "cache_read": 18295067
+      }
+     ]
+    },
+    {
+     "key": "/Users/crawfordnakayama",
+     "title": null,
+     "title_kind": null,
+     "cost": 42.14,
+     "raw": 19886343,
+     "n": 102,
+     "first": "2026-09-08T13:11:56.418Z",
+     "last": "2026-09-10T14:00:59.514Z",
+     "share": 5.92,
+     "pct": 2.61,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 29.97,
+       "input": 368,
+       "output": 24857,
+       "cache_write": 1362937,
+       "cache_read": 5852197
+      },
+      {
+       "model": "claude-opus-5",
+       "cost": 12.17,
+       "input": 166,
+       "output": 94929,
+       "cache_write": 370929,
+       "cache_read": 12179960
+      }
+     ]
+    },
+    {
+     "key": "/Users/crawfordnakayama/DTCloudSource/Projects",
+     "title": null,
+     "title_kind": null,
+     "cost": 35.0,
+     "raw": 70212490,
+     "n": 114,
+     "first": "2026-09-08T16:25:20.894Z",
+     "last": "2026-09-10T16:54:48.086Z",
+     "share": 4.92,
+     "pct": 2.17,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 30.88,
+       "input": 176,
+       "output": 31137,
+       "cache_write": 79492,
+       "cache_read": 58617542
+      },
+      {
+       "model": "claude-fable-5-1",
+       "cost": 4.12,
+       "input": 802,
+       "output": 15061,
+       "cache_write": 24786,
+       "cache_read": 11443494
+      }
+     ]
+    },
+    {
+     "key": "/Users/crawfordnakayama/DTCloudSource/WebApps/App",
+     "title": null,
+     "title_kind": null,
+     "cost": 29.45,
+     "raw": 57602913,
+     "n": 114,
+     "first": "2026-09-08T16:35:31.357Z",
+     "last": "2026-09-10T17:47:07.576Z",
+     "share": 4.14,
+     "pct": 1.82,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 24.96,
+       "input": 180,
+       "output": 39129,
+       "cache_write": 127106,
+       "cache_read": 45410410
+      },
+      {
+       "model": "claude-fable-5-1",
+       "cost": 4.49,
+       "input": 618,
+       "output": 12107,
+       "cache_write": 44401,
+       "cache_read": 11968962
+      }
+     ]
+    },
+    {
+     "key": "/Users/crawfordnakayama/usage_app",
+     "title": null,
+     "title_kind": null,
+     "cost": 17.41,
+     "raw": 27209816,
+     "n": 127,
+     "first": "2026-09-08T21:52:13.190Z",
+     "last": "2026-09-09T13:45:20.297Z",
+     "share": 2.45,
+     "pct": 1.08,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 11.68,
+       "input": 1652,
+       "output": 84278,
+       "cache_write": 117949,
+       "cache_read": 20347558
+      },
+      {
+       "model": "claude-opus-5",
+       "cost": 5.74,
+       "input": 132,
+       "output": 31807,
+       "cache_write": 171403,
+       "cache_read": 6455037
+      }
+     ]
+    },
+    {
+     "key": "/Users/crawfordnakayama/token-ledger/src-tauri",
+     "title": null,
+     "title_kind": null,
+     "cost": 10.91,
+     "raw": 16452350,
+     "n": 84,
+     "first": "2026-09-09T15:42:48.606Z",
+     "last": "2026-09-10T17:57:05.270Z",
+     "share": 1.53,
+     "pct": 0.67,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 10.91,
+       "input": 168,
+       "output": 66134,
+       "cache_write": 111795,
+       "cache_read": 16274253
+      }
+     ]
+    },
+    {
+     "key": "/Users/crawfordnakayama/DTCloudSource/WebApps/App/src/app",
+     "title": null,
+     "title_kind": null,
+     "cost": 9.7,
+     "raw": 18281763,
+     "n": 34,
+     "first": "2026-09-08T16:10:39.088Z",
+     "last": "2026-09-08T21:48:33.100Z",
+     "share": 1.36,
+     "pct": 0.6,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 6.59,
+       "input": 802,
+       "output": 38916,
+       "cache_write": 78556,
+       "cache_read": 12252446
+      },
+      {
+       "model": "claude-opus-5",
+       "cost": 3.11,
+       "input": 16,
+       "output": 3002,
+       "cache_write": 8500,
+       "cache_read": 5899525
+      }
+     ]
+    },
+    {
+     "key": "/Users/crawfordnakayama/DTCloudSource/personal/proposal-ai-loop-harness/scorer",
+     "title": null,
+     "title_kind": null,
+     "cost": 7.68,
+     "raw": 12452942,
+     "n": 61,
+     "first": "2026-09-09T16:29:18.153Z",
+     "last": "2026-09-09T19:28:55.569Z",
+     "share": 1.08,
+     "pct": 0.48,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 7.68,
+       "input": 122,
+       "output": 33830,
+       "cache_write": 65421,
+       "cache_read": 12353569
+      }
+     ]
+    },
+    {
+     "key": "/Users/crawfordnakayama/usage_app/src-tauri",
+     "title": null,
+     "title_kind": null,
+     "cost": 2.42,
+     "raw": 3645594,
+     "n": 10,
+     "first": "2026-09-08T22:02:53.237Z",
+     "last": "2026-09-08T23:27:39.716Z",
+     "share": 0.34,
+     "pct": 0.15,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 2.42,
+       "input": 320,
+       "output": 19656,
+       "cache_write": 26835,
+       "cache_read": 3598783
+      }
+     ]
+    }
+   ],
+   "by_session": [
+    {
+     "key": [
+      "7e80391a-3209-4450-b70e-cccfe2aa3dce",
+      "/Users/crawfordnakayama/DTCloudSource"
+     ],
+     "title": "Packages and allowances in catalog",
+     "title_kind": "custom",
+     "cost": 205.8,
+     "raw": 346798745,
+     "n": 566,
+     "first": "2026-09-08T15:16:01.292Z",
+     "last": "2026-09-09T02:27:12.436Z",
+     "share": 28.92,
+     "pct": 12.73,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 157.3,
+       "input": 638,
+       "output": 212693,
+       "cache_write": 3041804,
+       "cache_read": 243127399
+      },
+      {
+       "model": "claude-fable-5-1",
+       "cost": 48.49,
+       "input": 7164,
+       "output": 239912,
+       "cache_write": 576473,
+       "cache_read": 99592662
+      }
+     ]
+    },
+    {
+     "key": [
+      "3118e229-814b-4219-987f-9a11a1e6c5f4",
+      "/Users/crawfordnakayama/DTCloudSource"
+     ],
+     "title": "Quote Assist local testing flow",
+     "title_kind": "custom",
+     "cost": 133.87,
+     "raw": 242910412,
+     "n": 524,
+     "first": "2026-09-10T13:45:35.905Z",
+     "last": "2026-09-10T17:47:49.169Z",
+     "share": 18.81,
+     "pct": 8.28,
+     "unread": true,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 133.87,
+       "input": 1048,
+       "output": 207869,
+       "cache_write": 770105,
+       "cache_read": 241931390
+      }
+     ]
+    },
+    {
+     "key": [
+      "f073766f-8caa-4861-8dd9-e613edfeacf3",
+      "/Users/crawfordnakayama/tasks"
+     ],
+     "title": "Board task sequencing and performance",
+     "title_kind": "custom",
+     "cost": 60.95,
+     "raw": 79834253,
+     "n": 176,
+     "first": "2026-09-08T18:34:53.428Z",
+     "last": "2026-09-09T15:44:11.311Z",
+     "share": 8.57,
+     "pct": 3.77,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 42.82,
+       "input": 226,
+       "output": 72532,
+       "cache_write": 1110210,
+       "cache_read": 59809365
+      },
+      {
+       "model": "claude-fable-5-1",
+       "cost": 18.13,
+       "input": 1316,
+       "output": 87668,
+       "cache_write": 457869,
+       "cache_read": 18295067
+      }
+     ]
+    },
+    {
+     "key": [
+      "f61278b4-7287-4e15-9ed7-ed9b4ce75075",
+      "/Users/crawfordnakayama"
+     ],
+     "title": "Usage widget implementation",
+     "title_kind": "custom",
+     "cost": 58.31,
+     "raw": 45388596,
+     "n": 177,
+     "first": "2026-09-08T19:19:05.900Z",
+     "last": "2026-09-09T13:45:28.589Z",
+     "share": 8.2,
+     "pct": 3.61,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 46.2,
+       "input": 2468,
+       "output": 153641,
+       "cache_write": 1539555,
+       "cache_read": 30815519
+      },
+      {
+       "model": "claude-opus-5",
+       "cost": 12.11,
+       "input": 166,
+       "output": 101928,
+       "cache_write": 334367,
+       "cache_read": 12440952
+      }
+     ]
+    },
+    {
+     "key": [
+      "cc67c85a-ffa6-4139-ab30-7466d34b96af",
+      "/Users/crawfordnakayama/token-ledger"
+     ],
+     "title": "Tool usage counting for design/chat sessions",
+     "title_kind": "custom",
+     "cost": 27.95,
+     "raw": 38215224,
+     "n": 200,
+     "first": "2026-09-09T16:29:34.937Z",
+     "last": "2026-09-09T23:14:08.163Z",
+     "share": 3.93,
+     "pct": 1.73,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 27.95,
+       "input": 400,
+       "output": 133197,
+       "cache_write": 587079,
+       "cache_read": 37494548
+      }
+     ]
+    },
+    {
+     "key": [
+      "6e16d3e6-ffeb-4016-8219-06e3c70a7362",
+      "/Users/crawfordnakayama/\u65e5\u672c\u8a9e"
+     ],
+     "title": "Reader and vocab app bugs",
+     "title_kind": "custom",
+     "cost": 27.71,
+     "raw": 36544976,
+     "n": 97,
+     "first": "2026-09-08T14:07:19.637Z",
+     "last": "2026-09-08T16:39:31.154Z",
+     "share": 3.89,
+     "pct": 1.71,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 27.71,
+       "input": 2716,
+       "output": 187232,
+       "cache_write": 467242,
+       "cache_read": 35887786
+      }
+     ]
+    },
+    {
+     "key": [
+      "4b775ab2-6ebe-4e50-9ffa-028da45c997d",
+      "/Users/crawfordnakayama/DTCloudSource"
+     ],
+     "title": "Proposal agent and page SDK tools",
+     "title_kind": "custom",
+     "cost": 27.35,
+     "raw": 36133340,
+     "n": 190,
+     "first": "2026-09-09T15:07:03.105Z",
+     "last": "2026-09-10T13:53:11.648Z",
+     "share": 3.84,
+     "pct": 1.69,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 27.35,
+       "input": 380,
+       "output": 99830,
+       "cache_write": 719483,
+       "cache_read": 35313647
+      }
+     ]
+    },
+    {
+     "key": [
+      "370a65c3-6e4e-438e-b29b-ce1cc26749fc",
+      "/Users/crawfordnakayama/DTCloudSource"
+     ],
+     "title": "Merge readiness review",
+     "title_kind": "custom",
+     "cost": 24.76,
+     "raw": 40403698,
+     "n": 171,
+     "first": "2026-09-09T02:25:22.642Z",
+     "last": "2026-09-09T02:49:31.667Z",
+     "share": 3.48,
+     "pct": 1.53,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 24.76,
+       "input": 342,
+       "output": 72760,
+       "cache_write": 291747,
+       "cache_read": 40038849
+      }
+     ]
+    },
+    {
+     "key": [
+      "7d8c0284-ea69-43a9-a840-ba69fcc617f7",
+      "/Users/crawfordnakayama/\u65e5\u672c\u8a9e"
+     ],
+     "title": "Local translation model",
+     "title_kind": "custom",
+     "cost": 18.87,
+     "raw": 17592879,
+     "n": 82,
+     "first": "2026-09-08T14:08:34.207Z",
+     "last": "2026-09-08T17:00:13.815Z",
+     "share": 2.65,
+     "pct": 1.17,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 18.87,
+       "input": 2240,
+       "output": 115888,
+       "cache_write": 439618,
+       "cache_read": 17035133
+      }
+     ]
+    },
+    {
+     "key": [
+      "b87d4751-cef9-46ad-8ccc-a673f32625f4",
+      "/Users/crawfordnakayama/token-ledger"
+     ],
+     "title": "Ledger usage timeline view",
+     "title_kind": "custom",
+     "cost": 18.86,
+     "raw": 26311193,
+     "n": 117,
+     "first": "2026-09-10T16:05:24.676Z",
+     "last": "2026-09-10T17:55:43.283Z",
+     "share": 2.65,
+     "pct": 1.17,
+     "unread": false,
+     "working": true,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 18.86,
+       "input": 234,
+       "output": 130870,
+       "cache_write": 262796,
+       "cache_read": 25917293
+      }
+     ]
+    },
+    {
+     "key": [
+      "3478f7e5-ffaa-48d5-b18e-a9aab1144dca",
+      "/Users/crawfordnakayama/\u65e5\u672c\u8a9e"
+     ],
+     "title": "Uncommitted changes review",
+     "title_kind": "custom",
+     "cost": 17.03,
+     "raw": 14620206,
+     "n": 75,
+     "first": "2026-09-08T17:00:46.951Z",
+     "last": "2026-09-08T20:12:57.971Z",
+     "share": 2.39,
+     "pct": 1.05,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 17.03,
+       "input": 1850,
+       "output": 86589,
+       "cache_write": 458392,
+       "cache_read": 14073375
+      }
+     ]
+    },
+    {
+     "key": [
+      "59b82c91-1b1a-4b2b-8550-737287cbb24e",
+      "/Users/crawfordnakayama/token-ledger"
+     ],
+     "title": "Thread sorting and unread indicators",
+     "title_kind": "custom",
+     "cost": 15.01,
+     "raw": 22633715,
+     "n": 113,
+     "first": "2026-09-10T16:42:57.365Z",
+     "last": "2026-09-10T17:57:48.191Z",
+     "share": 2.11,
+     "pct": 0.93,
+     "unread": false,
+     "working": true,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 15.01,
+       "input": 226,
+       "output": 68161,
+       "cache_write": 213119,
+       "cache_read": 22352209
+      }
+     ]
+    },
+    {
+     "key": [
+      "4457f61c-4759-43fe-bc0b-e0c1df30fb12",
+      "/Users/crawfordnakayama/token-ledger"
+     ],
+     "title": "Widget gauge rerender on token update (fork)",
+     "title_kind": "custom",
+     "cost": 14.82,
+     "raw": 21874251,
+     "n": 117,
+     "first": "2026-09-09T13:47:04.930Z",
+     "last": "2026-09-09T16:49:43.802Z",
+     "share": 2.08,
+     "pct": 0.92,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 14.82,
+       "input": 234,
+       "output": 76991,
+       "cache_write": 209865,
+       "cache_read": 21587161
+      }
+     ]
+    },
+    {
+     "key": [
+      "6b2af53a-213a-482d-96cb-5da80a3cec17",
+      "/Users/crawfordnakayama/DTCloudSource"
+     ],
+     "title": "Packages and allowances in catalog (fork)",
+     "title_kind": "custom",
+     "cost": 10.99,
+     "raw": 967189,
+     "n": 2,
+     "first": "2026-09-08T18:51:00.743Z",
+     "last": "2026-09-08T18:56:28.709Z",
+     "share": 1.54,
+     "pct": 0.68,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 9.29,
+       "input": 2,
+       "output": 1188,
+       "cache_write": 460982,
+       "cache_read": 44800
+      },
+      {
+       "model": "claude-sonnet-5",
+       "cost": 1.7,
+       "input": 2,
+       "output": 616,
+       "cache_write": 420441,
+       "cache_read": 39158
+      }
+     ]
+    },
+    {
+     "key": [
+      "bfc318da-c8d6-45dc-bf3c-d7abf12b36ed",
+      "/Users/crawfordnakayama/token-ledger"
+     ],
+     "title": "Widget manual usage entry on PC",
+     "title_kind": "custom",
+     "cost": 6.7,
+     "raw": 8892427,
+     "n": 74,
+     "first": "2026-09-09T15:58:43.184Z",
+     "last": "2026-09-09T16:15:21.893Z",
+     "share": 0.94,
+     "pct": 0.41,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 6.7,
+       "input": 148,
+       "output": 44449,
+       "cache_write": 122949,
+       "cache_read": 8724881
+      }
+     ]
+    },
+    {
+     "key": [
+      "81b23a86-5cf6-4c78-a0d3-495a7ba79519",
+      "/Users/crawfordnakayama/usage_app"
+     ],
+     "title": "Widget gauge rerender on token update",
+     "title_kind": "custom",
+     "cost": 6.11,
+     "raw": 7306698,
+     "n": 71,
+     "first": "2026-09-09T02:15:18.800Z",
+     "last": "2026-09-09T13:45:44.946Z",
+     "share": 0.86,
+     "pct": 0.38,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 6.11,
+       "input": 142,
+       "output": 32740,
+       "cache_write": 173682,
+       "cache_read": 7100134
+      }
+     ]
+    },
+    {
+     "key": [
+      "a4c2fc16-fd32-4db3-9879-36c08f03b535",
+      "/Users/crawfordnakayama/DTCloudSource"
+     ],
+     "title": "PR review: agent PDF handling",
+     "title_kind": "custom",
+     "cost": 5.59,
+     "raw": 7629610,
+     "n": 66,
+     "first": "2026-09-09T02:33:44.255Z",
+     "last": "2026-09-09T02:49:58.003Z",
+     "share": 0.79,
+     "pct": 0.35,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 5.59,
+       "input": 132,
+       "output": 29741,
+       "cache_write": 110257,
+       "cache_read": 7489480
+      }
+     ]
+    },
+    {
+     "key": [
+      "d3976c54-e579-4c29-8621-2fe5ee4096aa",
+      "/Users/crawfordnakayama/token-ledger"
+     ],
+     "title": "GitHub releases and app distribution",
+     "title_kind": "custom",
+     "cost": 5.55,
+     "raw": 7725361,
+     "n": 78,
+     "first": "2026-09-10T14:25:50.580Z",
+     "last": "2026-09-10T16:09:39.822Z",
+     "share": 0.78,
+     "pct": 0.34,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 5.55,
+       "input": 156,
+       "output": 32683,
+       "cache_write": 93291,
+       "cache_read": 7599231
+      }
+     ]
+    },
+    {
+     "key": [
+      "b8046658-19f3-4786-b1e2-1c7ed79aa2da",
+      "/Users/crawfordnakayama/\u65e5\u672c\u8a9e"
+     ],
+     "title": "Testing strategies and kanji ordering",
+     "title_kind": "custom",
+     "cost": 5.03,
+     "raw": 6184224,
+     "n": 35,
+     "first": "2026-09-10T14:39:48.049Z",
+     "last": "2026-09-10T15:26:07.954Z",
+     "share": 0.71,
+     "pct": 0.31,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 5.03,
+       "input": 70,
+       "output": 47565,
+       "cache_write": 80850,
+       "cache_read": 6055739
+      }
+     ]
+    },
+    {
+     "key": [
+      "8cfd75ec-69ff-4a28-9a90-413aeb0572e4",
+      "/Users/crawfordnakayama/DTCloudSource"
+     ],
+     "title": "Proposals tool component usability",
+     "title_kind": "custom",
+     "cost": 4.98,
+     "raw": 2917421,
+     "n": 21,
+     "first": "2026-09-08T14:10:29.988Z",
+     "last": "2026-09-08T14:18:40.830Z",
+     "share": 0.7,
+     "pct": 0.31,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 4.98,
+       "input": 586,
+       "output": 26016,
+       "cache_write": 149258,
+       "cache_read": 2741561
+      }
+     ]
+    },
+    {
+     "key": [
+      "358b6ed6-ded9-4a76-9e30-8156809700a1",
+      "/Users/crawfordnakayama/DTCloudSource"
+     ],
+     "title": "PR deployment status across environments",
+     "title_kind": "custom",
+     "cost": 4.2,
+     "raw": 3600950,
+     "n": 31,
+     "first": "2026-09-08T15:14:55.986Z",
+     "last": "2026-09-08T15:30:05.340Z",
+     "share": 0.59,
+     "pct": 0.26,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 4.2,
+       "input": 932,
+       "output": 23499,
+       "cache_write": 107202,
+       "cache_read": 3469317
+      }
+     ]
+    },
+    {
+     "key": [
+      "66b4ff4a-fb39-4215-985e-45407b6bcdbf",
+      "/Users/crawfordnakayama/DTCloudSource/personal/proposal-ai-loop-harness/scorer"
+     ],
+     "title": "Proposal agent and page SDK tools (fork)",
+     "title_kind": "custom",
+     "cost": 3.61,
+     "raw": 3336364,
+     "n": 15,
+     "first": "2026-09-09T18:55:46.533Z",
+     "last": "2026-09-09T19:00:00.131Z",
+     "share": 0.51,
+     "pct": 0.22,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 3.61,
+       "input": 30,
+       "output": 7637,
+       "cache_write": 184839,
+       "cache_read": 3143858
+      }
+     ]
+    },
+    {
+     "key": [
+      "8c784f60-c08d-4acd-b094-31a6604eae4c",
+      "/Users/crawfordnakayama/DTCloudSource"
+     ],
+     "title": "Database changes review",
+     "title_kind": "custom",
+     "cost": 2.08,
+     "raw": 2212103,
+     "n": 22,
+     "first": "2026-09-08T20:02:42.539Z",
+     "last": "2026-09-08T20:53:34.451Z",
+     "share": 0.29,
+     "pct": 0.13,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 2.08,
+       "input": 44,
+       "output": 9420,
+       "cache_write": 78312,
+       "cache_read": 2124327
+      }
+     ]
+    },
+    {
+     "key": [
+      "ff5dc17e-0203-43a6-934a-ad9ff01c01ce",
+      "/Users/crawfordnakayama/token-ledger"
+     ],
+     "title": "Widget relocation on KVM switch",
+     "title_kind": "custom",
+     "cost": 1.95,
+     "raw": 2200114,
+     "n": 29,
+     "first": "2026-09-10T14:29:49.993Z",
+     "last": "2026-09-10T14:38:52.596Z",
+     "share": 0.27,
+     "pct": 0.12,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 1.95,
+       "input": 58,
+       "output": 17943,
+       "cache_write": 42709,
+       "cache_read": 2139404
+      }
+     ]
+    },
+    {
+     "key": [
+      "0dddf0a7-6217-4392-a0bc-79f81a3dbea0",
+      "/Users/crawfordnakayama/token-ledger"
+     ],
+     "title": "Widget drag/double-click issues with gauge buttons",
+     "title_kind": "custom",
+     "cost": 1.34,
+     "raw": 1007617,
+     "n": 16,
+     "first": "2026-09-09T23:14:11.218Z",
+     "last": "2026-09-10T12:35:41.561Z",
+     "share": 0.19,
+     "pct": 0.08,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-opus-5",
+       "cost": 1.34,
+       "input": 32,
+       "output": 4757,
+       "cache_write": 76126,
+       "cache_read": 926702
+      }
+     ]
+    }
+   ],
+   "series": {
+    "bucket": "hour",
+    "start": "2026-09-08T06:00:00Z",
+    "end": "2026-09-15T06:00:00Z",
+    "buckets": [
+     {
+      "t": "2026-09-08T06:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-08T07:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-08T08:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-08T09:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-08T10:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-08T11:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-08T12:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-08T13:00:00Z",
+      "by_session": [
+       [
+        "__rest",
+        0.1896,
+        102802
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-opus-5",
+        0.1896,
+        102802
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-08T14:00:00Z",
+      "by_session": [
+       [
+        "6e16d3e6-ffeb-4016-8219-06e3c70a7362",
+        21.7391,
+        23837944
+       ],
+       [
+        "7d8c0284-ea69-43a9-a840-ba69fcc617f7",
+        9.6949,
+        6873507
+       ],
+       [
+        "8cfd75ec-69ff-4a28-9a90-413aeb0572e4",
+        4.9772,
+        2917421
+       ],
+       [
+        "__rest",
+        0.1438,
+        102798
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-fable-5-1",
+        36.4112,
+        33628872
+       ],
+       [
+        "claude-opus-5",
+        0.1438,
+        102798
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-08T15:00:00Z",
+      "by_session": [
+       [
+        "7e80391a-3209-4450-b70e-cccfe2aa3dce",
+        6.6706,
+        4959621
+       ],
+       [
+        "6e16d3e6-ffeb-4016-8219-06e3c70a7362",
+        4.2767,
+        7652981
+       ],
+       [
+        "358b6ed6-ded9-4a76-9e30-8156809700a1",
+        4.1956,
+        3600950
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-fable-5-1",
+        15.143,
+        16213552
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-08T16:00:00Z",
+      "by_session": [
+       [
+        "7e80391a-3209-4450-b70e-cccfe2aa3dce",
+        26.5308,
+        55818501
+       ],
+       [
+        "7d8c0284-ea69-43a9-a840-ba69fcc617f7",
+        9.0914,
+        10421983
+       ],
+       [
+        "6e16d3e6-ffeb-4016-8219-06e3c70a7362",
+        1.6897,
+        5054051
+       ],
+       [
+        "__rest",
+        0.3217,
+        54014
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-fable-5-1",
+        37.6337,
+        71348549
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-08T17:00:00Z",
+      "by_session": [
+       [
+        "3478f7e5-ffaa-48d5-b18e-a9aab1144dca",
+        10.622,
+        9790459
+       ],
+       [
+        "7e80391a-3209-4450-b70e-cccfe2aa3dce",
+        6.0818,
+        14988290
+       ],
+       [
+        "7d8c0284-ea69-43a9-a840-ba69fcc617f7",
+        0.0816,
+        297389
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-fable-5-1",
+        16.7854,
+        25076138
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-08T18:00:00Z",
+      "by_session": [
+       [
+        "7e80391a-3209-4450-b70e-cccfe2aa3dce",
+        20.9287,
+        28013798
+       ],
+       [
+        "f073766f-8caa-4861-8dd9-e613edfeacf3",
+        16.18,
+        14384634
+       ],
+       [
+        "6b2af53a-213a-482d-96cb-5da80a3cec17",
+        10.986,
+        967189
+       ],
+       [
+        "3478f7e5-ffaa-48d5-b18e-a9aab1144dca",
+        1.4147,
+        3735700
+       ],
+       [
+        "__rest",
+        0.0631,
+        42417
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-fable-5-1",
+        36.0966,
+        43277105
+       ],
+       [
+        "claude-opus-5",
+        11.7171,
+        3363999
+       ],
+       [
+        "claude-sonnet-5",
+        1.6958,
+        460217
+       ],
+       [
+        "claude-haiku-4-5-20251001",
+        0.0631,
+        42417
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-08T19:00:00Z",
+      "by_session": [
+       [
+        "7e80391a-3209-4450-b70e-cccfe2aa3dce",
+        25.6352,
+        46345802
+       ],
+       [
+        "f61278b4-7287-4e15-9ed7-ed9b4ce75075",
+        5.9166,
+        6432527
+       ],
+       [
+        "f073766f-8caa-4861-8dd9-e613edfeacf3",
+        1.9477,
+        4457286
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-opus-5",
+        31.5518,
+        52778329
+       ],
+       [
+        "claude-fable-5-1",
+        1.9477,
+        4457286
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-08T20:00:00Z",
+      "by_session": [
+       [
+        "3478f7e5-ffaa-48d5-b18e-a9aab1144dca",
+        4.9975,
+        1094047
+       ],
+       [
+        "7e80391a-3209-4450-b70e-cccfe2aa3dce",
+        2.9959,
+        5510429
+       ],
+       [
+        "8c784f60-c08d-4acd-b094-31a6604eae4c",
+        2.081,
+        2212103
+       ],
+       [
+        "f61278b4-7287-4e15-9ed7-ed9b4ce75075",
+        1.0635,
+        1623560
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-opus-5",
+        6.1403,
+        9346092
+       ],
+       [
+        "claude-fable-5-1",
+        4.9975,
+        1094047
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-08T21:00:00Z",
+      "by_session": [
+       [
+        "7e80391a-3209-4450-b70e-cccfe2aa3dce",
+        39.8339,
+        62302304
+       ],
+       [
+        "f61278b4-7287-4e15-9ed7-ed9b4ce75075",
+        12.699,
+        8056698
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-opus-5",
+        44.9669,
+        67123630
+       ],
+       [
+        "claude-fable-5-1",
+        7.5659,
+        3235372
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-08T22:00:00Z",
+      "by_session": [
+       [
+        "7e80391a-3209-4450-b70e-cccfe2aa3dce",
+        19.3626,
+        36421386
+       ],
+       [
+        "f61278b4-7287-4e15-9ed7-ed9b4ce75075",
+        13.5666,
+        24174283
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-opus-5",
+        19.3626,
+        36421386
+       ],
+       [
+        "claude-fable-5-1",
+        13.5666,
+        24174283
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-08T23:00:00Z",
+      "by_session": [
+       [
+        "7e80391a-3209-4450-b70e-cccfe2aa3dce",
+        20.5365,
+        39063456
+       ],
+       [
+        "f61278b4-7287-4e15-9ed7-ed9b4ce75075",
+        9.0149,
+        2956262
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-opus-5",
+        20.5365,
+        39063456
+       ],
+       [
+        "claude-fable-5-1",
+        9.0149,
+        2956262
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-09T00:00:00Z",
+      "by_session": [
+       [
+        "7e80391a-3209-4450-b70e-cccfe2aa3dce",
+        5.4118,
+        10148833
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-opus-5",
+        5.4118,
+        10148833
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-09T01:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-09T02:00:00Z",
+      "by_session": [
+       [
+        "f073766f-8caa-4861-8dd9-e613edfeacf3",
+        37.2317,
+        60396926
+       ],
+       [
+        "7e80391a-3209-4450-b70e-cccfe2aa3dce",
+        31.8093,
+        43226325
+       ],
+       [
+        "370a65c3-6e4e-438e-b29b-ce1cc26749fc",
+        24.7576,
+        40403698
+       ],
+       [
+        "f61278b4-7287-4e15-9ed7-ed9b4ce75075",
+        8.0916,
+        1284997
+       ],
+       [
+        "a4c2fc16-fd32-4db3-9879-36c08f03b535",
+        5.5915,
+        7629610
+       ],
+       [
+        "81b23a86-5cf6-4c78-a0d3-495a7ba79519",
+        4.0196,
+        5029392
+       ],
+       [
+        "__rest",
+        0.1316,
+        126553
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-opus-5",
+        103.4097,
+        156685951
+       ],
+       [
+        "claude-fable-5-1",
+        8.0916,
+        1284997
+       ],
+       [
+        "claude-haiku-4-5-20251001",
+        0.1316,
+        126553
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-09T03:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-09T04:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-09T05:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-09T06:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-09T07:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-09T08:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-09T09:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-09T10:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-09T11:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-09T12:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-09T13:00:00Z",
+      "by_session": [
+       [
+        "f61278b4-7287-4e15-9ed7-ed9b4ce75075",
+        7.9627,
+        860269
+       ],
+       [
+        "81b23a86-5cf6-4c78-a0d3-495a7ba79519",
+        2.0865,
+        2277306
+       ],
+       [
+        "4457f61c-4759-43fe-bc0b-e0c1df30fb12",
+        0.4768,
+        797578
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-fable-5-1",
+        7.9627,
+        860269
+       ],
+       [
+        "claude-opus-5",
+        2.5633,
+        3074884
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-09T14:00:00Z",
+      "by_session": [
+       [
+        "__rest",
+        0.1894,
+        102792
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-opus-5",
+        0.1894,
+        102792
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-09T15:00:00Z",
+      "by_session": [
+       [
+        "f073766f-8caa-4861-8dd9-e613edfeacf3",
+        5.5895,
+        595407
+       ],
+       [
+        "4457f61c-4759-43fe-bc0b-e0c1df30fb12",
+        3.4082,
+        3690603
+       ],
+       [
+        "4b775ab2-6ebe-4e50-9ffa-028da45c997d",
+        1.3479,
+        1213535
+       ],
+       [
+        "bfc318da-c8d6-45dc-bf3c-d7abf12b36ed",
+        0.5835,
+        481489
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-opus-5",
+        10.9291,
+        5981034
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-09T16:00:00Z",
+      "by_session": [
+       [
+        "4457f61c-4759-43fe-bc0b-e0c1df30fb12",
+        10.9332,
+        17386070
+       ],
+       [
+        "4b775ab2-6ebe-4e50-9ffa-028da45c997d",
+        7.6826,
+        11351843
+       ],
+       [
+        "bfc318da-c8d6-45dc-bf3c-d7abf12b36ed",
+        6.1204,
+        8410938
+       ],
+       [
+        "cc67c85a-ffa6-4139-ab30-7466d34b96af",
+        3.2682,
+        3680706
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-opus-5",
+        28.0044,
+        40829557
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-09T17:00:00Z",
+      "by_session": [
+       [
+        "4b775ab2-6ebe-4e50-9ffa-028da45c997d",
+        2.7923,
+        4918892
+       ],
+       [
+        "cc67c85a-ffa6-4139-ab30-7466d34b96af",
+        1.8487,
+        2428860
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-opus-5",
+        4.641,
+        7347752
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-09T18:00:00Z",
+      "by_session": [
+       [
+        "4b775ab2-6ebe-4e50-9ffa-028da45c997d",
+        6.6511,
+        11186543
+       ],
+       [
+        "66b4ff4a-fb39-4215-985e-45407b6bcdbf",
+        3.4689,
+        3105642
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-opus-5",
+        10.12,
+        14292185
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-09T19:00:00Z",
+      "by_session": [
+       [
+        "cc67c85a-ffa6-4139-ab30-7466d34b96af",
+        4.0057,
+        3878268
+       ],
+       [
+        "4b775ab2-6ebe-4e50-9ffa-028da45c997d",
+        2.2418,
+        4061546
+       ],
+       [
+        "66b4ff4a-fb39-4215-985e-45407b6bcdbf",
+        0.1425,
+        230722
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-opus-5",
+        6.3899,
+        8170536
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-09T20:00:00Z",
+      "by_session": [
+       [
+        "cc67c85a-ffa6-4139-ab30-7466d34b96af",
+        6.8604,
+        11612314
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-opus-5",
+        6.8604,
+        11612314
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-09T21:00:00Z",
+      "by_session": [
+       [
+        "cc67c85a-ffa6-4139-ab30-7466d34b96af",
+        8.6135,
+        14862697
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-opus-5",
+        8.6135,
+        14862697
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-09T22:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-09T23:00:00Z",
+      "by_session": [
+       [
+        "cc67c85a-ffa6-4139-ab30-7466d34b96af",
+        3.3535,
+        1752379
+       ],
+       [
+        "0dddf0a7-6217-4392-a0bc-79f81a3dbea0",
+        0.4798,
+        408440
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-opus-5",
+        3.8333,
+        2160819
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-10T00:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-10T01:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-10T02:00:00Z",
+      "by_session": [
+       [
+        "0dddf0a7-6217-4392-a0bc-79f81a3dbea0",
+        0.3567,
+        195177
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-opus-5",
+        0.3567,
+        195177
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-10T03:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-10T04:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-10T05:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-10T06:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-10T07:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-10T08:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-10T09:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-10T10:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-10T11:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-10T12:00:00Z",
+      "by_session": [
+       [
+        "4b775ab2-6ebe-4e50-9ffa-028da45c997d",
+        3.8421,
+        2534005
+       ],
+       [
+        "0dddf0a7-6217-4392-a0bc-79f81a3dbea0",
+        0.5072,
+        404000
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-opus-5",
+        4.3493,
+        2938005
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-10T13:00:00Z",
+      "by_session": [
+       [
+        "3118e229-814b-4219-987f-9a11a1e6c5f4",
+        6.8761,
+        9860339
+       ],
+       [
+        "4b775ab2-6ebe-4e50-9ffa-028da45c997d",
+        2.7916,
+        866976
+       ],
+       [
+        "__rest",
+        0.8773,
+        609060
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-opus-5",
+        10.545,
+        11336375
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-10T14:00:00Z",
+      "by_session": [
+       [
+        "3118e229-814b-4219-987f-9a11a1e6c5f4",
+        37.3686,
+        65065652
+       ],
+       [
+        "ff5dc17e-0203-43a6-934a-ad9ff01c01ce",
+        1.9457,
+        2200114
+       ],
+       [
+        "d3976c54-e579-4c29-8621-2fe5ee4096aa",
+        0.4933,
+        503044
+       ],
+       [
+        "b8046658-19f3-4786-b1e2-1c7ed79aa2da",
+        0.1236,
+        123381
+       ],
+       [
+        "__rest",
+        0.1904,
+        102830
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-opus-5",
+        40.1215,
+        67995021
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-10T15:00:00Z",
+      "by_session": [
+       [
+        "3118e229-814b-4219-987f-9a11a1e6c5f4",
+        26.7726,
+        49754989
+       ],
+       [
+        "b8046658-19f3-4786-b1e2-1c7ed79aa2da",
+        4.9022,
+        6060843
+       ],
+       [
+        "d3976c54-e579-4c29-8621-2fe5ee4096aa",
+        4.8114,
+        6810916
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-opus-5",
+        36.4863,
+        62626748
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-10T16:00:00Z",
+      "by_session": [
+       [
+        "3118e229-814b-4219-987f-9a11a1e6c5f4",
+        30.601,
+        57114476
+       ],
+       [
+        "b87d4751-cef9-46ad-8ccc-a673f32625f4",
+        16.3167,
+        21701193
+       ],
+       [
+        "59b82c91-1b1a-4b2b-8550-737287cbb24e",
+        12.0277,
+        17622510
+       ],
+       [
+        "d3976c54-e579-4c29-8621-2fe5ee4096aa",
+        0.2457,
+        411401
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-opus-5",
+        59.1911,
+        96849580
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-10T17:00:00Z",
+      "by_session": [
+       [
+        "3118e229-814b-4219-987f-9a11a1e6c5f4",
+        32.2503,
+        61114956
+       ],
+       [
+        "59b82c91-1b1a-4b2b-8550-737287cbb24e",
+        2.9848,
+        5011205
+       ],
+       [
+        "b87d4751-cef9-46ad-8ccc-a673f32625f4",
+        2.5429,
+        4610000
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-opus-5",
+        37.7779,
+        70736161
+       ]
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "fable",
+   "label": "Weekly \u00b7 Fable",
+   "sub": "resets weekly",
+   "start": "2026-09-08T06:00:00Z",
+   "reset": "2026-09-15T06:00:00Z",
+   "boundary_known": true,
+   "idle": false,
+   "calibrated": true,
+   "pct": 59.0,
+   "pace": 1.65,
+   "ramp": 0.587,
+   "elapsed_frac": 0.357,
+   "total_cost": 195.22,
+   "total_raw": 227606732,
+   "messages": 712,
+   "limit": 330.88,
+   "kinds": {
+    "input": 19276,
+    "output": 922081,
+    "cache_write": 4671065,
+    "cache_read": 221994310
+   },
+   "by_model": [
+    {
+     "key": "claude-fable-5-1",
+     "title": null,
+     "title_kind": null,
+     "cost": 195.22,
+     "raw": 227606732,
+     "n": 712,
+     "first": "2026-09-08T14:07:19.637Z",
+     "last": "2026-09-09T13:45:28.589Z",
+     "share": 100.0,
+     "pct": 59.0,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 195.22,
+       "input": 19276,
+       "output": 922081,
+       "cache_write": 4671065,
+       "cache_read": 221994310
+      }
+     ]
+    }
+   ],
+   "by_project": [
+    {
+     "key": "/Users/crawfordnakayama/\u65e5\u672c\u8a9e",
+     "title": null,
+     "title_kind": null,
+     "cost": 61.54,
+     "raw": 68400054,
+     "n": 252,
+     "first": "2026-09-08T14:07:19.637Z",
+     "last": "2026-09-08T20:12:57.971Z",
+     "share": 31.52,
+     "pct": 18.6,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 61.54,
+       "input": 6742,
+       "output": 377547,
+       "cache_write": 1295612,
+       "cache_read": 66720153
+      }
+     ]
+    },
+    {
+     "key": "/Users/crawfordnakayama/DTCloudSource",
+     "title": null,
+     "title_kind": null,
+     "cost": 51.3,
+     "raw": 70367212,
+     "n": 222,
+     "first": "2026-09-08T14:10:29.988Z",
+     "last": "2026-09-08T18:54:35.160Z",
+     "share": 26.28,
+     "pct": 15.5,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 51.3,
+       "input": 6398,
+       "output": 222440,
+       "cache_write": 1143305,
+       "cache_read": 68995069
+      }
+     ]
+    },
+    {
+     "key": "/Users/crawfordnakayama",
+     "title": null,
+     "title_kind": null,
+     "cost": 29.97,
+     "raw": 7240359,
+     "n": 19,
+     "first": "2026-09-08T21:51:54.527Z",
+     "last": "2026-09-09T13:45:28.589Z",
+     "share": 15.35,
+     "pct": 9.06,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 29.97,
+       "input": 368,
+       "output": 24857,
+       "cache_write": 1362937,
+       "cache_read": 5852197
+      }
+     ]
+    },
+    {
+     "key": "/Users/crawfordnakayama/tasks",
+     "title": null,
+     "title_kind": null,
+     "cost": 18.13,
+     "raw": 18841920,
+     "n": 63,
+     "first": "2026-09-08T18:34:53.428Z",
+     "last": "2026-09-08T19:04:33.758Z",
+     "share": 9.29,
+     "pct": 5.48,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 18.13,
+       "input": 1316,
+       "output": 87668,
+       "cache_write": 457869,
+       "cache_read": 18295067
+      }
+     ]
+    },
+    {
+     "key": "/Users/crawfordnakayama/usage_app",
+     "title": null,
+     "title_kind": null,
+     "cost": 11.68,
+     "raw": 20551437,
+     "n": 61,
+     "first": "2026-09-08T21:52:13.190Z",
+     "last": "2026-09-09T02:08:53.382Z",
+     "share": 5.98,
+     "pct": 3.53,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 11.68,
+       "input": 1652,
+       "output": 84278,
+       "cache_write": 117949,
+       "cache_read": 20347558
+      }
+     ]
+    },
+    {
+     "key": "/Users/crawfordnakayama/DTCloudSource/WebApps/App/src/app",
+     "title": null,
+     "title_kind": null,
+     "cost": 6.59,
+     "raw": 12370720,
+     "n": 26,
+     "first": "2026-09-08T16:10:39.088Z",
+     "last": "2026-09-08T18:53:45.048Z",
+     "share": 3.37,
+     "pct": 1.99,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 6.59,
+       "input": 802,
+       "output": 38916,
+       "cache_write": 78556,
+       "cache_read": 12252446
+      }
+     ]
+    },
+    {
+     "key": "/Users/crawfordnakayama/DTCloudSource/WebApps/App",
+     "title": null,
+     "title_kind": null,
+     "cost": 4.49,
+     "raw": 12026088,
+     "n": 24,
+     "first": "2026-09-08T16:35:31.357Z",
+     "last": "2026-09-08T18:54:02.545Z",
+     "share": 2.3,
+     "pct": 1.36,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 4.49,
+       "input": 618,
+       "output": 12107,
+       "cache_write": 44401,
+       "cache_read": 11968962
+      }
+     ]
+    },
+    {
+     "key": "/Users/crawfordnakayama/DTCloudSource/Projects",
+     "title": null,
+     "title_kind": null,
+     "cost": 4.12,
+     "raw": 11484143,
+     "n": 26,
+     "first": "2026-09-08T16:25:20.894Z",
+     "last": "2026-09-08T16:35:25.289Z",
+     "share": 2.11,
+     "pct": 1.24,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 4.12,
+       "input": 802,
+       "output": 15061,
+       "cache_write": 24786,
+       "cache_read": 11443494
+      }
+     ]
+    },
+    {
+     "key": "/Users/crawfordnakayama/usage_app/src-tauri",
+     "title": null,
+     "title_kind": null,
+     "cost": 2.42,
+     "raw": 3645594,
+     "n": 10,
+     "first": "2026-09-08T22:02:53.237Z",
+     "last": "2026-09-08T23:27:39.716Z",
+     "share": 1.24,
+     "pct": 0.73,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 2.42,
+       "input": 320,
+       "output": 19656,
+       "cache_write": 26835,
+       "cache_read": 3598783
+      }
+     ]
+    },
+    {
+     "key": "/Users/crawfordnakayama/\u65e5\u672c\u8a9e/Design",
+     "title": null,
+     "title_kind": null,
+     "cost": 2.07,
+     "raw": 358007,
+     "n": 2,
+     "first": "2026-09-08T14:09:42.366Z",
+     "last": "2026-09-08T14:10:34.066Z",
+     "share": 1.06,
+     "pct": 0.63,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 2.07,
+       "input": 64,
+       "output": 12162,
+       "cache_write": 69640,
+       "cache_read": 276141
+      }
+     ]
+    },
+    {
+     "key": "/Users/crawfordnakayama/usage_app/src-tauri/src/ledger",
+     "title": null,
+     "title_kind": null,
+     "cost": 1.38,
+     "raw": 526529,
+     "n": 2,
+     "first": "2026-09-08T21:55:45.279Z",
+     "last": "2026-09-08T21:57:36.480Z",
+     "share": 0.71,
+     "pct": 0.42,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 1.38,
+       "input": 64,
+       "output": 17922,
+       "cache_write": 18162,
+       "cache_read": 490381
+      }
+     ]
+    },
+    {
+     "key": "/Users/crawfordnakayama/usage_app/src-tauri/src",
+     "title": null,
+     "title_kind": null,
+     "cost": 0.53,
+     "raw": 273348,
+     "n": 1,
+     "first": "2026-09-08T21:58:50.416Z",
+     "last": "2026-09-08T21:58:50.416Z",
+     "share": 0.27,
+     "pct": 0.16,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 0.53,
+       "input": 32,
+       "output": 6705,
+       "cache_write": 6622,
+       "cache_read": 259989
+      }
+     ]
+    }
+   ],
+   "by_session": [
+    {
+     "key": [
+      "7e80391a-3209-4450-b70e-cccfe2aa3dce",
+      "/Users/crawfordnakayama/DTCloudSource"
+     ],
+     "title": "Packages and allowances in catalog",
+     "title_kind": "custom",
+     "cost": 48.49,
+     "raw": 100416211,
+     "n": 247,
+     "first": "2026-09-08T15:16:01.292Z",
+     "last": "2026-09-08T18:54:35.160Z",
+     "share": 24.84,
+     "pct": 14.66,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 48.49,
+       "input": 7164,
+       "output": 239912,
+       "cache_write": 576473,
+       "cache_read": 99592662
+      }
+     ]
+    },
+    {
+     "key": [
+      "f61278b4-7287-4e15-9ed7-ed9b4ce75075",
+      "/Users/crawfordnakayama/usage_app"
+     ],
+     "title": "Usage widget implementation",
+     "title_kind": "custom",
+     "cost": 46.2,
+     "raw": 32511183,
+     "n": 94,
+     "first": "2026-09-08T21:51:54.527Z",
+     "last": "2026-09-09T13:45:28.589Z",
+     "share": 23.67,
+     "pct": 13.96,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 46.2,
+       "input": 2468,
+       "output": 153641,
+       "cache_write": 1539555,
+       "cache_read": 30815519
+      }
+     ]
+    },
+    {
+     "key": [
+      "6e16d3e6-ffeb-4016-8219-06e3c70a7362",
+      "/Users/crawfordnakayama/\u65e5\u672c\u8a9e"
+     ],
+     "title": "Reader and vocab app bugs",
+     "title_kind": "custom",
+     "cost": 27.71,
+     "raw": 36544976,
+     "n": 97,
+     "first": "2026-09-08T14:07:19.637Z",
+     "last": "2026-09-08T16:39:31.154Z",
+     "share": 14.19,
+     "pct": 8.37,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 27.71,
+       "input": 2716,
+       "output": 187232,
+       "cache_write": 467242,
+       "cache_read": 35887786
+      }
+     ]
+    },
+    {
+     "key": [
+      "7d8c0284-ea69-43a9-a840-ba69fcc617f7",
+      "/Users/crawfordnakayama/\u65e5\u672c\u8a9e"
+     ],
+     "title": "Local translation model",
+     "title_kind": "custom",
+     "cost": 18.87,
+     "raw": 17592879,
+     "n": 82,
+     "first": "2026-09-08T14:08:34.207Z",
+     "last": "2026-09-08T17:00:13.815Z",
+     "share": 9.67,
+     "pct": 5.7,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 18.87,
+       "input": 2240,
+       "output": 115888,
+       "cache_write": 439618,
+       "cache_read": 17035133
+      }
+     ]
+    },
+    {
+     "key": [
+      "f073766f-8caa-4861-8dd9-e613edfeacf3",
+      "/Users/crawfordnakayama/tasks"
+     ],
+     "title": "Board task sequencing and performance",
+     "title_kind": "custom",
+     "cost": 18.13,
+     "raw": 18841920,
+     "n": 63,
+     "first": "2026-09-08T18:34:53.428Z",
+     "last": "2026-09-08T19:04:33.758Z",
+     "share": 9.29,
+     "pct": 5.48,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 18.13,
+       "input": 1316,
+       "output": 87668,
+       "cache_write": 457869,
+       "cache_read": 18295067
+      }
+     ]
+    },
+    {
+     "key": [
+      "3478f7e5-ffaa-48d5-b18e-a9aab1144dca",
+      "/Users/crawfordnakayama/\u65e5\u672c\u8a9e"
+     ],
+     "title": "Uncommitted changes review",
+     "title_kind": "custom",
+     "cost": 17.03,
+     "raw": 14620206,
+     "n": 75,
+     "first": "2026-09-08T17:00:46.951Z",
+     "last": "2026-09-08T20:12:57.971Z",
+     "share": 8.73,
+     "pct": 5.15,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 17.03,
+       "input": 1850,
+       "output": 86589,
+       "cache_write": 458392,
+       "cache_read": 14073375
+      }
+     ]
+    },
+    {
+     "key": [
+      "6b2af53a-213a-482d-96cb-5da80a3cec17",
+      "/Users/crawfordnakayama/DTCloudSource"
+     ],
+     "title": "Packages and allowances in catalog (fork)",
+     "title_kind": "custom",
+     "cost": 9.29,
+     "raw": 506972,
+     "n": 1,
+     "first": "2026-09-08T18:51:00.743Z",
+     "last": "2026-09-08T18:51:00.743Z",
+     "share": 4.76,
+     "pct": 2.81,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 9.29,
+       "input": 2,
+       "output": 1188,
+       "cache_write": 460982,
+       "cache_read": 44800
+      }
+     ]
+    },
+    {
+     "key": [
+      "8cfd75ec-69ff-4a28-9a90-413aeb0572e4",
+      "/Users/crawfordnakayama/DTCloudSource"
+     ],
+     "title": "Proposals tool component usability",
+     "title_kind": "custom",
+     "cost": 4.98,
+     "raw": 2917421,
+     "n": 21,
+     "first": "2026-09-08T14:10:29.988Z",
+     "last": "2026-09-08T14:18:40.830Z",
+     "share": 2.55,
+     "pct": 1.5,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 4.98,
+       "input": 586,
+       "output": 26016,
+       "cache_write": 149258,
+       "cache_read": 2741561
+      }
+     ]
+    },
+    {
+     "key": [
+      "358b6ed6-ded9-4a76-9e30-8156809700a1",
+      "/Users/crawfordnakayama/DTCloudSource"
+     ],
+     "title": "PR deployment status across environments",
+     "title_kind": "custom",
+     "cost": 4.2,
+     "raw": 3600950,
+     "n": 31,
+     "first": "2026-09-08T15:14:55.986Z",
+     "last": "2026-09-08T15:30:05.340Z",
+     "share": 2.15,
+     "pct": 1.27,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 4.2,
+       "input": 932,
+       "output": 23499,
+       "cache_write": 107202,
+       "cache_read": 3469317
+      }
+     ]
+    },
+    {
+     "key": [
+      "19a9de17-5114-492a-b6c4-ff8f186aab0d",
+      "/Users/crawfordnakayama/Library/Application Support/Claude/scratch-workspaces/cc90827f-08e3-45de-b52e-6e5bd25efb07/e6fbf55b-1e7f-4429-bdbc-6783f6bc6914/scratch-2026-09-08-f4c0ea"
+     ],
+     "title": "Coaching changes detection via unsupervised learning",
+     "title_kind": "custom",
+     "cost": 0.32,
+     "raw": 54014,
+     "n": 1,
+     "first": "2026-09-08T16:35:27Z",
+     "last": "2026-09-08T16:35:27Z",
+     "share": 0.16,
+     "pct": 0.1,
+     "unread": false,
+     "working": false,
+     "models": [
+      {
+       "model": "claude-fable-5-1",
+       "cost": 0.32,
+       "input": 2,
+       "output": 448,
+       "cache_write": 14474,
+       "cache_read": 39090
+      }
+     ]
+    }
+   ],
+   "series": {
+    "bucket": "hour",
+    "start": "2026-09-08T06:00:00Z",
+    "end": "2026-09-15T06:00:00Z",
+    "buckets": [
+     {
+      "t": "2026-09-08T06:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-08T07:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-08T08:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-08T09:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-08T10:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-08T11:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-08T12:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-08T13:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-08T14:00:00Z",
+      "by_session": [
+       [
+        "6e16d3e6-ffeb-4016-8219-06e3c70a7362",
+        21.7391,
+        23837944
+       ],
+       [
+        "7d8c0284-ea69-43a9-a840-ba69fcc617f7",
+        9.6949,
+        6873507
+       ],
+       [
+        "8cfd75ec-69ff-4a28-9a90-413aeb0572e4",
+        4.9772,
+        2917421
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-fable-5-1",
+        36.4112,
+        33628872
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-08T15:00:00Z",
+      "by_session": [
+       [
+        "7e80391a-3209-4450-b70e-cccfe2aa3dce",
+        6.6706,
+        4959621
+       ],
+       [
+        "6e16d3e6-ffeb-4016-8219-06e3c70a7362",
+        4.2767,
+        7652981
+       ],
+       [
+        "358b6ed6-ded9-4a76-9e30-8156809700a1",
+        4.1956,
+        3600950
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-fable-5-1",
+        15.143,
+        16213552
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-08T16:00:00Z",
+      "by_session": [
+       [
+        "7e80391a-3209-4450-b70e-cccfe2aa3dce",
+        26.5308,
+        55818501
+       ],
+       [
+        "7d8c0284-ea69-43a9-a840-ba69fcc617f7",
+        9.0914,
+        10421983
+       ],
+       [
+        "6e16d3e6-ffeb-4016-8219-06e3c70a7362",
+        1.6897,
+        5054051
+       ],
+       [
+        "19a9de17-5114-492a-b6c4-ff8f186aab0d",
+        0.3217,
+        54014
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-fable-5-1",
+        37.6337,
+        71348549
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-08T17:00:00Z",
+      "by_session": [
+       [
+        "3478f7e5-ffaa-48d5-b18e-a9aab1144dca",
+        10.622,
+        9790459
+       ],
+       [
+        "7e80391a-3209-4450-b70e-cccfe2aa3dce",
+        6.0818,
+        14988290
+       ],
+       [
+        "7d8c0284-ea69-43a9-a840-ba69fcc617f7",
+        0.0816,
+        297389
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-fable-5-1",
+        16.7854,
+        25076138
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-08T18:00:00Z",
+      "by_session": [
+       [
+        "f073766f-8caa-4861-8dd9-e613edfeacf3",
+        16.18,
+        14384634
+       ],
+       [
+        "6b2af53a-213a-482d-96cb-5da80a3cec17",
+        9.2903,
+        506972
+       ],
+       [
+        "7e80391a-3209-4450-b70e-cccfe2aa3dce",
+        9.2116,
+        24649799
+       ],
+       [
+        "3478f7e5-ffaa-48d5-b18e-a9aab1144dca",
+        1.4147,
+        3735700
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-fable-5-1",
+        36.0966,
+        43277105
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-08T19:00:00Z",
+      "by_session": [
+       [
+        "f073766f-8caa-4861-8dd9-e613edfeacf3",
+        1.9477,
+        4457286
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-fable-5-1",
+        1.9477,
+        4457286
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-08T20:00:00Z",
+      "by_session": [
+       [
+        "3478f7e5-ffaa-48d5-b18e-a9aab1144dca",
+        4.9975,
+        1094047
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-fable-5-1",
+        4.9975,
+        1094047
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-08T21:00:00Z",
+      "by_session": [
+       [
+        "f61278b4-7287-4e15-9ed7-ed9b4ce75075",
+        7.5659,
+        3235372
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-fable-5-1",
+        7.5659,
+        3235372
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-08T22:00:00Z",
+      "by_session": [
+       [
+        "f61278b4-7287-4e15-9ed7-ed9b4ce75075",
+        13.5666,
+        24174283
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-fable-5-1",
+        13.5666,
+        24174283
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-08T23:00:00Z",
+      "by_session": [
+       [
+        "f61278b4-7287-4e15-9ed7-ed9b4ce75075",
+        9.0149,
+        2956262
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-fable-5-1",
+        9.0149,
+        2956262
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-09T00:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-09T01:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-09T02:00:00Z",
+      "by_session": [
+       [
+        "f61278b4-7287-4e15-9ed7-ed9b4ce75075",
+        8.0916,
+        1284997
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-fable-5-1",
+        8.0916,
+        1284997
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-09T03:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-09T04:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-09T05:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-09T06:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-09T07:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-09T08:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-09T09:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-09T10:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-09T11:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-09T12:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-09T13:00:00Z",
+      "by_session": [
+       [
+        "f61278b4-7287-4e15-9ed7-ed9b4ce75075",
+        7.9627,
+        860269
+       ]
+      ],
+      "by_model": [
+       [
+        "claude-fable-5-1",
+        7.9627,
+        860269
+       ]
+      ]
+     },
+     {
+      "t": "2026-09-09T14:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-09T15:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-09T16:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-09T17:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-09T18:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-09T19:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-09T20:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-09T21:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-09T22:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-09T23:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-10T00:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-10T01:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-10T02:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-10T03:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-10T04:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-10T05:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-10T06:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-10T07:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-10T08:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-10T09:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-10T10:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-10T11:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-10T12:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-10T13:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-10T14:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-10T15:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-10T16:00:00Z",
+      "by_session": [],
+      "by_model": []
+     },
+     {
+      "t": "2026-09-10T17:00:00Z",
+      "by_session": [],
+      "by_model": []
+     }
+    ]
+   }
   }
+ ],
+ "scan": {
+  "files_total": 7047,
+  "files_in_window": 982,
+  "files_read": 3,
+  "bytes_read": 5363905,
+  "lines_seen": 738,
+  "records_added": 150,
+  "duplicates_skipped": 73,
+  "records_retained": 19140,
+  "duration_ms": 334
+ },
+ "index_records": 19140,
+ "usage_cache": {
+  "fetched_at": "2026-09-09T16:36:23.340Z",
+  "session": {
+   "percent": 8.0,
+   "resets_at": "2026-09-09T18:40:00.303957Z"
+  },
+  "weekly": {
+   "percent": 34.0,
+   "resets_at": "2026-09-15T06:00:00.303983Z"
+  },
+  "fable": {
+   "percent": 59.0,
+   "resets_at": "2026-09-15T06:00:00.304391Z"
+  }
+ },
+ "calibration_source": "auto",
+ "thread_sort": "usage",
+ "list_rows": 25,
+ "widget_rows": 5,
+ "cache_diag": {
+  "path": "/Users/crawfordnakayama/.claude.json",
+  "projects_dir": "/Users/crawfordnakayama/.claude/projects",
+  "reason": "ok",
+  "detail": null,
+  "fetched_at": "2026-09-09T16:36:23.340Z",
+  "best_pct": 59.0,
+  "live": false,
+  "connected": false,
+  "live_error": null,
+  "live_auth_failed": false
+ },
+ "device_label": "crawfords-m5-macbook-pro",
+ "remote_threads": [
+  {
+   "id": "cse_01GAm9T5jhVzAUxoHSEajGAt",
+   "title": "Defense/scheme impact on player performance",
+   "last": "2026-09-10T17:52:10.000Z",
+   "working": true,
+   "requires_action": false,
+   "archived": false,
+   "unread": false,
+   "repo": "sportnak5/ff_model",
+   "this_device": false,
+   "local_session": null,
+   "models": [
+    {
+     "model": "claude-opus-5",
+     "cost": 18.42,
+     "raw": 10979118
+    }
+   ],
+   "cost": 18.42,
+   "raw": 10979118
+  },
+  {
+   "id": "cse_01KbCG6btf32ZzVvJmXq8Wme",
+   "title": "Boosting in transformer ensembles",
+   "last": "2026-09-10T17:31:44.000Z",
+   "working": false,
+   "requires_action": true,
+   "archived": false,
+   "unread": true,
+   "repo": null,
+   "this_device": false,
+   "local_session": null,
+   "models": [
+    {
+     "model": "claude-fable-5-1",
+     "cost": 2.11,
+     "raw": 3480221
+    },
+    {
+     "model": "claude-opus-5",
+     "cost": 7.3,
+     "raw": 4118002
+    }
+   ],
+   "cost": 9.41,
+   "raw": 7598223
+  },
+  {
+   "id": "cse_01ZzUnwalkedYetQqRrSsTtUu",
+   "title": "Nightly ingest rerun after the schema change",
+   "last": "2026-09-10T17:05:02.000Z",
+   "working": false,
+   "requires_action": false,
+   "archived": false,
+   "unread": true,
+   "repo": "answerrocket/CIQ",
+   "this_device": false,
+   "local_session": null,
+   "models": [],
+   "cost": 0.0,
+   "raw": 0
+  }
+ ]
 }

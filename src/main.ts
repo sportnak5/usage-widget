@@ -17,7 +17,7 @@ import {
   allowedBuckets, BAND, BAND_HOVER, bucketLabel, bucketOf, chart, defaultBucket, guide, hitBucket, subline,
 } from "./shared/timeline";
 import {
-  deviceTag, listRows, localRows, mergeThreads, sortOf, statusMark, statusOf, threadName,
+  listRows, localRows, mergeThreads, remoteTag, sortOf, statusMark, statusOf, threadName,
 } from "./shared/threads";
 import type { ThreadRow } from "./shared/threads";
 import type { View } from "./shared/timeline";
@@ -347,19 +347,26 @@ function detail(e: Entry): string {
 }
 
 /// A conversation running on another machine: a name, a state and a time, and
-/// dashes where this machine's numbers would be. Not a button — there is no
+/// the tokens its own event stream reports. Not a button — there is no
 /// transcript here to expand, and nothing to mark read that this app owns.
-function remoteRow(row: ThreadRow & { remote: true }, snap: Snapshot | null): string {
+///
+/// The cost is a floor rather than a total: the event stream reports output
+/// tokens as a streaming placeholder, so the row says "at least". The
+/// percentage column stays empty either way — that is a share of *this*
+/// machine's window, and the row is not this machine's.
+function remoteRow(row: ThreadRow & { remote: true }): string {
   const r = row.r;
   const state = r.working ? "still working" : r.requires_action ? "waiting on you" : r.unread ? "unread" : "idle";
-  const tip = `${threadName(row)}\non another device — no token counts reach this machine\n${state} · last active ${when(r.last)}`;
+  const has = r.models.length > 0;
+  const mini = r.models.map((m) => `<i style="width:${(m.cost / (r.cost || 1) * 100).toFixed(2)}%;background:${modelColor(m.model)}"></i>`).join("");
+  const tip = `${threadName(row)}\non another device${has ? ` — at least ${usd(r.cost)}, output tokens aren't reported for other devices` : " — tokens not read yet"}\n${state} · last active ${when(r.last)}`;
   return `<div class="row remote" title="${esc(tip)}">
-      <span class="chip ghost"></span>
+      <span class="chip${has ? "" : " ghost"}"${has ? ` style="background:${modelColor(r.models[0].model)}"` : ""}></span>
       ${statusMark(statusOf(row))}
-      <span class="name"><b>${esc(threadName(row))}</b><em>${deviceTag(row, snap)}${esc(`${state} · last active ${when(r.last)}`)}</em></span>
-      <span class="raw r">—</span>
-      <span class="r mix"></span>
-      <span class="pct r">—<small>not counted here</small></span>
+      <span class="name"><b>${esc(threadName(row))}</b><em>${remoteTag(row)}${esc(`${state} · last active ${when(r.last)}`)}</em></span>
+      <span class="raw r">${has ? tok(r.raw) : "—"}</span>
+      <span class="r mix">${has ? `<span class="minibar">${mini}</span>` : ""}</span>
+      <span class="pct r">${has ? `${esc("\u2265")}${usd(r.cost)}<small>output not counted</small>` : `—<small>not counted here</small>`}</span>
     </div>`;
 }
 
@@ -380,14 +387,14 @@ function renderList(): void {
     return;
   }
   $("rows").innerHTML = rows.map((row, i) => {
-    if (row.remote) return remoteRow(row, snap);
+    if (row.remote) return remoteRow(row);
     const e = row.e;
     const mini = e.models.map((m) => `<i style="width:${(m.cost / (e.cost || 1) * 100).toFixed(2)}%;background:${modelColor(m.model)}"></i>`).join("");
     const pct = e.pct === null ? `${e.share.toFixed(1)}%<small>of usage</small>` : `${e.pct.toFixed(1)}%<small>${e.share.toFixed(0)}% of window</small>`;
     return `<button class="row${e.working ? " working" : e.unread ? " unread" : ""}" data-i="${i}" aria-expanded="${open === i}">
         <span class="chip" style="background:${modelColor(e.models[0].model)}"></span>
         ${statusMark(e)}
-        <span class="name"><b>${esc(entryName(e, group))}</b><em>${group === "by_session" ? deviceTag(row, snap) : ""}${esc(sublabel(e, group))}</em></span>
+        <span class="name"><b>${esc(entryName(e, group))}</b><em>${group === "by_session" ? remoteTag(row) : ""}${esc(sublabel(e, group))}</em></span>
         <span class="raw r">${tok(e.raw)}</span>
         <span class="r mix"><span class="minibar">${mini}</span></span>
         <span class="pct r">${pct}</span>

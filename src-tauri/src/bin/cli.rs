@@ -143,15 +143,23 @@ fn main() {
         }
     }
 
-    // The account list is not per-window: it carries no usage, only state.
+    // The account list is not per-window. Its tokens come from each session's
+    // own event stream, and only for the rows this machine has no transcript
+    // for — hence the blanks on `here` rows and the `>=` on the rest, which
+    // marks a floor: remote output tokens are not reported.
     if !snap.remote_threads.is_empty() {
         println!("\n== ACROSS DEVICES");
-        println!("   {:<44}{:>18}{:>16}", "CONVERSATION", "device", "state");
+        println!("   {:<40}{:>10}{:>12}{:>10}{:>12}", "CONVERSATION", "where", "weighted", "raw", "state");
         for r in snap.remote_threads.iter().take(15) {
             let name = r.title.clone().unwrap_or_else(|| r.id.clone());
-            let device = if r.this_device { snap.device_label.clone() } else { "elsewhere".into() };
+            let where_ = if r.this_device { "here" } else { "remote" };
             let state = if r.working { "working" } else if r.requires_action { "needs you" } else if r.archived { "archived" } else { "idle" };
-            println!("   {:<44}{:>18}{:>16}", trunc(&name, 43), trunc(&device, 17), state);
+            let (cost, raw) = if r.models.is_empty() {
+                ("—".to_string(), "—".to_string())
+            } else {
+                (format!(">=${:.2}", r.cost), format!("{:.1}M", r.raw as f64 / 1e6))
+            };
+            println!("   {:<40}{:>10}{:>12}{:>10}{:>12}", trunc(&name, 39), where_, cost, raw, state);
         }
     }
 }
