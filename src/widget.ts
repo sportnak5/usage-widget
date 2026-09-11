@@ -11,7 +11,9 @@ import { modelColor, paint, paceNote } from "./shared/color";
 import { basename, esc, hhmm, setHome, short, tidy, tok, until } from "./shared/format";
 import { grow, numText, ringArcs } from "./shared/ring";
 import { applyScheme } from "./shared/schemes";
-import { sortOf, sortToggle, statusMark, statusNote, widgetRows } from "./shared/threads";
+import {
+  deviceTag, mergeThreads, sortOf, sortToggle, statusMark, statusNote, statusOf, threadName, widgetRows,
+} from "./shared/threads";
 import type { Snapshot, ThreadSort, WindowOut } from "./shared/types";
 
 applySavedTheme();
@@ -62,21 +64,36 @@ function renderDials(): void {
 function renderRows(): void {
   if (!snap) return;
   const w = snap.windows[sel];
-  // The backend keeps whichever window wants more, so the widget takes its
-  // own cut of the same ranked list.
-  const rows = w.by_session.slice(0, widgetRows(snap));
+  // The backend keeps whichever window wants more, and the account's other
+  // devices are merged in before the cut, so the widget takes its own cut of
+  // the same list the ledger is showing.
+  const rows = mergeThreads(snap, w).slice(0, widgetRows(snap));
   const sort = sortOf(snap);
   const cap = `<span class="cap">Conversations · ${SCOPE[sel]}${sortToggle(sort)}</span>`;
   const body = rows.length === 0
     ? `<div class="wempty">Nothing in this window yet.</div>`
-    : rows.map((e) => {
+    : rows.map((row) => {
+        // A remote row has a name, a state and a time and nothing else — no
+        // token counts reach this machine — so its gauge cells stay empty
+        // rather than showing a zero that would read as "used nothing".
+        if (row.remote) {
+          const r = row.r;
+          const st = statusOf(row);
+          const tip = `${threadName(row)}\non another device${r.repo ? " · " + r.repo : ""}\nlast active ${hhmm(r.last)}${statusNote(st)}`;
+          return `<div class="wr remote" style="${paint(null)}" title="${esc(tip)}">
+          <i></i>
+          <span class="n"><span class="nt">${esc(threadName(row))}</span>${deviceTag(row, snap)}${st.working || st.unread ? statusMark(st) : ""}</span>
+          <span class="t">—</span><span class="g"></span><span class="p"></span>
+        </div>`;
+        }
+        const e = row.e;
         const [sid, cwd] = e.key as [string, string];
         const pct = e.pct;
         const name = e.title || basename(cwd) || "untitled";
         const tip = `${name}\n${tidy(cwd)}\n${pct === null ? e.share.toFixed(0) + "% of usage in this window" : pct.toFixed(1) + "% of the " + SCOPE[sel] + " limit"}${statusNote(e)}`;
         return `<div class="wr" style="${paint(pct === null ? null : pct / 100)}" title="${esc(tip)}" data-sid="${esc(sid)}">
           <i style="background:${modelColor(e.models[0].model)}"></i>
-          <span class="n"><span class="nt">${esc(name)}</span>${e.working || e.unread ? statusMark(e) : ""}</span>
+          <span class="n"><span class="nt">${esc(name)}</span>${deviceTag(row, snap)}${e.working || e.unread ? statusMark(e) : ""}</span>
           <span class="t">${tok(e.raw)}</span>
           <span class="g"><i style="width:${Math.max(2, Math.min(100, pct ?? e.share)).toFixed(1)}%"></i></span>
           <span class="p gauge-color">${pct === null ? e.share.toFixed(0) + "%" : pct.toFixed(1) + "%"}</span>

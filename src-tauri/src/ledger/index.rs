@@ -51,12 +51,28 @@ struct Stored {
     rec: Rec,
 }
 
+/// A captured `bridgeSessionId`, remembered against the transcript it came
+/// from. It outlives that session's usage records deliberately: the line is
+/// written once, at the top of the file, and the offset is past it forever
+/// after, so pruning it with the records would lose it for good.
+#[derive(Clone, Debug, Serialize, Deserialize)]
+struct BridgeRef {
+    #[serde(rename = "f")]
+    file: u32,
+    #[serde(rename = "b")]
+    id: String,
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Index {
     version: u32,
     files: Vec<FileEntry>,
     recs: Vec<Stored>,
     titles: HashMap<String, Title>,
+    /// Local session id → the account-wide session id it is mirrored under.
+    /// Only sessions with remote control on ever write one.
+    #[serde(default)]
+    bridge: HashMap<String, BridgeRef>,
     #[serde(skip)]
     seen: HashSet<String>,
 }
@@ -74,11 +90,21 @@ pub struct ScanStats {
     pub duration_ms: u128,
 }
 
-const INDEX_VERSION: u32 = 1;
+/// Bumped when the parser starts caring about a line it used to skip: offsets
+/// are per-file, so anything already read is never looked at again unless the
+/// stored index is thrown away. Version 2 added `bridge-session` capture.
+const INDEX_VERSION: u32 = 2;
 
 impl Default for Index {
     fn default() -> Self {
-        Index { version: INDEX_VERSION, files: Vec::new(), recs: Vec::new(), titles: HashMap::new(), seen: HashSet::new() }
+        Index {
+            version: INDEX_VERSION,
+            files: Vec::new(),
+            recs: Vec::new(),
+            titles: HashMap::new(),
+            bridge: HashMap::new(),
+            seen: HashSet::new(),
+        }
     }
 }
 
@@ -122,6 +148,14 @@ impl Index {
 
     pub fn title(&self, session: &str) -> Option<&Title> {
         self.titles.get(session)
+    }
+
+    /// Account-wide session id → the local session that wrote it. A row in the
+    /// account's session list that appears here ran on this machine; one that
+    /// doesn't has not been seen here, which is as close to device identity as
+    /// the API allows.
+    pub fn bridge_sessions(&self) -> HashMap<&str, &str> {
+        self.bridge.iter().map(|(sid, b)| (b.id.as_str(), sid.as_str())).collect()
     }
 
     /// The transcript a session most recently wrote a billable turn to. A
@@ -226,6 +260,9 @@ impl Index {
 
     fn drop_file(&mut self, file: u32) {
         self.recs.retain(|s| s.file != file);
+        // Rewritten from the start, or gone: either way the line is re-read or
+        // it no longer describes anything.
+        self.bridge.retain(|_, b| b.file != file);
         self.rebuild_seen();
     }
 
@@ -235,7 +272,8 @@ impl Index {
         if self.recs.len() != before {
             self.rebuild_seen();
         }
-        // Titles for sessions we no longer hold any record of.
+        // Titles for sessions we no longer hold any record of. Bridge ids are
+        // not pruned here — they are tied to their file instead, see BridgeRef.
         let live: HashSet<&str> = self.recs.iter().map(|s| s.rec.session.as_str()).collect();
         self.titles.retain(|sid, _| live.contains(sid.as_str()));
     }
@@ -294,6 +332,9 @@ impl Index {
                     if replace {
                         self.titles.insert(session, title);
                     }
+                }
+                Parsed::Bridge { session, bridge_id } => {
+                    self.bridge.insert(session, BridgeRef { file, id: bridge_id });
                 }
                 Parsed::Skip => {}
             }
@@ -444,6 +485,33 @@ mod tests {
         idx.refresh(&root, now);
         assert_eq!(idx.title("s1").unwrap().text, "A proper title");
         assert_eq!(idx.title("s1").unwrap().kind, TitleKind::Custom);
+    }
+
+    #[test]
+    fn bridge_ids_survive_their_records_aging_out() {
+        let root = tmpdir("bridge");
+        let now = DateTime::parse_from_rfc3339("2026-09-08T20:00:00Z").unwrap().with_timezone(&Utc);
+        let a = root.join("proj-a/a.jsonl");
+        let mut body = String::new();
+        body += r#"{"type":"bridge-session","sessionId":"s1","bridgeSessionId":"cse_aaa","lastSequenceNum":0}"#;
+        body += "\n";
+        // Older than retention, so the session holds no records at all — the
+        // case that used to lose the id and mislabel the row as remote.
+        body += &usage_line("1", "2026-08-01T19:00:00Z", "s1", 100);
+        fs::write(&a, body).unwrap();
+
+        let mut idx = Index::default();
+        idx.refresh(&root, now);
+        assert_eq!(idx.bridge_sessions().get("cse_aaa"), Some(&"s1"));
+
+        // A second refresh reads no new bytes; the id has to still be there.
+        idx.refresh(&root, now);
+        assert_eq!(idx.bridge_sessions().get("cse_aaa"), Some(&"s1"));
+
+        // The transcript is gone: so is the claim that it ran here.
+        fs::remove_file(&a).unwrap();
+        idx.refresh(&root, now);
+        assert!(idx.bridge_sessions().is_empty());
     }
 
     #[test]
