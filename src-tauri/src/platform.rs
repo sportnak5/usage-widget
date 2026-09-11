@@ -49,6 +49,26 @@ pub fn pin_to_desktop(w: &tauri::WebviewWindow, pinned: bool) {
 #[cfg(not(any(target_os = "macos", target_os = "windows")))]
 pub fn pin_to_desktop(_w: &tauri::WebviewWindow, _pinned: bool) {}
 
+/// Whether the left mouse button is held right now — the only way to tell a
+/// window the user is dragging from one the window server has just moved on
+/// its own, which it does whenever displays come and go.
+#[cfg(target_os = "macos")]
+pub fn left_mouse_down() -> bool {
+    use objc2::{class, msg_send};
+
+    // Safety: +[NSEvent pressedMouseButtons] takes no arguments and returns an
+    // NSUInteger whose bit 0 is the left button.
+    let buttons: usize = unsafe { msg_send![class!(NSEvent), pressedMouseButtons] };
+    buttons & 1 != 0
+}
+
+/// Elsewhere there is no cheap way to ask, so every move counts as a drag and
+/// the display watcher's timing stays the only guard, as it was before.
+#[cfg(not(target_os = "macos"))]
+pub fn left_mouse_down() -> bool {
+    true
+}
+
 /// Offset between screen coordinates and the coordinates the widget window
 /// actually takes, in logical points. Zero everywhere except a Windows widget
 /// parented to the desktop, whose position is relative to the virtual screen.

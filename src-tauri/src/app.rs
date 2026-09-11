@@ -36,6 +36,11 @@ pub struct AppState {
 struct PendingMove {
     pos: LogicalPosition<f64>,
     at: Instant,
+    /// Whether the mouse was held when the move came in. A window server that
+    /// reshuffles windows after a display change does it with no button down,
+    /// and can do it long after the change itself — later than any timing
+    /// guard can cover — so this is what actually tells the two apart.
+    dragged: bool,
 }
 
 /// Position, size and scale of one display: x, y, width, height, scale bits.
@@ -194,7 +199,27 @@ fn poll_displays(app: &AppHandle) {
         }
     };
     if let Some(m) = settled {
-        commit_widget_move(app, m.pos);
+        if m.dragged {
+            commit_widget_move(app, m.pos);
+        } else if moved_off_saved(app, m.pos) {
+            // Nobody was holding the window: the window server put it there
+            // while rebuilding Spaces around a display that came or went, so
+            // take it back rather than remember it.
+            place_widget(app, &w);
+        }
+    }
+}
+
+/// Whether a reported position is somewhere other than the saved one. Only
+/// asked before putting the widget back, so that re-placing it does not start
+/// another round of move-and-restore.
+fn moved_off_saved(app: &AppHandle, pos: LogicalPosition<f64>) -> bool {
+    let state = app.state::<AppState>();
+    let geom = lock(&state.engine).settings.widget.clone();
+    match geom {
+        Some(g) => g.x != pos.x as i32 || g.y != pos.y as i32,
+        // Never placed by the user, so there is nothing to go back to.
+        None => false,
     }
 }
 
@@ -212,7 +237,7 @@ fn flush_widget_move(app: &AppHandle) {
             p.take()
         }
     };
-    if let Some(m) = pending {
+    if let Some(m) = pending.filter(|m| m.dragged) {
         commit_widget_move(app, m.pos);
     }
 }
@@ -664,9 +689,16 @@ pub fn run() {
                 let (ox, oy) = crate::platform::desktop_offset(sf);
                 // Held, not saved: the display watcher decides whether this was
                 // the user or the window server shuffling windows about.
-                *lock(&state.widget_move) = Some(PendingMove {
+                let mut pending = lock(&state.widget_move);
+                // A drag reports a move per frame and the last one can land
+                // just after the button comes up, so once any event of this
+                // run was dragged the whole run counts as one.
+                let dragged = crate::platform::left_mouse_down()
+                    || pending.as_ref().is_some_and(|m| m.dragged);
+                *pending = Some(PendingMove {
                     pos: LogicalPosition { x: p.x + ox, y: p.y + oy },
                     at: Instant::now(),
+                    dragged,
                 });
             }
             _ => {}
